@@ -6,6 +6,9 @@ import {
   FaUser,
 } from "react-icons/fa";
 import Layout from "../../../components/layouts/OperasionalLayout";
+import Table from "../../../components/tables/Table";
+import Pagination from "../../../components/tables/Pagination";
+import TableComplete from "../../../components/tables/TableComplete";
 export default function Home() {
   return (
     <Layout>
@@ -81,7 +84,14 @@ export default function Home() {
             icon={FaUser}
           />
         </div>
-        <div className="mt-6">{/* <Table /> */}</div>
+        <div className="mt-6">
+          <Table />
+          <div className="flex justify-end">
+            <Pagination />
+          </div>
+        </div>
+
+        <TableComplete />
       </main>
     </Layout>
   );

@@ -3,6 +3,7 @@ import Home from "./pages/Home.jsx";
 import OperasionalDashboard from "./pages/operational/Home.jsx";
 import OperasionalSupplierDashboard from "./pages/operational/supplier/Home.jsx";
 import OperasionalCustomerDashboard from "./pages/operational/customer/Home.jsx";
+import OperasionalCustomerDetail from "./pages/operational/customer/CustomerDetail.jsx";
 import Login from "./pages/auth/Login.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -87,6 +88,10 @@ function App() {
             <Route
               path="/operasional/customers"
               element={<OperasionalCustomerDashboard />}
+            />
+            <Route
+              path="/operasional/customer/:id"
+              element={<OperasionalCustomerDetail />}
             />
             <Route path="/" element={<Home />} />
           </>
