@@ -50,7 +50,7 @@ const DataTable = ({ rows, columns, loading }) => {
           pageSize={pageSize}
           disableSelectionOnClick
           slots={{
-            loadingOverlay: loading ? LinearProgress : undefined, // Menampilkan loading overlay hanya jika loading adalah true
+            loadingOverlay: loading ? LinearProgress : undefined,
           }}
           loading={loading}
           sx={{ "--DataGrid-overlayHeight": "300px" }}

@@ -21,7 +21,7 @@ const Layout = ({ children }) => {
       <Topbar toggleSidebar={toggleSidebar} />
       <div className="flex">
         <Sidebar isOpen={isSidebarOpen} />
-        <div className="p-4 w-full">{children}</div>
+        <div className="p-4 w-full overflow-x-hidden">{children}</div>
       </div>
     </div>
   );
