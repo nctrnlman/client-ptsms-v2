@@ -6,10 +6,43 @@ import {
   FaUser,
 } from "react-icons/fa";
 import Layout from "../../../components/layouts/OperasionalLayout";
-import Table from "../../../components/tables/Table";
-import Pagination from "../../../components/tables/Pagination";
-import TableComplete from "../../../components/tables/TableComplete";
+import DataTable from "../../../components/tables/DataTable";
+import axios from "axios";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 export default function Home() {
+  const navigate = useNavigate();
+  const columns = [
+    { field: "id", headerName: "ID", width: 90 },
+    { field: "customer_name", headerName: "First name", width: 150 },
+    { field: "created_at", headerName: "Last name", width: 150 },
+    { field: "age", headerName: "Age", type: "number", width: 110 },
+  ];
+
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const handleCreateClick = () => {
+    navigate("/operasional/supplier/form");
+  };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/supplier/all`
+      );
+      setRows(response.data.data);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <Layout>
       <main className="flex flex-col gap-4 ">
@@ -60,10 +93,28 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div>
+        <div className="flex justify-between">
           <h1 className="text-3xl pb-3 font-medium">
             Suppliers Dashboard Page
           </h1>
+          <button
+            onClick={handleCreateClick}
+            className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold p-3 rounded-full"
+          >
+            Create
+            <svg
+              className="-mr-1 ml-2 h-4 w-4"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
         </div>
 
         <div className="flex gap-6 ">
@@ -84,14 +135,7 @@ export default function Home() {
             icon={FaUser}
           />
         </div>
-        <div className="mt-6">
-          <Table />
-          <div className="flex justify-end">
-            <Pagination />
-          </div>
-        </div>
-
-        <TableComplete />
+        <DataTable rows={rows} columns={columns} loading={loading} />
       </main>
     </Layout>
   );
