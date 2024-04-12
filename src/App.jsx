@@ -10,8 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
 import { user } from "./features/users/user.js";
 import { useEffect, useState } from "react";
-import { ClipLoader } from "react-spinners";
-
+import logo from "./assets/logo/icon-dark.png";
 function App() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -67,8 +66,8 @@ function App() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center mx-auto">
-        <ClipLoader size={20} loading={loading} />
+      <div className="flex justify-center items-center mx-auto min-h-screen">
+        <img src={logo} alt="" className="w-40" />
       </div>
     );
   }
