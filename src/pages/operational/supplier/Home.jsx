@@ -13,6 +13,9 @@ import { useNavigate } from "react-router-dom";
 import ModalAddDistributor from "../../../components/cards/ModalAddDistributor";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { formatDate, formatCurrency } from "../../../utils/converter";
+import { encryptNumber } from "../../../utils/encryptionUtils";
+
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -20,27 +23,65 @@ export default function Home() {
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
   const columns = [
-    { field: "id", headerName: "ID", width: 90 },
-    { field: "supplier_name", headerName: "Distributor name", width: 200 },
-    { field: "created_at", headerName: "No Faktur", width: 150 },
-    { field: "age", headerName: "No AKL/AKD", width: 110 },
-    { field: "Payment", headerName: "Payment Method", width: 110 },
-    { field: "Created", headerName: "Date", width: 110 },
-    { field: "Deadline", headerName: "Deadline", width: 110 },
-    { field: "Note", headerName: "Note", width: 110 },
-    { field: "action", headerName: "Action", width: 110 },
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "no_faktur", headerName: "No Faktur", flex: 1 },
+    { field: "supplier_name", headerName: "Distributor name", flex: 1 },
+    { field: "payment_method", headerName: "Payment Method", flex: 1 },
+    { field: "created_at", headerName: "Created Date", flex: 1 },
+    { field: "time_to_payment", headerName: "Time To Payment", flex: 1 },
+    { field: "amount", headerName: "Total Amount", flex: 1 },
+    { field: "note", headerName: "Note", flex: 1 },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      renderCell: (params) => (
+        <div className="flex gap-3 ">
+          <button
+            className=" text-brand-500  hover:text-brand-800 font-bold"
+            onClick={() => handleEdit(params.row.id)}
+          >
+            Edit
+          </button>
+          <button
+            className=" text-red-500 hover:text-red-800 font-bold "
+            onClick={() => handleDelete(params.row.id)}
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
   ];
 
   const handleCreateClick = () => {
     navigate("/operasional/supplier/form");
   };
+  const handleDelete = (id) => {
+    // Logika untuk menghapus data dengan ID yang diteruskan
+    console.log(`Delete data with ID: ${id}`);
+  };
+  const handleEdit = (id) => {
+    navigate(`/operasional/supplier/transaction/detail/${encryptNumber(id)}`);
+  };
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/all`
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/list`
       );
-      setRows(response.data.data);
+      const modifiedData = response.data.data.map((item, index) => ({
+        id: index + 1,
+        no_faktur: item.no_faktur,
+        supplier_name: `${item.supplier_name}-(${item.supplier_code})`,
+        payment_method: item.payment_method,
+        created_at: formatDate(item.created_at),
+        time_to_payment: formatDate(item.time_to_payment),
+        amount: formatCurrency(item.amount),
+        note: item.note,
+      }));
+      setRows(modifiedData);
+      // setRows(response.data.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);

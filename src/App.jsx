@@ -5,6 +5,7 @@ import OperasionalSupplierDashboard from "./pages/operational/supplier/Home.jsx"
 import OperasionalCustomerDashboard from "./pages/operational/customer/Home.jsx";
 import OperasionalCustomerDetail from "./pages/operational/customer/CustomerDetail.jsx";
 import OperasionalForm from "./pages/operational/supplier/SupplierForm.jsx";
+import OperasionalTransactionInDetail from "./pages/operational/supplier/TransactionInDetail.jsx";
 import Login from "./pages/auth/Login.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -96,6 +97,10 @@ function App() {
             <Route
               path="/operasional/supplier/form"
               element={<OperasionalForm />}
+            />
+            <Route
+              path="/operasional/supplier/transaction/detail/:id"
+              element={<OperasionalTransactionInDetail />}
             />
             <Route path="/" element={<Home />} />
           </>
