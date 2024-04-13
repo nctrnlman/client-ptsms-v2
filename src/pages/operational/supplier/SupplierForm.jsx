@@ -4,10 +4,24 @@ import Repeater from "../../../components/form/Repeater";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 export default function SupplierForm() {
   const [options, setOptions] = useState([]);
+  const [product, setProduct] = useState([]);
+  const [productType, setProductType] = useState([]);
+  const [productMerk, setProductMerk] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSupplier, setSelectedSupplier] = useState("");
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    noFaktur: "",
+    supplierId: "",
+    paymentMethod: "",
+    timeToPayment: "",
+    note: "",
+    productList: [],
+  });
 
   const getMasterDynamic = async () => {
     try {
@@ -15,6 +29,10 @@ export default function SupplierForm() {
         `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
       );
       setOptions(response.data.data.supplier);
+      setProduct(response.data.data.product);
+      setProductType(response.data.data.productType);
+      setProductMerk(response.data.data.productMerk);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
@@ -25,8 +43,35 @@ export default function SupplierForm() {
     getMasterDynamic();
   }, []);
 
-  const handleSupplierChange = (event) => {
-    setSelectedSupplier(event.target.value);
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/create`,
+        formData
+      );
+      setFormData({
+        noFaktur: "",
+        supplierId: "",
+        paymentMethod: "",
+        timeToPayment: "",
+        note: "",
+        productList: [],
+      });
+
+      toast.success(response.data.message);
+      navigate(`/operasional/supplier`);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      toast.error(error.response.data.message);
+    }
   };
 
   return (
@@ -114,7 +159,9 @@ export default function SupplierForm() {
         </div>
 
         <div className=" flex flex-col gap-6">
+          {/* Form fields */}
           <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* No Faktur */}
             <div>
               <label
                 htmlFor="no_faktur"
@@ -125,26 +172,15 @@ export default function SupplierForm() {
               <input
                 type="text"
                 id="no_faktur"
+                name="noFaktur"
+                value={formData.noFaktur}
+                onChange={handleInputChange}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="No Faktur"
                 required
               />
             </div>
-            <div>
-              <label
-                htmlFor="akl_akd"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                No AKL/AKD
-              </label>
-              <input
-                type="text"
-                id="akl_akd"
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="No AKL/AKD"
-                required
-              />
-            </div>
+            {/* Supplier */}
             <div>
               <label
                 htmlFor="supplier"
@@ -155,12 +191,14 @@ export default function SupplierForm() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-
               <select
                 id="supplier"
+                name="supplierId"
+                value={formData.supplierId}
+                onChange={(e) => {
+                  handleInputChange(e);
+                }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                value={selectedSupplier}
-                onChange={handleSupplierChange}
                 disabled={loading}
               >
                 <option value="">Choose a supplier</option>
@@ -172,7 +210,7 @@ export default function SupplierForm() {
                   ))}
               </select>
             </div>
-
+            {/* Payment Method */}
             <div>
               <label
                 htmlFor="payment_method"
@@ -182,55 +220,83 @@ export default function SupplierForm() {
               </label>
               <select
                 id="payment_method"
+                name="paymentMethod"
+                value={formData.paymentMethod}
+                onChange={handleInputChange}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               >
-                <option>Choose a payment method</option>
+                <option value="">Choose a payment method</option>
                 <option value="Cash">Cash</option>
                 <option value="Credit">Credit</option>
               </select>
             </div>
-
+            {/* Time to Payment */}
             <div>
               <label
-                htmlFor=""
+                htmlFor="time_to_payment"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Created Date
+                Time to Payment
               </label>
               <Datepicker
-                title="Created Date"
-                language="en"
-                labelTodayButton="Today"
-                labelClearButton="Clear"
-              />
-            </div>
-            <div>
-              <label
-                htmlFor=""
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Deadline
-              </label>
-              <Datepicker
-                title="Deadline Date"
+                id="time_to_payment"
+                name="timeToPayment"
+                // selected={formData.timeToPayment}
+                value={formData.timeToPayment}
+                onSelectedDateChanged={(date) =>
+                  setFormData({ ...formData, timeToPayment: date })
+                }
+                title="Time to Payment"
                 language="en"
                 labelTodayButton="Today"
                 labelClearButton="Clear"
               />
             </div>
           </div>
+
+          {/* Note */}
+          <div>
+            <label
+              htmlFor="note"
+              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+            >
+              Note
+            </label>
+            <textarea
+              id="note"
+              name="note"
+              value={formData.note}
+              onChange={handleInputChange}
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Insert Note here.."
+              required
+            />
+          </div>
+
+          {/* Product List */}
           <div className="">
             <label
               htmlFor=""
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
-              Product List
+              Product List{" "}
+              {loading && (
+                <ClipLoader color="#4A90E2" loading={loading} size={10} />
+              )}
             </label>
-            <Repeater />
+            <Repeater
+              product={product}
+              productType={productType}
+              productMerk={productMerk}
+              setProduct={setFormData} // Set the product data in the form data state
+            />
           </div>
 
           <div className="flex justify-end mt-4">
-            <button className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold py-2 px-4 rounded-2xl">
+            <button
+              onClick={handleSubmit}
+              className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold py-2 px-4 rounded-2xl"
+            >
               Submit
             </button>
           </div>
