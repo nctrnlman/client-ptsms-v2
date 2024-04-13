@@ -49,6 +49,7 @@ const DataTable = ({ rows, columns, loading }) => {
           columns={columns}
           pageSize={pageSize}
           disableSelectionOnClick
+          autoHeight
           slots={{
             loadingOverlay: loading ? LinearProgress : undefined,
           }}
