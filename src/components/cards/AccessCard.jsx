@@ -8,30 +8,46 @@ import {
   CCol,
 } from "@coreui/react";
 import "@coreui/coreui/dist/css/coreui.min.css";
+import { Icon } from "@iconify/react";
 
 function Cards() {
-  const cardTitles = ["Operasional", "Master", "Marketing"];
+  const cards = [
+    {
+      title: "Operasional",
+      link: "operasional/dashboard",
+      icon: "mdi:cog-outline",
+    },
+    {
+      title: "Master",
+      link: "#",
+      icon: "mdi:database",
+    },
+    {
+      title: "Marketing",
+      link: "#",
+      icon: "mdi:bullhorn",
+    },
+  ];
 
   return (
     <CRow className="justify-content-center">
-      {cardTitles.map((title, index) => (
-        <CCol key={title} md="4" style={{ padding: "1rem" }}>
-          <CCard style={{ width: "100%", height: "100%" }}>
-            <CCardBody style={{ padding: "1rem" }}>
-              <CCardTitle>{title}</CCardTitle>
-              <CCardText>
+      {cards.map((card) => (
+        <CCol key={card.title} md="4" style={{ padding: "1rem" }}>
+          <CCard className="transition duration-300 ease-in-out transform hover:scale-105" style={{ height: "100%" }}>
+            <div className="relative flex justify-center items-center h-48 bg-gray-100 glassmorphism">
+              <Icon icon={card.icon} width="64" height="64" />
+            </div>
+            <CCardBody>
+              <CCardTitle className="font-semibold">{card.title}</CCardTitle>
+              <CCardText className="text-gray-500">
                 Some quick example text to build on the card title and make up
-                the bulk of the card's content.
+                the bulk of the cards content.
               </CCardText>
-              {title === "Operasional" ? (
-                <CButton color="primary" href="operasional/dashboard">
-                  Details
+              <div className="pt-2">
+                <CButton color="primary" href={card.link}>
+                  View Details
                 </CButton>
-              ) : (
-                <CButton color="primary" href="#">
-                  Details
-                </CButton>
-              )}
+              </div>
             </CCardBody>
           </CCard>
         </CCol>
