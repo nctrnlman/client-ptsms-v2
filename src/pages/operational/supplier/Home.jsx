@@ -20,6 +20,10 @@ export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalSupplier, setTotalSupplier] = useState(0);
+  const [todayTransaction, setTodayTransaction] = useState(0);
+  const [totalTransaction, setTotalTransaction] = useState(0);
+  const [transactionId, setTransactionId] = useState(0);
+  const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();
   const columns = [
@@ -39,13 +43,13 @@ export default function Home() {
         <div className="flex gap-3 ">
           <button
             className=" text-brand-500  hover:text-brand-800 font-bold"
-            onClick={() => handleEdit(params.row.id)}
+            onClick={() => handleEdit(params.row.transaction_id)}
           >
             Edit
           </button>
           <button
             className=" text-red-500 hover:text-red-800 font-bold "
-            onClick={() => handleDelete(params.row.id)}
+            onClick={() => handleDelete(params.row.transaction_id)}
           >
             Delete
           </button>
@@ -72,6 +76,7 @@ export default function Home() {
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
+        transaction_id: item.transaction_in_id,
         no_faktur: item.no_faktur,
         supplier_name: `${item.supplier_name}-(${item.supplier_code})`,
         payment_method: item.payment_method,
@@ -79,8 +84,10 @@ export default function Home() {
         time_to_payment: formatDate(item.time_to_payment),
         amount: formatCurrency(item.amount),
         note: item.note,
+        action: item.note,
       }));
       setRows(modifiedData);
+
       // setRows(response.data.data);
       setLoading(false);
     } catch (error) {
@@ -96,6 +103,9 @@ export default function Home() {
         `${import.meta.env.VITE_API_BASE_URL}/supplier/master`
       );
       setTotalSupplier(response.data.data.totalSupplier);
+      setMostSupplierTransaction(response.data.data.mostSupplierTransaction);
+      setTotalTransaction(response.data.data.totalTransaction);
+      setTodayTransaction(response.data.data.todayTransaction);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -237,18 +247,18 @@ export default function Home() {
             icon={FaUsers}
           />
           <DashboardCard
-            title="Today Attendance"
-            description="50"
+            title="Today Transaction"
+            description={todayTransaction}
             icon={FaCalendarDay}
           />
           <DashboardCard
-            title="Total Attendance"
-            description="1000"
+            title="Total Transaction"
+            description={totalTransaction}
             icon={FaClipboardList}
           />
           <DashboardCard
-            title="Most Frequent User"
-            description="John Doe"
+            title="Most Frequent Distributor"
+            description={mostSupplierTransaction}
             icon={FaUser}
           />
         </div>
