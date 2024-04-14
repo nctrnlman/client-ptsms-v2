@@ -1,47 +1,63 @@
 import Layout from "../../../components/layouts/OperasionalLayout";
 import { Datepicker } from "flowbite-react";
-import Repeater from "../../../components/form/Repeater";
+import TransactionOutRepeater from "../../../components/form/TransactionOutRepeater";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { formatCurrency } from "../../../utils/converter";
+import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
 export default function TransactionOutFrom() {
-  const [options, setOptions] = useState([]);
+  const { id } = useParams();
+  const [customerId, setCustomerId] = useState(0);
   const [product, setProduct] = useState([]);
-  const [productType, setProductType] = useState([]);
-  const [productMerk, setProductMerk] = useState([]);
+  const [customer, setCustomer] = useState([]);
+  const [salesman, setSalesman] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [totalTransaction, setTotalTransaction] = useState(0);
+  const [totalTransactionTax, setTotalTransactionTax] = useState(0);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     noFaktur: "",
-    supplierId: "",
+    noPo: "",
+    customerId: "",
+    salesman: "",
     paymentMethod: "",
     timeToPayment: "",
+    deliveryDate: "",
     note: "",
     productList: [],
   });
 
+  const calculateTotalTransaction = () => {
+    let total = 0;
+    formData.productList.forEach((product) => {
+      total += product.productPrice;
+    });
+    let totalWithTax = 0;
+    formData.productList.forEach((product) => {
+      totalWithTax += product.productTotalPrice;
+    });
+    setTotalTransaction(total);
+    setTotalTransactionTax(totalWithTax);
+  };
+
   const getMasterDynamic = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
+        `${import.meta.env.VITE_API_BASE_URL}/data/master/transaction`
       );
-      setOptions(response.data.data.supplier);
       setProduct(response.data.data.product);
-      setProductType(response.data.data.productType);
-      setProductMerk(response.data.data.productMerk);
-
+      setCustomer(response.data.data.customer);
+      setSalesman(response.data.data.salesman);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
       setLoading(false);
     }
   };
-  useEffect(() => {
-    getMasterDynamic();
-  }, []);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -54,25 +70,39 @@ export default function TransactionOutFrom() {
   const handleSubmit = async () => {
     try {
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/create`,
-        formData
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/create`,
+        {
+          ...formData,
+          totalPayment: totalTransaction,
+          totalPaymentTax: totalTransactionTax,
+        }
       );
       setFormData({
         noFaktur: "",
-        supplierId: "",
+        noPo: "",
+        customerId: "",
+        salesman: "",
         paymentMethod: "",
         timeToPayment: "",
+        deliveryDate: "",
         note: "",
         productList: [],
       });
-
+      setTotalTransaction("");
+      setTotalTransactionTax("");
       toast.success(response.data.message);
-      navigate(`/operasional/supplier`);
+      navigate(`operasional/customer/${encryptNumber(customerId)}`);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(error.response.data.message);
     }
   };
+
+  useEffect(() => {
+    setCustomerId(decryptNumber(id));
+    getMasterDynamic();
+    calculateTotalTransaction();
+  }, [formData.productList]);
 
   return (
     <Layout>
@@ -185,9 +215,12 @@ export default function TransactionOutFrom() {
           </p>
         </div>
 
-        <div className=" flex flex-col gap-6">
+        <div className=" flex flex-col gap-3">
+          <h4 className="pt-3 block mb-2 text-xl font-medium text-gray-900 dark:text-white">
+            Transaction Information
+          </h4>
           {/* Form fields */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* No Faktur */}
             <div>
               <label
@@ -207,32 +240,88 @@ export default function TransactionOutFrom() {
                 required
               />
             </div>
-            {/* Supplier */}
+            {/* No PO */}
             <div>
               <label
-                htmlFor="supplier"
+                htmlFor="no_po"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Supplier{" "}
+                No PO
+              </label>
+              <input
+                type="text"
+                id="no_po"
+                name="noPo"
+                value={formData.noPo}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="No PO"
+                required
+              />
+            </div>
+
+            {/* Customer */}
+            <div>
+              <label
+                htmlFor="customer"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Customer{" "}
                 {loading && (
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
               <select
-                id="supplier"
-                name="supplierId"
-                value={formData.supplierId}
+                id="customer"
+                name="customerId"
+                value={formData.customerId}
                 onChange={(e) => {
                   handleInputChange(e);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 disabled={loading}
               >
-                <option value="">Choose a supplier</option>
+                <option value="">Choose a Customer</option>
                 {!loading &&
-                  options?.map((option) => (
-                    <option key={option.supplier_id} value={option.supplier_id}>
-                      {option.supplier_code + "-" + option.supplier_name}
+                  customer?.map((option) => (
+                    <option
+                      key={option.customer_id}
+                      value={parseInt(option.customer_id)}
+                    >
+                      {option.customer_name}
+                    </option>
+                  ))}
+              </select>
+            </div>
+            {/* Salesman */}
+            <div>
+              <label
+                htmlFor="salesman"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Salesman{" "}
+                {loading && (
+                  <ClipLoader color="#4A90E2" loading={loading} size={10} />
+                )}
+              </label>
+              <select
+                id="salesman"
+                name="salesman"
+                value={formData.salesman}
+                onChange={(e) => {
+                  handleInputChange(e);
+                }}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                disabled={loading}
+              >
+                <option value="">Choose a Salesman</option>
+                {!loading &&
+                  salesman?.map((option) => (
+                    <option
+                      key={option.sales_id}
+                      value={parseInt(option.sales_id)}
+                    >
+                      {option.sales_name}
                     </option>
                   ))}
               </select>
@@ -256,6 +345,28 @@ export default function TransactionOutFrom() {
                 <option value="Cash">Cash</option>
                 <option value="Credit">Credit</option>
               </select>
+            </div>
+            {/* Delivery Date */}
+            <div>
+              <label
+                htmlFor="deliveryDate"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Delivery Date
+              </label>
+              <Datepicker
+                id="deliveryDate"
+                name="timeToPayment"
+                // selected={formData.timeToPayment}
+                value={formData.deliveryDate}
+                onSelectedDateChanged={(date) =>
+                  setFormData({ ...formData, deliveryDate: date })
+                }
+                title="Delivery Date"
+                language="en"
+                labelTodayButton="Today"
+                labelClearButton="Clear"
+              />
             </div>
             {/* Time to Payment */}
             <div>
@@ -295,31 +406,30 @@ export default function TransactionOutFrom() {
               value={formData.note}
               onChange={handleInputChange}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Insert Note here.."
+              placeholder="Insert Note here..."
               required
             />
           </div>
 
           {/* Product List */}
-          <div className="">
+          <div className="pt-3 ">
             <label
               htmlFor=""
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              className="block mb-2 text-xl font-medium text-gray-900 dark:text-white"
             >
-              Product List{" "}
+              Product Information{" "}
               {loading && (
                 <ClipLoader color="#4A90E2" loading={loading} size={10} />
               )}
             </label>
-            <Repeater
+            <TransactionOutRepeater
               product={product}
-              productType={productType}
-              productMerk={productMerk}
-              setProduct={setFormData} // Set the product data in the form data state
+              setProduct={setFormData}
             />
           </div>
 
-          <div className="flex justify-end mt-4">
+          <div className="flex items-center justify-end mt-10 gap-4">
+            <p>Total Price: {formatCurrency(totalTransactionTax)}</p>
             <button
               onClick={handleSubmit}
               className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold py-2 px-4 rounded-2xl"

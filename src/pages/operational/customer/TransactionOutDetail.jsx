@@ -4,10 +4,11 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
-import { decryptNumber } from "../../../utils/encryptionUtils";
-export default function TransactionInDetail() {
+import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+export default function TransactionOutDetail() {
   const { id } = useParams();
   const [rows, setRows] = useState([]);
+  const [customerId, setCustomerId] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -23,7 +24,7 @@ export default function TransactionInDetail() {
   ];
 
   const handleCreateClick = () => {
-    navigate("/operasional/supplier/form");
+    navigate(`/operasional/supplier/form/${encryptNumber(customerId)}`);
   };
   const fetchData = async (id) => {
     try {
@@ -50,7 +51,8 @@ export default function TransactionInDetail() {
   };
 
   useEffect(() => {
-    fetchData(decryptNumber(id));
+    setCustomerId(decryptNumber(id));
+    fetchData(customerId);
   }, []);
 
   return (
@@ -96,7 +98,7 @@ export default function TransactionInDetail() {
                   href="#"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Suppliers
+                  Customer
                 </a>
               </div>
             </li>
@@ -121,7 +123,7 @@ export default function TransactionInDetail() {
                   href="#"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Transaction
+                  Transaction Out
                 </a>
               </div>
             </li>
@@ -155,7 +157,7 @@ export default function TransactionInDetail() {
 
         <div className="flex justify-between">
           <h1 className="text-3xl pb-3 font-medium">
-            Suppliers Transaction Detail
+            Customer Transaction Out Detail
           </h1>
           <div className="flex justify-end gap-3">
             <button
