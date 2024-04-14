@@ -22,7 +22,6 @@ export default function Home() {
   const [totalSupplier, setTotalSupplier] = useState(0);
   const [todayTransaction, setTodayTransaction] = useState(0);
   const [totalTransaction, setTotalTransaction] = useState(0);
-  const [transactionId, setTransactionId] = useState(0);
   const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
   const [openModal, setOpenModal] = useState(false);
   const navigate = useNavigate();

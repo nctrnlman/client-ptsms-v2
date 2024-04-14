@@ -6,6 +6,7 @@ import OperasionalCustomerDashboard from "./pages/operational/customer/Home.jsx"
 import OperasionalCustomerDetail from "./pages/operational/customer/CustomerDetail.jsx";
 import OperasionalForm from "./pages/operational/supplier/SupplierForm.jsx";
 import OperasionalTransactionInDetail from "./pages/operational/supplier/TransactionInDetail.jsx";
+import OperasionalTransactionOutForm from "./pages/operational/customer/TransactionOutForm.jsx";
 import Login from "./pages/auth/Login.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -30,7 +31,7 @@ function App() {
           decodedToken.exp < Math.floor(Date.now() / 1000)
         ) {
           localStorage.removeItem("user_token");
-          navigate("/sign-in", { replace: true });
+          navigate("/login", { replace: true });
           return;
         }
       }
@@ -44,7 +45,7 @@ function App() {
 
     if (decodedToken.exp && decodedToken.exp < Math.floor(Date.now() / 1000)) {
       localStorage.removeItem("user_token");
-      navigate("/sign-in", { replace: true });
+      navigate("/login", { replace: true });
       return;
     }
   };
@@ -103,6 +104,10 @@ function App() {
               element={<OperasionalTransactionInDetail />}
             />
             <Route path="/" element={<Home />} />
+            <Route
+              path="/operasional/transaction/out/form"
+              element={<OperasionalTransactionOutForm />}
+            />
           </>
         ) : (
           <>

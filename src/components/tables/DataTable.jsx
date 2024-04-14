@@ -2,6 +2,7 @@ import { useState } from "react";
 import { DataGrid } from "@mui/x-data-grid";
 import { Pagination } from "@mui/material";
 import LinearProgress from "@mui/material/LinearProgress";
+import { FaSearch } from "react-icons/fa";
 
 const DataTable = ({ rows, columns, loading }) => {
   const [filterText, setFilterText] = useState("");
@@ -41,6 +42,9 @@ const DataTable = ({ rows, columns, loading }) => {
           value={filterText}
           onChange={handleFilterChange}
         />
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+          <FaSearch className="h-5 w-5 text-gray-400" />
+        </div>
       </div>
       <div className="w-full h-full">
         <DataGrid
@@ -49,7 +53,6 @@ const DataTable = ({ rows, columns, loading }) => {
           columns={columns}
           pageSize={pageSize}
           disableSelectionOnClick
-          autoHeight
           slots={{
             loadingOverlay: loading ? LinearProgress : undefined,
           }}
