@@ -6,11 +6,11 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
-import { decryptNumber } from "../../../utils/encryptionUtils";
-import { encryptNumber } from "../../../utils/encryptionUtils";
+import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
 export default function CustomerDetail() {
   const { id } = useParams();
   const [rows, setRows] = useState([]);
+  const [customerId, setCustomerId] = useState(0);
   const [todayTransaction, setTodayTransaction] = useState(0);
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [customerName, setCustomerName] = useState("Customer");
@@ -53,7 +53,7 @@ export default function CustomerDetail() {
   ];
 
   const handleCreateClick = () => {
-    navigate("/operasional/transaction/out/form");
+    navigate(`/operasional/transaction/out/form/${encryptNumber(customerId)}`);
   };
 
   const handleDelete = (id) => {
@@ -61,7 +61,7 @@ export default function CustomerDetail() {
     console.log(`Delete data with ID: ${id}`);
   };
   const handleEdit = (id) => {
-    navigate(`/operasional/supplier/transaction/detail/${encryptNumber(id)}`);
+    navigate(`/operasional/customer/transaction/detail/${encryptNumber(id)}`);
   };
   const fetchData = async (id) => {
     try {
@@ -108,6 +108,7 @@ export default function CustomerDetail() {
   };
 
   useEffect(() => {
+    setCustomerId(decryptNumber(id));
     fetchMasterData(decryptNumber(id));
     fetchData(decryptNumber(id));
   }, []);

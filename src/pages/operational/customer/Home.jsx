@@ -1,12 +1,14 @@
 import Layout from "../../../components/layouts/OperasionalLayout";
 import CustomerListCard from "../../../components/cards/CustomerListCard";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 export default function Home() {
   const [customerData, setCustomerData] = useState([]);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -20,6 +22,10 @@ export default function Home() {
       console.error("Error fetching customer data:", error);
       setLoading(false);
     }
+  };
+
+  const handleCreateClick = () => {
+    navigate(`/operasional/transaction/out/form`);
   };
 
   useEffect(() => {
@@ -76,16 +82,38 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div className="pb-3">
-          <h1 className="text-3xl pb-1  font-medium">Customers List</h1>
-          <p>
-            Total Customer :{" "}
-            {loading ? (
-              <ClipLoader size={10} color="#422AFB" loading={loading} />
-            ) : (
-              totalCustomer
-            )}
-          </p>
+        <div className="pb-3 flex justify-between">
+          <div>
+            <h1 className="text-3xl pb-1  font-medium">Customers List</h1>
+            <p>
+              Total Customer :{" "}
+              {loading ? (
+                <ClipLoader size={10} color="#422AFB" loading={loading} />
+              ) : (
+                totalCustomer
+              )}
+            </p>
+          </div>
+          <div className="flex justify-end gap-3">
+            <button
+              onClick={handleCreateClick}
+              className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold p-3 rounded-full"
+            >
+              Add Transaction
+              <svg
+                className="-mr-1 ml-2 h-4 w-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {loading ? (
