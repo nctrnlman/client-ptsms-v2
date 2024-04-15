@@ -6,12 +6,13 @@ import {
   FaUser,
 } from "react-icons/fa";
 import Layout from "../../components/layouts/OperasionalLayout";
+
 export default function Home() {
   return (
     <Layout>
-      <main className="flex flex-col gap-4 ">
+      <main className="flex flex-col gap-4">
         <nav className="flex" aria-label="Breadcrumb">
-          <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
+          <ol className="inline-flex flex-wrap items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
               <a
                 href="#"
@@ -56,12 +57,10 @@ export default function Home() {
             </li>
           </ol>
         </nav>
-
         <div>
           <h1 className="text-3xl pb-3 font-medium">Dashboard Page</h1>
         </div>
-
-        <div className="flex gap-6 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
           <DashboardCard title="Total Users" description="100" icon={FaUsers} />
           <DashboardCard
             title="Today Attendance"
