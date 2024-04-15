@@ -10,7 +10,7 @@ import Layout from "../../components/layouts/OperasionalLayout";
 export default function Home() {
   return (
     <Layout>
-      <main className="flex flex-col gap-4">
+       <main className="pt-16 sm:pt-0">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex flex-wrap items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">

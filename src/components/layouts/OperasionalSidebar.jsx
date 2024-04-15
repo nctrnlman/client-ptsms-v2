@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const OperasionalSidebar = ({ isOpen }) => {
+const OperasionalSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const [activePage, setActivePage] = useState("");
 
@@ -99,37 +99,46 @@ const OperasionalSidebar = ({ isOpen }) => {
     );
   }
 
+  const handlePageClick = (pagePath) => {
+    setActivePage(pagePath);
+    onClose();
+  };
+
   return (
-    <div className="">
+    <>
       {isOpen && (
-        <aside
-          id="default-sidebar"
-          className={`  left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0 ${
-            isOpen ? "translate-x-0" : "-translate-x-full "
-          }`}
-          aria-label="Sidebar"
-        >
-          <div className="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-            <ul className="space-y-2 font-medium">
-              {pages.map((page, index) => (
-                <li key={index}>
-                  <Link
-                    to={page.path}
-                    className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
-                      activePage === page.path && "font-bold bg-gray-200"
-                    }`}
-                    onClick={() => setActivePage(page.path)}
-                  >
-                    <page.icon />
-                    <span className="ms-3">{page.title}</span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </aside>
+        <div
+          className="fixed inset-0 z-20 bg-gray-600 bg-opacity-50 sm:hidden"
+          onClick={onClose}
+        ></div>
       )}
-    </div>
+      <aside
+        id="default-sidebar"
+        className={`fixed sm:relative left-0 z-20 sm:z-0 w-64 h-screen transition-transform ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        } bg-white dark:bg-gray-800`}
+        aria-label="Sidebar"
+      >
+        <div className="h-full px-3 py-4 overflow-y-auto">
+          <ul className="space-y-2 font-medium">
+            {pages.map((page, index) => (
+              <li key={index}>
+                <Link
+                  to={page.path}
+                  className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
+                    activePage === page.path && "font-bold bg-gray-200"
+                  }`}
+                  onClick={() => handlePageClick(page.path)}
+                >
+                  <page.icon />
+                  <span className="ms-3">{page.title}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </aside>
+    </>
   );
 };
 
