@@ -6,6 +6,7 @@ import {
   FaUser,
 } from "react-icons/fa";
 import Layout from "../../components/layouts/OperasionalLayout";
+import TAChart from "../../components/chart/TAChart";
 
 export default function Home() {
   return (
@@ -78,7 +79,9 @@ export default function Home() {
             icon={FaUser}
           />
         </div>
-        <div className="mt-6">{/* <Table /> */}</div>
+        <div className="mt-10 p-5">
+          <TAChart />
+        </div>
       </main>
     </Layout>
   );
