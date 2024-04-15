@@ -23,6 +23,11 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       title: "Products",
     },
     {
+      path: "/operasional/distributors",
+      icon: DistributorIcon,
+      title: "Distributors",
+    },
+    {
       path: "/",
       icon: BackToAccessIcon,
       title: "Back to Access",

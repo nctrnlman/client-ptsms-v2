@@ -3,6 +3,7 @@ import Home from "./pages/Home.jsx";
 import OperasionalDashboard from "./pages/operational/Home.jsx";
 import OperasionalSupplierDashboard from "./pages/operational/supplier/Home.jsx";
 import OperasionalCustomerDashboard from "./pages/operational/customer/Home.jsx";
+import OperasionalDistributorDashboard from "./pages/operational/distributor/Home.jsx";
 import OperasionalCustomerDetail from "./pages/operational/customer/CustomerDetail.jsx";
 import OperasionalProductDashboard from "./pages/operational/product/Home.jsx";
 // import OperasionalProductDetail from "./pages/operational/product/Home.jsx";
@@ -10,6 +11,7 @@ import OperasionalForm from "./pages/operational/supplier/SupplierForm.jsx";
 import OperasionalTransactionInDetail from "./pages/operational/supplier/TransactionInDetail.jsx";
 import OperasionalTransactionOutForm from "./pages/operational/customer/TransactionOutForm.jsx";
 import OperasionalTransactionOutDetail from "./pages/operational/customer/TransactionOutDetail.jsx";
+
 import Login from "./pages/auth/Login.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -122,6 +124,10 @@ function App() {
             <Route
               path="/operasional/customer/transaction/detail/:id"
               element={<OperasionalTransactionOutDetail />}
+            />
+            <Route 
+              path="/operasional/distributors" 
+              element={<OperasionalDistributorDashboard />}
             />
             <Route path="/login" element={<Login />} />
           </>
