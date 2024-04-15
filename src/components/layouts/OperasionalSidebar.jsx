@@ -18,6 +18,11 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     },
     { path: "/operasional/customers", icon: HospitalIcon, title: "Customers" },
     {
+      path: "/operasional/distributors",
+      icon: DistributorIcon,
+      title: "Distributors",
+    },
+    {
       path: "/",
       icon: BackToAccessIcon,
       title: "Back to Access",
