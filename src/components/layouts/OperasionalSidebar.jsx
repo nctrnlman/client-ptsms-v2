@@ -13,10 +13,10 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     { path: "/operasional/dashboard", icon: DashboardIcon, title: "Dashboard" },
     {
       path: "/operasional/suppliers",
-      icon: DistributorIcon,
+      icon: SuppliersIcon,
       title: "Suppliers",
     },
-    { path: "/operasional/customers", icon: HospitalIcon, title: "Customers" },
+    { path: "/operasional/customers", icon: CustomersIcon, title: "Customers" },
     {
       path: "/operasional/products",
       icon: ProductIcon,
@@ -40,15 +40,14 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
-        viewBox="0 0 22 21"
+        viewBox="0 0 24 24"
       >
-        <path d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z" />
-        <path d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z" />
+        <path d="M4 13h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1zm-1 7a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v4zm10 0a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-7a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v7zm1-10h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1h-6a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1z" />
       </svg>
     );
   }
 
-  function DistributorIcon() {
+  function SuppliersIcon() {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
@@ -59,14 +58,14 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
-        viewBox="0 0 18 18"
+        viewBox="0 0 24 24"
       >
-        <path d="M6.143 0H1.857A1.857 1.857 0 0 0 0 1.857v4.286C0 7.169.831 8 1.857 8h4.286A1.857 1.857 0 0 0 8 6.143V1.857A1.857 1.857 0 0 0 6.143 0Zm10 0h-4.286A1.857 1.857 0 0 0 10 1.857v4.286C10 7.169 10.831 8 11.857 8h4.286A1.857 1.857 0 0 0 18 6.143V1.857A1.857 1.857 0 0 0 16.143 0Zm-10 10H1.857A1.857 1.857 0 0 0 0 11.857v4.286C0 17.169.831 18 1.857 18h4.286A1.857 1.857 0 0 0 8 16.143v-4.286A1.857 1.857 0 0 0 6.143 10Zm10 0h-4.286A1.857 1.857 0 0 0 10 11.857v4.286c0 1.026.831 1.857 1.857 1.857h4.286A1.857 1.857 0 0 0 18 16.143v-4.286A1.857 1.857 0 0 0 16.143 10Z" />
+        <path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z" />
       </svg>
     );
   }
 
-  function HospitalIcon() {
+  function CustomersIcon() {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
@@ -77,9 +76,9 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
-        viewBox="0 0 18 20"
+        viewBox="0 0 24 24"
       >
-        <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
+        <path d="M12 4a4 4 0 0 1 4 4 4 4 0 0 1-4 4 4 4 0 0 1-4-4 4 4 0 0 1 4-4m0 10c4.42 0 8 1.79 8 4v2H4v-2c0-2.21 3.58-4 8-4z" />
       </svg>
     );
   }
@@ -88,20 +87,16 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
-          activePage === "/operasional/products"
+          activePage === "/operasional/product"
             ? "text-brand-500"
             : "text-gray-500"
         }`}
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
-        viewBox="0 0 20 20"
+        viewBox="0 0 24 24"
       >
-        <path
-          fillRule="evenodd"
-          d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z"
-          clipRule="evenodd"
-        />
+        <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm-5 14H9v-2h6v2zm3-4H6v-2h12v2zm0-4H6V8h12v2z" />
       </svg>
     );
   }
