@@ -10,23 +10,28 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import { encryptNumber } from "../../../utils/encryptionUtils";
+import ModalDelete from "../../../components/cards/ModalDelete";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalProduct, setTotalProduct] = useState(0);
-  const [todayTransaction, setTodayTransaction] = useState(0);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [mostSoldProduct, setMostSoldProduct] = useState("");
+  const [totalProductMerk, setTotalProductMerk] = useState(0);
+  const [totalProductType, setTotalProductType] = useState(0);
+  const [mostStockProduct, setMostStockProduct] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
   const navigate = useNavigate();
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
-    { field: "product_code", headerName: "Product Code", flex: 1 },
     { field: "product_name", headerName: "Product Name", flex: 1 },
-    { field: "category", headerName: "Category", flex: 1 },
+    { field: "product_type", headerName: "Product Type", flex: 1 },
+    { field: "product_merk", headerName: "Product Merk", flex: 1 },
+    { field: "akl_akd", headerName: "No AKL/AKD", flex: 1 },
     { field: "price", headerName: "Price", flex: 1 },
     { field: "stock", headerName: "Stock", flex: 1 },
+    { field: "expired_date", headerName: "Expired Date", flex: 1 },
     {
       field: "action",
       headerName: "Action",
@@ -41,7 +46,7 @@ export default function Home() {
           </button>
           <button
             className="text-red-500 hover:text-red-800 font-bold"
-            onClick={() => handleDelete(params.row.product_id)}
+            onClick={() => handleToggleModalDelete(params.row.product_id)}
           >
             Delete
           </button>
@@ -50,11 +55,25 @@ export default function Home() {
     },
   ];
 
-  const handleCreateClick = () => {
-    navigate("/operasional/product/form");
+  const handleToggleModalDelete = (id) => {
+    setSelectedProductId(id);
+    setOpenModalDelete(true);
   };
-  const handleDelete = (id) => {
-    console.log(`Delete data with ID: ${id}`);
+  const handleDeleteProduct = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/product/delete/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting distributor:", error);
+      setLoading(false);
+    }
   };
   const handleEdit = (id) => {
     navigate(`/operasional/product/detail/${encryptNumber(id)}`);
@@ -63,16 +82,18 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/products`
+        `${import.meta.env.VITE_API_BASE_URL}/product/all`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
         product_id: item.product_id,
-        product_code: item.product_code,
         product_name: item.product_name,
-        category: item.category,
+        product_type: item.type_name,
+        product_merk: item.merk_name,
+        akl_akd: item.akl_akd,
         price: formatCurrency(item.price),
         stock: item.stock,
+        expired_date: formatDate(item.expired_date),
       }));
       setRows(modifiedData);
       setLoading(false);
@@ -86,12 +107,12 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/products/master`
+        `${import.meta.env.VITE_API_BASE_URL}/product/master`
       );
       setTotalProduct(response.data.data.totalProduct);
-      setMostSoldProduct(response.data.data.mostSoldProduct);
-      setTotalTransaction(response.data.data.totalTransaction);
-      setTodayTransaction(response.data.data.todayTransaction);
+      setTotalProductMerk(response.data.data.totalProductMerk);
+      setTotalProductType(response.data.data.totalProductType);
+      setMostStockProduct(response.data.data.mostStockProduct);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -199,25 +220,6 @@ export default function Home() {
                 />
               </svg>
             </button>
-
-            <button
-              onClick={handleCreateClick}
-              className="bg-brand-500 flex items-center hover:bg-brand-800 text-white font-bold p-3 rounded-full"
-            >
-              Create
-              <svg
-                className="-mr-1 ml-2 h-4 w-4"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
           </div>
         </div>
 
@@ -228,18 +230,18 @@ export default function Home() {
             icon={FaBox}
           />
           <DashboardCard
-            title="Today Transactions"
-            description={todayTransaction}
+            title="Today Product Merk"
+            description={totalProductMerk}
             icon={FaCalendarDay}
           />
           <DashboardCard
-            title="Total Transactions"
-            description={totalTransaction}
+            title="Total Product Type"
+            description={totalProductType}
             icon={FaClipboardList}
           />
           <DashboardCard
-            title="Most Sold Product"
-            description={mostSoldProduct}
+            title="Most Stock Product"
+            description={mostStockProduct}
             icon={FaTags}
           />
         </div>
@@ -249,6 +251,12 @@ export default function Home() {
           openModal={openModal}
           setOpenModal={setOpenModal}
           onCreateProduct={handleCreateProduct}
+        />
+        <ModalDelete
+          id={selectedProductId}
+          onDeleteComponent={handleDeleteProduct}
+          open={openModalDelete}
+          onClose={() => setOpenModalDelete(false)}
         />
       </main>
     </Layout>
