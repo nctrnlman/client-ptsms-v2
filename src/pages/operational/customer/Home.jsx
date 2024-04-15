@@ -82,11 +82,11 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div className="pb-3 flex justify-between">
+        <div className="pb-3 flex flex-col md:flex-row justify-between items-center">
           <div>
-            <h1 className="text-3xl pb-1  font-medium">Customers List</h1>
+            <h1 className="text-3xl pb-1 font-medium">Customers List</h1>
             <p>
-              Total Customer :{" "}
+              Total Customer:{" "}
               {loading ? (
                 <ClipLoader size={10} color="#422AFB" loading={loading} />
               ) : (
@@ -94,10 +94,10 @@ export default function Home() {
               )}
             </p>
           </div>
-          <div className="flex justify-end gap-3">
+          <div className="mt-4 md:mt-0">
             <button
               onClick={handleCreateClick}
-              className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold p-3 rounded-full"
+              className="bg-brand-500 flex items-center hover:bg-brand-800 text-white font-bold py-2 px-4 rounded-full"
             >
               Add Transaction
               <svg
@@ -121,7 +121,7 @@ export default function Home() {
             <ClipLoader size={40} color="#422AFB" loading={loading} />
           </div>
         ) : (
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {customerData?.map((customer, index) => (
               <CustomerListCard key={index} customer={customer} />
             ))}
