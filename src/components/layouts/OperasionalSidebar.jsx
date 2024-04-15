@@ -24,7 +24,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     },
     {
       path: "/operasional/distributors",
-      icon: DistributorIcon,
+      icon: ProductIcon,
       title: "Distributors",
     },
     {
