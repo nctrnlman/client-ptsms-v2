@@ -18,6 +18,11 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     },
     { path: "/operasional/customers", icon: HospitalIcon, title: "Customers" },
     {
+      path: "/operasional/products",
+      icon: ProductIcon,
+      title: "Products",
+    },
+    {
       path: "/",
       icon: BackToAccessIcon,
       title: "Back to Access",
@@ -75,6 +80,28 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
         viewBox="0 0 18 20"
       >
         <path d="M17 5.923A1 1 0 0 0 16 5h-3V4a4 4 0 1 0-8 0v1H2a1 1 0 0 0-1 .923L.086 17.846A2 2 0 0 0 2.08 20h13.84a2 2 0 0 0 1.994-2.153L17 5.923ZM7 9a1 1 0 0 1-2 0V7h2v2Zm0-5a2 2 0 1 1 4 0v1H7V4Zm6 5a1 1 0 1 1-2 0V7h2v2Z" />
+      </svg>
+    );
+  }
+
+  function ProductIcon() {
+    return (
+      <svg
+        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
+          activePage === "/operasional/products"
+            ? "text-brand-500"
+            : "text-gray-500"
+        }`}
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path
+          fillRule="evenodd"
+          d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486zM16 18H9.071l6-6H16a2 2 0 012 2v2a2 2 0 01-2 2z"
+          clipRule="evenodd"
+        />
       </svg>
     );
   }
