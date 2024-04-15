@@ -4,6 +4,8 @@ import OperasionalDashboard from "./pages/operational/Home.jsx";
 import OperasionalSupplierDashboard from "./pages/operational/supplier/Home.jsx";
 import OperasionalCustomerDashboard from "./pages/operational/customer/Home.jsx";
 import OperasionalCustomerDetail from "./pages/operational/customer/CustomerDetail.jsx";
+import OperasionalProductDashboard from "./pages/operational/product/Home.jsx";
+// import OperasionalProductDetail from "./pages/operational/product/Home.jsx";
 import OperasionalForm from "./pages/operational/supplier/SupplierForm.jsx";
 import OperasionalTransactionInDetail from "./pages/operational/supplier/TransactionInDetail.jsx";
 import OperasionalTransactionOutForm from "./pages/operational/customer/TransactionOutForm.jsx";
@@ -95,6 +97,10 @@ function App() {
             <Route
               path="/operasional/customer/:id"
               element={<OperasionalCustomerDetail />}
+            />
+            <Route
+              path="/operasional/products"
+              element={<OperasionalProductDashboard />}
             />
             <Route
               path="/operasional/supplier/form"
