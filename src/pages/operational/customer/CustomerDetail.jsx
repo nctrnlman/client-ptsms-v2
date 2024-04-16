@@ -7,6 +7,8 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import ModalDelete from "../../../components/cards/ModalDelete"; // Import ModalDelete component
+
 export default function CustomerDetail() {
   const { id } = useParams();
   const [rows, setRows] = useState([]);
@@ -15,6 +17,8 @@ export default function CustomerDetail() {
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [customerName, setCustomerName] = useState("Customer");
   const [loading, setLoading] = useState(true);
+  const [selectedTransactionId, setSelectedTransactionId] = useState(null); // State for selected transaction ID
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false); // State for delete modal visibility
   const navigate = useNavigate();
 
   const columns = [
@@ -57,12 +61,14 @@ export default function CustomerDetail() {
   };
 
   const handleDelete = (id) => {
-    // Logika untuk menghapus data dengan ID yang diteruskan
-    console.log(`Delete data with ID: ${id}`);
+    setSelectedTransactionId(id);
+    setDeleteModalOpen(true);
   };
+
   const handleEdit = (id) => {
     navigate(`/operasional/customer/transaction/detail/${encryptNumber(id)}`);
   };
+
   const fetchData = async (id) => {
     try {
       setLoading(true);
@@ -251,7 +257,21 @@ export default function CustomerDetail() {
             icon={FaClipboardList}
           />
         </div>
+
+        {/* Render DataTable component */}
         <DataTable rows={rows} columns={columns} loading={loading} />
+
+        {/* Render ModalDelete component */}
+        <ModalDelete
+          id={selectedTransactionId}
+          onDeleteComponent={(id) => {
+            // Implement deletion logic here
+            console.log(`Deleting transaction with ID: ${id}`);
+            setDeleteModalOpen(false); // Close the delete modal
+          }}
+          open={deleteModalOpen}
+          onClose={() => setDeleteModalOpen(false)} // Close the delete modal
+        />
       </main>
     </Layout>
   );
