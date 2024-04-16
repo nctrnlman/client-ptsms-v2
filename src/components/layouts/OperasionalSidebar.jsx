@@ -24,9 +24,9 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     },
     {
       path: "/operasional/distributors",
-      icon: ProductIcon,
+      icon: DistributorIcon,
       title: "Distributors",
-    },
+    },    
     {
       path: "/",
       icon: BackToAccessIcon,
@@ -37,9 +37,9 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
   function DashboardIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
           activePage === "/operasional/dashboard"
-            ? "text-brand-500"
+            ? "text-teal-500"
             : "text-gray-500"
         }`}
         aria-hidden="true"
@@ -51,13 +51,13 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-
+  
   function SuppliersIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
           activePage === "/operasional/suppliers"
-            ? "text-brand-500"
+            ? "text-teal-500"
             : "text-gray-500"
         }`}
         aria-hidden="true"
@@ -69,13 +69,13 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-
+  
   function CustomersIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
           activePage === "/operasional/customers"
-            ? "text-brand-500"
+            ? "text-teal-500"
             : "text-gray-500"
         }`}
         aria-hidden="true"
@@ -87,13 +87,13 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-
+  
   function ProductIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
           activePage === "/operasional/product"
-            ? "text-brand-500"
+            ? "text-teal-500"
             : "text-gray-500"
         }`}
         aria-hidden="true"
@@ -105,11 +105,29 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-
+  
+  function DistributorIcon() {
+    return (
+      <svg
+        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
+          activePage === "/operasional/distributors"
+            ? "text-teal-500"
+            : "text-gray-500"
+        }`}
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path d="M11 22v-2H5c-1.11 0-1.99-.89-1.99-2L3 5c0-1.11.89-2 2-2h10c1.11 0 2 .89 2 2v13c0 1.11-.89 2-2 2h-6v2h4c1.11 0 2-.89 2-2V5h2v15h-8zM5 5v13h6V5H5z" />
+      </svg>
+    );
+  }
+  
   function BackToAccessIcon() {
     return (
       <svg
-        className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-brand-500 dark:group-hover:text-white"
+        className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white"
         aria-hidden="true"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
@@ -125,6 +143,8 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
+  
+  
 
   const handlePageClick = (pagePath) => {
     setActivePage(pagePath);
