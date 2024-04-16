@@ -178,7 +178,7 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
-        <Button onClick={handleCreateProduct} className="bg-brand-500">
+        <Button onClick={handleCreateProduct} className="bg-teal-500">
           Create
         </Button>
       </Modal.Footer>

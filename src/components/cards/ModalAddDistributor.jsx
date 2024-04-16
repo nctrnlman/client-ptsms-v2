@@ -57,7 +57,7 @@ function ModalAddDistributor({ openModal, setOpenModal, onCreateDistributor }) {
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
-        <Button onClick={handleCreateDistributor} className="bg-brand-500 ">
+        <Button onClick={handleCreateDistributor} className="bg-teal-500 ">
           Create
         </Button>
       </Modal.Footer>
