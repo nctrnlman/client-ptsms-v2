@@ -226,7 +226,7 @@ export default function CustomerDetail() {
           <div className="flex justify-end gap-3">
             <button
               onClick={handleCreateClick}
-              className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold p-3 rounded-full"
+              className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
             >
               Add Transaction
               <svg

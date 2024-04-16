@@ -36,7 +36,7 @@ function CustomerListCard({ customer }) {
       {encryptedCustomerId && (
         <Button
           href={`customer/${encryptedCustomerId}`}
-          className="bg-brand-500 hover:bg-brand-600 text-white font-semibold rounded-lg inline-flex items-center text-sm transition-transform hover:translate-x-1 hover:translate-y-1"
+          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold rounded-lg inline-flex items-center text-sm transition-transform hover:translate-x-1 hover:translate-y-1"
         >
           <span className="mr-1">Details</span>
           <svg

@@ -9,7 +9,7 @@ import {
 } from "flowbite-react";
 import axios from "axios";
 
-function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
+function ModalEditProduct({ id, open, onClose, onEditProduct }) {
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
@@ -20,7 +20,6 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   const [productMerk, setProductMerk] = useState([]);
   const [selectedProductType, setSelectedProductType] = useState("");
   const [selectedProductMerk, setSelectedProductMerk] = useState("");
-
 
   const productNameInputRef = useRef(null);
 
@@ -38,56 +37,75 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
     }
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setProductName("");
-    setAklAkd("");
-    setExpiredDate("");
-    setPrice("");
-    setStock("");
+  const fetchProductData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/product/${id}`
+      );
+      const productData = response.data.data;
+      setProductName(productData.product_name);
+      setPrice(productData.price);
+      setStock(productData.stock);
+      setAklAkd(productData.akl_akd);
+      setExpiredDate(productData.expired_date);
+      setSelectedProductType(productData.product_type_id);
+      setSelectedProductMerk(productData.product_merk_id);
+    } catch (error) {
+      console.error("Error fetching product data:", error);
+    }
   };
 
-  const handleCreateProduct = () => {
-    onCreateProduct({
-      name: productName,
-      aklAkd: aklAkd,
-      expiredDate: expiredDate,
-      price: price,
-      stock: stock,
-      productType: selectedProductType,
-      productMerk: selectedProductMerk,
-    });
-    handleCloseModal();
+  const handleUpdateProduct = async () => {
+    try {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/product/update/${id}`,
+        {
+          name: productName,
+          aklAkd: aklAkd,
+          expiredDate: expiredDate,
+          price: price,
+          stock: stock,
+          productType: selectedProductType,
+          productMerk: selectedProductMerk,
+        }
+      );
+      onEditProduct();
+      onClose();
+    } catch (error) {
+      console.error("Error updating product:", error);
+    }
   };
 
   useEffect(() => {
-    getMasterDynamic();
-  }, []);
+    if (open) {
+      getMasterDynamic();
+      fetchProductData();
+    }
+  }, [open]);
 
   return (
     <Modal
-      show={openModal}
+      show={open}
       size="xl"
       popup
-      onClose={handleCloseModal}
+      onClose={onClose}
       initialFocus={productNameInputRef}
     >
       <Modal.Header />
       <Modal.Body>
         <div className="space-y-6">
-          <h3 className="text-xl font-medium text-center text-gray-900 dark:text-white">
-            Add New Product
-          </h3>
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productName" value="Product Name" />
             </div>
             <TextInput
               id="productName"
-              ref={productNameInputRef}
-              placeholder="Enter product name"
+              type="text"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
+              placeholder="Enter product name"
+              required={true}
+              ref={productNameInputRef}
             />
           </div>
           <div>
@@ -98,11 +116,12 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
               id="productType"
               value={selectedProductType}
               onChange={(e) => setSelectedProductType(e.target.value)}
+              required={true}
             >
-              <option value="">Choose Product type</option>
+              <option value="">Select product type</option>
               {productType.map((type) => (
-                <option key={type.product_type_id} value={type.product_type_id}>
-                  {type.type_name}
+                <option key={type.id} value={type.id}>
+                  {type.name}
                 </option>
               ))}
             </Select>
@@ -115,40 +134,27 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
               id="productMerk"
               value={selectedProductMerk}
               onChange={(e) => setSelectedProductMerk(e.target.value)}
+              required={true}
             >
-              <option value="">Choose Product Merk</option>
+              <option value="">Select product merk</option>
               {productMerk.map((merk) => (
-                <option key={merk.product_merk_id} value={merk.product_merk_id}>
-                  {merk.merk_name}
+                <option key={merk.id} value={merk.id}>
+                  {merk.name}
                 </option>
               ))}
             </Select>
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="akl_akd" value="N0 AKL/AKD" />
+              <Label htmlFor="aklAkd" value="No AKL/AKD" />
             </div>
             <TextInput
-              id="akl_akd"
-              placeholder="Enter akl/akd"
+              id="aklAkd"
+              type="text"
               value={aklAkd}
               onChange={(e) => setAklAkd(e.target.value)}
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="expiredDate" value="Expired Date" />
-            </div>
-            <Datepicker
-              id="expiredDate"
-              name="expiredDate"
-              // selected={formData.timeToPayment}
-              value={expiredDate}
-              onSelectedDateChanged={(date) => setExpiredDate(date)}
-              title="Expired Date"
-              language="en"
-              labelTodayButton="Today"
-              labelClearButton="Clear"
+              placeholder="Enter AKL/AKD number"
+              required={true}
             />
           </div>
           <div>
@@ -158,9 +164,10 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             <TextInput
               id="price"
               type="number"
-              placeholder="Enter price"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
+              placeholder="Enter product price"
+              required={true}
             />
           </div>
           <div>
@@ -170,20 +177,32 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             <TextInput
               id="stock"
               type="number"
-              placeholder="Enter stock"
               value={stock}
               onChange={(e) => setStock(e.target.value)}
+              placeholder="Enter product stock"
+              required={true}
+            />
+          </div>
+          <div>
+            <div className="mb-2 block">
+              <Label htmlFor="expiredDate" value="Expired Date" />
+            </div>
+            <Datepicker
+              id="expiredDate"
+              value={expiredDate}
+              onChange={(date) => setExpiredDate(date)}
+              required={true}
             />
           </div>
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
-        <Button onClick={handleCreateProduct} className="bg-teal-500">
-          Create
+        <Button onClick={handleUpdateProduct} className="bg-brand-500">
+          Update
         </Button>
       </Modal.Footer>
     </Modal>
   );
 }
 
-export default ModalAddProduct;
+export default ModalEditProduct;
