@@ -1,20 +1,47 @@
-import React, { useRef, useState } from "react";
-import { Button, Label, Modal, TextInput } from "flowbite-react";
+import { useRef, useState, useEffect } from "react";
+import {
+  Button,
+  Label,
+  Modal,
+  Select,
+  TextInput,
+  Datepicker,
+} from "flowbite-react";
+import axios from "axios";
 
 function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   const [productName, setProductName] = useState("");
-  const [productCode, setProductCode] = useState("");
-  const [category, setCategory] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
+  const [aklAkd, setAklAkd] = useState("");
+  const [expiredDate, setExpiredDate] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [productType, setProductType] = useState([]);
+  const [productMerk, setProductMerk] = useState([]);
+  const [selectedProductType, setSelectedProductType] = useState("");
+  const [selectedProductMerk, setSelectedProductMerk] = useState("");
 
   const productNameInputRef = useRef(null);
+
+  const getMasterDynamic = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/data/master/transaction`
+      );
+      setProductType(response.data.data.productType);
+      setProductMerk(response.data.data.productMerk);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching options:", error);
+      setLoading(false);
+    }
+  };
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setProductName("");
-    setProductCode("");
-    setCategory("");
+    setAklAkd("");
+    setExpiredDate("");
     setPrice("");
     setStock("");
   };
@@ -22,18 +49,24 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   const handleCreateProduct = () => {
     onCreateProduct({
       name: productName,
-      code: productCode,
-      category: category,
+      aklAkd: aklAkd,
+      expiredDate: expiredDate,
       price: price,
       stock: stock,
+      productType: selectedProductType,
+      productMerk: selectedProductMerk,
     });
     handleCloseModal();
   };
 
+  useEffect(() => {
+    getMasterDynamic();
+  }, []);
+
   return (
     <Modal
       show={openModal}
-      size="md"
+      size="xl"
       popup
       onClose={handleCloseModal}
       initialFocus={productNameInputRef}
@@ -58,24 +91,63 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="productCode" value="Product Code" />
+              <Label htmlFor="productType" value="Product Type" />
+            </div>
+            <Select
+              id="productType"
+              value={selectedProductType}
+              onChange={(e) => setSelectedProductType(e.target.value)}
+            >
+              <option value="">Choose Product type</option>
+              {productType.map((type) => (
+                <option key={type.product_type_id} value={type.product_type_id}>
+                  {type.type_name}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <div className="mb-2 block">
+              <Label htmlFor="productMerk" value="Product Merk" />
+            </div>
+            <Select
+              id="productMerk"
+              value={selectedProductMerk}
+              onChange={(e) => setSelectedProductMerk(e.target.value)}
+            >
+              <option value="">Choose Product Merk</option>
+              {productMerk.map((merk) => (
+                <option key={merk.product_merk_id} value={merk.product_merk_id}>
+                  {merk.merk_name}
+                </option>
+              ))}
+            </Select>
+          </div>
+          <div>
+            <div className="mb-2 block">
+              <Label htmlFor="akl_akd" value="N0 AKL/AKD" />
             </div>
             <TextInput
-              id="productCode"
-              placeholder="Enter product code"
-              value={productCode}
-              onChange={(e) => setProductCode(e.target.value)}
+              id="akl_akd"
+              placeholder="Enter akl/akd"
+              value={aklAkd}
+              onChange={(e) => setAklAkd(e.target.value)}
             />
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="category" value="Category" />
+              <Label htmlFor="expiredDate" value="Expired Date" />
             </div>
-            <TextInput
-              id="category"
-              placeholder="Enter category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+            <Datepicker
+              id="expiredDate"
+              name="expiredDate"
+              // selected={formData.timeToPayment}
+              value={expiredDate}
+              onSelectedDateChanged={(date) => setExpiredDate(date)}
+              title="Expired Date"
+              language="en"
+              labelTodayButton="Today"
+              labelClearButton="Clear"
             />
           </div>
           <div>
@@ -84,6 +156,7 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             </div>
             <TextInput
               id="price"
+              type="number"
               placeholder="Enter price"
               value={price}
               onChange={(e) => setPrice(e.target.value)}
@@ -95,6 +168,7 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             </div>
             <TextInput
               id="stock"
+              type="number"
               placeholder="Enter stock"
               value={stock}
               onChange={(e) => setStock(e.target.value)}

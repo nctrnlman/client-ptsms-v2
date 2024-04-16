@@ -202,11 +202,11 @@ export default function Home() {
           <div className="flex justify-end gap-3">
             <button
               onClick={handleToggleModal}
-              className="flex items-center text-brand-500 hover:bg-gray-50 font-bold p-3 border border-gray-500 rounded-full"
+              className="flex items-center text-white bg-brand-500 hover:bg-brand-800 font-bold p-3 border rounded-full"
             >
               Add Product
               <svg
-                className="-mr-1 ml-2 h-4 w-4 text-brand-500"
+                className="-mr-1 ml-2 h-4 w-4 text-white"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 20 20"
