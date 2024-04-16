@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import { encryptNumber } from "../../../utils/encryptionUtils";
 import ModalDelete from "../../../components/cards/ModalDelete";
+import ModalEdit from "../../../components/cards/ModalEditProduct";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
@@ -22,6 +23,7 @@ export default function Home() {
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
+  const [openModalEdit, setOpenModalEdit] = useState(false); // tambahkan state untuk modal edit
   const navigate = useNavigate();
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -76,7 +78,8 @@ export default function Home() {
     }
   };
   const handleEdit = (id) => {
-    navigate(`/operasional/product/detail/${encryptNumber(id)}`);
+    setSelectedProductId(id);
+    setOpenModalEdit(true); // Buka modal edit saat tombol Edit ditekan
   };
   const fetchData = async () => {
     try {
@@ -257,6 +260,12 @@ export default function Home() {
           onDeleteComponent={handleDeleteProduct}
           open={openModalDelete}
           onClose={() => setOpenModalDelete(false)}
+        />
+        <ModalEdit
+          id={selectedProductId}
+          onEditComponent={handleEdit}
+          open={openModalEdit}
+          onClose={() => setOpenModalEdit(false)}
         />
       </main>
     </Layout>
