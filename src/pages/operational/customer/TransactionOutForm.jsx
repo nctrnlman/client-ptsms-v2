@@ -432,7 +432,7 @@ export default function TransactionOutFrom() {
             <p>Total Price: {formatCurrency(totalTransactionTax)}</p>
             <button
               onClick={handleSubmit}
-              className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold py-2 px-4 rounded-2xl"
+              className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"
             >
               Submit
             </button>
