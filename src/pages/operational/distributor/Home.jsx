@@ -54,6 +54,7 @@ export default function Home() {
     },
   ];
   const handleToggleModalDelete = (id) => {
+    console.log(id);
     setSelectedDistributorId(id);
     setOpenModalDelete(true);
   };
@@ -106,6 +107,7 @@ export default function Home() {
   const handleDeleteDistributor = async (id) => {
     try {
       setLoading(true);
+
       const response = await axios.delete(
         `${import.meta.env.VITE_API_BASE_URL}/supplier/delete/${id}`
       );
