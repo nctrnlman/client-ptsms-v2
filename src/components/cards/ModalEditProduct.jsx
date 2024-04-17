@@ -197,7 +197,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
-        <Button onClick={handleUpdateProduct} className="bg-brand-500">
+        <Button onClick={handleUpdateProduct} className="bg-teal-500">
           Update
         </Button>
       </Modal.Footer>
