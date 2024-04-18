@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 const OperasionalSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const [activePage, setActivePage] = useState("");
 
-  useState(() => {
+  useEffect(() => {
     setActivePage(location.pathname);
   }, [location.pathname]);
 
@@ -26,7 +26,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       path: "/operasional/distributors",
       icon: DistributorIcon,
       title: "Distributors",
-    },    
+    },
     {
       path: "/",
       icon: BackToAccessIcon,
@@ -51,7 +51,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function SuppliersIcon() {
     return (
       <svg
@@ -69,7 +69,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function CustomersIcon() {
     return (
       <svg
@@ -87,7 +87,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function ProductIcon() {
     return (
       <svg
@@ -105,7 +105,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function DistributorIcon() {
     return (
       <svg
@@ -123,7 +123,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function BackToAccessIcon() {
     return (
       <svg
@@ -143,8 +143,6 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
-  
 
   const handlePageClick = (pagePath) => {
     setActivePage(pagePath);
@@ -173,7 +171,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
                 <Link
                   to={page.path}
                   className={`flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group ${
-                    activePage === page.path && "font-bold bg-gray-200"
+                    activePage === page.path ? "font-bold bg-gray-200" : ""
                   }`}
                   onClick={() => handlePageClick(page.path)}
                 >
