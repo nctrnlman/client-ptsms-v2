@@ -7,6 +7,8 @@ import {
 } from "react-icons/fa";
 import Layout from "../../components/layouts/OperasionalLayout";
 import TAChart from "../../components/chart/TAChart";
+import IncomingTransactionsChart from "../../components/chart/IncomingTransactionsChart";
+import TransactionChart from "../../components/chart/OutgoingTransactionsChart";
 
 export default function Home() {
   return (
@@ -79,8 +81,10 @@ export default function Home() {
             icon={FaUser}
           />
         </div>
-        <div className="mt-10 p-5">
+        <div className="mt-10 p-2">
           <TAChart />
+          <IncomingTransactionsChart />
+          <TransactionChart/>
         </div>
       </main>
     </Layout>
