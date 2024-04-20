@@ -1,10 +1,5 @@
 import DashboardCard from "../../components/cards/DashboardCard";
-import {
-  FaUsers,
-  FaCalendarDay,
-  FaClipboardList,
-  FaUser,
-} from "react-icons/fa";
+import { FaBox, FaTruck, FaShoppingCart, FaExchangeAlt } from "react-icons/fa";
 import Layout from "../../components/layouts/OperasionalLayout";
 import TAChart from "../../components/chart/TAChart";
 import IncomingTransactionsChart from "../../components/chart/IncomingTransactionsChart";
@@ -13,27 +8,52 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 
 export default function Home() {
-  const [data, setdata] = useState([1,2,3,4]);
-  const fetchData = async () => {
+  const [transactionOut, setTransactionOut] = useState([]);
+  const [transactionIn, setTransactionIn] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [totalProduct, setTotalProduct] = useState(0);
+  const [totalSupplier, setTotalSupplier] = useState(0);
+  const [totalTransactionIn, setTotalTransactionIn] = useState(0);
+  const [totalTransactionOut, settotalTransactionOut] = useState(0);
+  const fetchDataTransaction = async () => {
     try {
+      setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/report`
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/report`
       );
-      console.log(responsedata.data)
-     
+      setTransactionOut(response.data.data.transactionOut);
+      setTransactionIn(response.data.data.transactionIn);
+      setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
-      
+      setLoading(false);
     }
   };
 
+  const fetchCardData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/data/operasional/dashboard`
+      );
+      setTotalProduct(response.data.data.totalProduct);
+      setTotalSupplier(response.data.data.totalSupplier);
+      setTotalTransactionIn(response.data.data.totalTransactionIn);
+      settotalTransactionOut(response.data.data.totalTransactionOut);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    fetchData();
+    fetchCardData();
+    fetchDataTransaction();
   }, []);
 
   return (
     <Layout>
-       <main className="pt-16 sm:pt-0">
+      <main className="flex flex-col gap-4 ">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex flex-wrap items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
@@ -84,27 +104,44 @@ export default function Home() {
           <h1 className="text-3xl pb-3 font-medium">Dashboard Page</h1>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-          <DashboardCard title="Total Users" description="100" icon={FaUsers} />
           <DashboardCard
-            title="Today Attendance"
-            description="50"
-            icon={FaCalendarDay}
+            title="Total Products"
+            description={totalProduct}
+            icon={FaBox}
           />
           <DashboardCard
-            title="Total Attendance"
-            description="1000"
-            icon={FaClipboardList}
+            title="Today Suppliers"
+            description={totalSupplier}
+            icon={FaTruck}
           />
           <DashboardCard
-            title="Most Frequent User"
-            description="John Doe"
-            icon={FaUser}
+            title="Total Transaction In"
+            description={totalTransactionIn}
+            icon={FaShoppingCart}
+          />
+          <DashboardCard
+            title="Total Transaction Out"
+            description={totalTransactionOut}
+            icon={FaExchangeAlt}
           />
         </div>
-        <div className="mt-10 p-2">
-          <TAChart />
-          <IncomingTransactionsChart />
-          <OutgoingTransactionsChart data={data} />
+        <div className="mt-10 p-4 ">
+          {/* <div>
+            <h1 className="text-2xl pb-3 font-medium">Total Transaction </h1>
+            <TAChart />
+          </div> */}
+          <div className="pb-5">
+            <h1 className="text-2xl pb-3 font-medium">
+              Transaction Incoming Report
+            </h1>
+            <IncomingTransactionsChart data={transactionIn} />
+          </div>
+          <div>
+            <h1 className="text-2xl pb-3 font-medium">
+              Transaction Outgoing Report
+            </h1>
+            <OutgoingTransactionsChart data={transactionOut} />
+          </div>
         </div>
       </main>
     </Layout>

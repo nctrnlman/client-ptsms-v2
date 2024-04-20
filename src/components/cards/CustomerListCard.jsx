@@ -12,7 +12,6 @@ function CustomerListCard({
   const [customerEmail, setCustomerEmail] = useState("");
 
   const handleEditClick = () => {
-    console.log("tes", customer.customer_id);
     setSelectedProductId(customer.customer_id);
     setOpenModalEdit(true);
   };

@@ -1,20 +1,49 @@
-import React from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from "chart.js";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
 const OutgoingTransactionsChart = ({ data }) => {
-  // Assuming 'data' is an array of objects with 'month' and 'value' properties
   const chartData = {
-    labels: ['month a','month b'],
+    labels: [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ],
     datasets: [
       {
-        label: 'Outgoing Transactions',
+        label: "Outgoing Transactions",
         data: data,
         fill: false,
-        borderColor: 'rgb(75, 192, 192)',
-        tension: 0.1,
+        backgroundColor: "rgba(75, 192, 192, 0.2)",
+        borderColor: "rgba(75, 192, 192, 1)",
+        borderWidth: 2,
       },
     ],
   };
@@ -25,11 +54,24 @@ const OutgoingTransactionsChart = ({ data }) => {
         beginAtZero: true,
       },
     },
+    plugins: {
+      legend: {
+        display: true,
+        position: "bottom",
+      },
+    },
+    layout: {
+      padding: {
+        top: 50, // Atur padding atas sesuai kebutuhan
+        bottom: 50, // Atur padding bawah sesuai kebutuhan
+      },
+    },
+    responsive: true,
+    maintainAspectRatio: false,
   };
 
   return (
     <div>
-      <h2>Outgoing Transactions Chart</h2>
       <Line data={chartData} options={options} />
     </div>
   );
