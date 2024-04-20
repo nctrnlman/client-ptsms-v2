@@ -7,10 +7,15 @@ import "react-toastify/dist/ReactToastify.css";
 import Layout from "../../../components/layouts/OperasionalLayout";
 import CustomerListCard from "../../../components/cards/CustomerListCard";
 import ModalAddCustomer from "../../../components/cards/ModalAddCustomer";
+import ModalEditCustomer from "../../../components/cards/ModalEditCustomer";
+import ModalDelete from "../../../components/cards/ModalDelete";
 export default function Home() {
   const [customerData, setCustomerData] = useState([]);
   const [totalCustomer, setTotalCustomer] = useState(0);
   const [openModal, setOpenModal] = useState(false);
+  const [openModalEdit, setOpenModalEdit] = useState(false);
+  const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const fetchData = async () => {
@@ -32,10 +37,9 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/customer/create`,
         {
-          supplierName: newCustomer.name,
-          supplierCode: newCustomer.code,
+          customerName: newCustomer.name,
         }
       );
       toast.success(response.data.message);
@@ -50,6 +54,47 @@ export default function Home() {
 
   const handleToggleModal = () => {
     setOpenModal(!openModal);
+  };
+  const updateCustomer = async (id, newData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/customer/update/${id}`,
+        {
+          customerName: newData.name,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message || "Failed to create customer");
+      }
+      console.error("Error updating customer:", error);
+      setLoading(false);
+    }
+  };
+
+  const deleteCustomer = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/customer/delete/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting distributor:", error);
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -149,7 +194,13 @@ export default function Home() {
         ) : (
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {customerData?.map((customer, index) => (
-              <CustomerListCard key={index} customer={customer} />
+              <CustomerListCard
+                key={index}
+                customer={customer}
+                setOpenModalEdit={setOpenModalEdit}
+                setOpenModalDelete={setOpenModalDelete}
+                setSelectedProductId={setSelectedProductId}
+              />
             ))}
           </div>
         )}
@@ -157,6 +208,18 @@ export default function Home() {
           openModal={openModal}
           setOpenModal={setOpenModal}
           onCreateCustomer={handleCreateCustomer}
+        />
+        <ModalEditCustomer
+          id={selectedProductId}
+          openModal={openModalEdit}
+          setOpenModal={setOpenModalEdit}
+          onUpdateCustomer={updateCustomer}
+        />
+        <ModalDelete
+          id={selectedProductId}
+          onDeleteComponent={deleteCustomer}
+          open={openModalDelete}
+          onClose={() => setOpenModalDelete(false)}
         />
       </main>
     </Layout>
