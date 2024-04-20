@@ -1,10 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  FaUsers,
-  FaCalendarDay,
-  FaClipboardList,
-  FaUser,
-} from "react-icons/fa";
+import { FaUsers } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,25 +7,20 @@ import DashboardCard from "../../../components/cards/DashboardCard";
 import Layout from "../../../components/layouts/OperasionalLayout";
 import DataTable from "../../../components/tables/DataTable";
 import ModalDelete from "../../../components/cards/ModalDelete";
-import ModalEditDistributor from "../../../components/cards/ModalEditDistributor";
-import ModalAddDistributor from "../../../components/cards/ModalAddDistributor";
+import ModalEditSales from "../../../components/cards/ModalEditSales";
+import ModalAddSales from "../../../components/cards/ModalAddSales";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalDistributor, setTotalDistributor] = useState(0);
-  const [todayTransaction, setTodayTransaction] = useState(0);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [mostDistributorTransaction, setMostDistributorTransaction] =
-    useState("");
+  const [totalSales, setTotalSales] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [selectedDistributorId, setSelectedDistributorId] = useState(null);
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
-    { field: "supplier_code", headerName: "Distributor Code", flex: 1 },
-    { field: "supplier_name", headerName: "Distributor Name", flex: 1 },
+    { field: "sales_name", headerName: "Sales Name", flex: 1 },
     {
       field: "action",
       headerName: "Action",
@@ -39,13 +29,13 @@ export default function Home() {
         <div className="flex gap-3 ">
           <button
             className=" text-brand-500  hover:text-brand-800 font-bold"
-            onClick={() => handleToggleModalEdit(params.row.supplier_id)}
+            onClick={() => handleToggleModalEdit(params.row.sales_id)}
           >
             Edit
           </button>
           <button
             className="text-red-500 hover:text-red-800 font-bold"
-            onClick={() => handleToggleModalDelete(params.row.supplier_id)}
+            onClick={() => handleToggleModalDelete(params.row.sales_id)}
           >
             Delete
           </button>
@@ -54,7 +44,6 @@ export default function Home() {
     },
   ];
   const handleToggleModalDelete = (id) => {
-    console.log(id);
     setSelectedDistributorId(id);
     setOpenModalDelete(true);
   };
@@ -70,13 +59,12 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/all`
+        `${import.meta.env.VITE_API_BASE_URL}/sales/all`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
-        supplier_id: item.supplier_id,
-        supplier_code: item.supplier_code,
-        supplier_name: item.supplier_name,
+        sales_id: item.sales_id,
+        sales_name: item.sales_name,
       }));
       setRows(modifiedData);
 
@@ -91,12 +79,9 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master`
+        `${import.meta.env.VITE_API_BASE_URL}/sales/master`
       );
-      setTotalDistributor(response.data.data.totalSupplier);
-      setMostDistributorTransaction(response.data.data.mostSupplierTransaction);
-      setTotalTransaction(response.data.data.totalTransaction);
-      setTodayTransaction(response.data.data.todayTransaction);
+      setTotalSales(response.data.data.totalSales);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -104,12 +89,12 @@ export default function Home() {
     }
   };
 
-  const handleDeleteDistributor = async (id) => {
+  const handleDeleteSales = async (id) => {
     try {
       setLoading(true);
 
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/delete/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/sales/delete/${id}`
       );
       toast.success(response.data.message);
       await fetchData();
@@ -117,19 +102,18 @@ export default function Home() {
       setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
-      console.error("Error deleting distributor:", error);
+      console.error("Error deleting sales:", error);
       setLoading(false);
     }
   };
 
-  const handleCreateDistributor = async (newDistributor) => {
+  const handleCreateSales = async (newSales) => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/sales/create`,
         {
-          supplierName: newDistributor.name,
-          supplierCode: newDistributor.code,
+          salesName: newSales.name,
         }
       );
       toast.success(response.data.message);
@@ -137,20 +121,26 @@ export default function Home() {
       await fetchMasterData();
       setLoading(false);
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message || "Failed to create product");
+      }
       console.error("Error creating distributor:", error);
       setLoading(false);
     }
   };
 
-  const updateDistributor = async (id, newData) => {
+  const updateSales = async (id, newData) => {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/update/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/sales/update/${id}`,
         {
-          supplierName: newData.name,
-          supplierCode: newData.code,
+          salesName: newData.name,
         }
       );
       toast.success(response.data.message);
@@ -158,8 +148,15 @@ export default function Home() {
       await fetchMasterData();
       setLoading(false);
     } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error updating distributor:", error);
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message || "Failed to create product");
+      }
+      console.error("Error updating sales:", error);
       setLoading(false);
     }
   };
@@ -245,43 +242,28 @@ export default function Home() {
         </div>
         <div className="flex gap-6 ">
           <DashboardCard
-            title="Total Distributor"
-            description={totalDistributor}
+            title="Total Sales"
+            description={totalSales}
             icon={FaUsers}
-          />
-          <DashboardCard
-            title="Today Transaction"
-            description={todayTransaction}
-            icon={FaCalendarDay}
-          />
-          <DashboardCard
-            title="Total Transaction"
-            description={totalTransaction}
-            icon={FaClipboardList}
-          />
-          <DashboardCard
-            title="Most Frequent Distributor"
-            description={mostDistributorTransaction}
-            icon={FaUser}
           />
         </div>
         <DataTable rows={rows} columns={columns} loading={loading} />
-        <ModalAddDistributor
+        <ModalAddSales
           openModal={openModal}
           setOpenModal={setOpenModal}
-          onCreateDistributor={handleCreateDistributor}
+          onCreateSales={handleCreateSales}
         />
         <ModalDelete
           id={selectedDistributorId}
-          onDeleteComponent={handleDeleteDistributor}
+          onDeleteComponent={handleDeleteSales}
           open={openModalDelete}
           onClose={() => setOpenModalDelete(false)}
         />
-        <ModalEditDistributor
+        <ModalEditSales
           id={selectedDistributorId}
           openModal={openModalEdit}
           setOpenModal={setOpenModalEdit}
-          onUpdateDistributor={updateDistributor}
+          onUpdateSales={updateSales}
         />
       </main>
     </Layout>
