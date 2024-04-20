@@ -44,7 +44,7 @@ function Cards() {
                 the bulk of the cards content.
               </CCardText>
               <div className="pt-2">
-                <CButton color="primary" href={card.link}>
+                <CButton className="bg-teal-500 hover:bg-teal-800 text-white" href={card.link}>
                   View Details
                 </CButton>
               </div>

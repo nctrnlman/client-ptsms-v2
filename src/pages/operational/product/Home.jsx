@@ -38,7 +38,7 @@ export default function Home() {
       renderCell: (params) => (
         <div className="flex gap-3">
           <button
-            className="text-brand-500 hover:text-brand-800 font-bold"
+            className="text-brand-500 hover:text-teal-800 font-bold"
             onClick={() => handleEdit(params.row.product_id)}
           >
             Edit
@@ -155,7 +155,7 @@ export default function Home() {
             <li className="inline-flex items-center">
               <a
                 href="#"
-                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-teal-600 dark:text-gray-400 dark:hover:text-white"
               >
                 <svg
                   className="w-3 h-3 me-2.5"
@@ -188,7 +188,7 @@ export default function Home() {
                 </svg>
                 <a
                   href="#"
-                  className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
+                  className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
                   Products
                 </a>
