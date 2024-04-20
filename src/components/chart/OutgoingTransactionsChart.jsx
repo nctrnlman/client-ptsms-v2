@@ -71,7 +71,7 @@ const OutgoingTransactionsChart = ({ data }) => {
   };
 
   return (
-    <div>
+    <div className="w-[50%]">
       <Line data={chartData} options={options} />
     </div>
   );
