@@ -28,6 +28,11 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       title: "Distributors",
     },
     {
+      path: "/operasional/sales",
+      icon: SalesmanIcon,
+      title: "Sales",
+    },
+    {
       path: "/",
       icon: BackToAccessIcon,
       title: "Back to Access",
@@ -92,7 +97,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
-          activePage === "/operasional/product"
+          activePage === "/operasional/products"
             ? "text-teal-500"
             : "text-gray-500"
         }`}
@@ -120,6 +125,30 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
         viewBox="0 0 24 24"
       >
         <path d="M11 22v-2H5c-1.11 0-1.99-.89-1.99-2L3 5c0-1.11.89-2 2-2h10c1.11 0 2 .89 2 2v13c0 1.11-.89 2-2 2h-6v2h4c1.11 0 2-.89 2-2V5h2v15h-8zM5 5v13h6V5H5z" />
+      </svg>
+    );
+  }
+
+  function SalesmanIcon() {
+    return (
+      <svg
+        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
+          activePage === "/operasional/sales"
+            ? "text-teal-500"
+            : "text-gray-500"
+        }`}
+        aria-hidden="true"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M7 11.003V5h4a2 2 0 012 2v5.003M13 13.003V5h2l3 3v5.003M9 15.003V18"
+        />
       </svg>
     );
   }

@@ -18,6 +18,7 @@ export default function TransactionOutEdit() {
   const [loading, setLoading] = useState(true);
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [totalTransactionTax, setTotalTransactionTax] = useState(0);
+  const [productLength, setProductLength] = useState(0);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     noFaktur: "",
@@ -32,12 +33,14 @@ export default function TransactionOutEdit() {
   });
 
   const calculateTotalTransaction = () => {
-    let total = 0;
+    let total = totalTransaction;
     formData.productList.forEach((product) => {
+      console.log(product.productPrice, "cekprice");
       total += product.productPrice;
     });
-    let totalWithTax = 0;
+    let totalWithTax = totalTransactionTax;
     formData.productList.forEach((product) => {
+      console.log(product.productTotalPrice, "cekpricetotal");
       totalWithTax += product.productTotalPrice;
     });
     setTotalTransaction(total);
@@ -107,7 +110,6 @@ export default function TransactionOutEdit() {
 
       const transactionDetail = response.data.data;
 
-      // Mengatur nilai formData berdasarkan data transaksi yang diterima
       setFormData({
         ...formData,
         noFaktur: transactionDetail.transactionOut.no_faktur || "",
@@ -120,8 +122,12 @@ export default function TransactionOutEdit() {
         note: transactionDetail.transactionOut.note || "",
         productList: transactionDetail.transactionOutDetail || [],
       });
-      // setTotalTransaction(transactionDetail.transactionOut.amount);
-      // setTotalTransactionTax(transactionDetail.transactionOut.amount_tax);
+      setProductLength(transactionDetail.transactionOutDetail.length);
+      console.log(transactionDetail.transactionOutDetail.length);
+      setTotalTransaction(parseInt(transactionDetail.transactionOut.amount));
+      setTotalTransactionTax(
+        parseInt(transactionDetail.transactionOut.amount_tax)
+      );
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
@@ -132,10 +138,17 @@ export default function TransactionOutEdit() {
   useEffect(() => {
     setCustomerId(decryptNumber(id));
     getMasterDynamic();
-    calculateTotalTransaction();
+    // calculateTotalTransaction();
     getTransactionDetail(decryptNumber(id));
   }, []);
 
+  useEffect(() => {
+    if (formData.productList.length > productLength) {
+      calculateTotalTransaction();
+    }
+    console.log(totalTransaction, "tes a");
+    console.log(totalTransactionTax, "tes b");
+  }, [formData.productList.length > productLength]);
   return (
     <Layout>
       <main className="flex flex-col gap-4 ">
@@ -463,6 +476,7 @@ export default function TransactionOutEdit() {
 
           <div className="flex items-center justify-end mt-10 gap-4">
             <p>Total Price: {formatCurrency(totalTransactionTax)}</p>
+            <p>Total Price: {totalTransactionTax}</p>
             <button
               onClick={handleSubmit}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"
