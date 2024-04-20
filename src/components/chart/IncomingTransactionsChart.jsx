@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Bar } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from 'chart.js';
+import { Line } from 'react-chartjs-2'; // Import Line instead of Bar
+import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import axios from 'axios';
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale, LinearScale, LineElement, Title, Tooltip, Legend); // Register LineElement
 
 const IncomingTransactionsChart = () => {
   const [chartData, setChartData] = useState({
@@ -12,7 +12,7 @@ const IncomingTransactionsChart = () => {
       {
         label: 'Total Incoming Transactions',
         data: [],
-        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+        backgroundColor: 'rgba(75, 192, 192, 0.2)', // Optional for line charts
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 2,
       },
@@ -32,14 +32,13 @@ const IncomingTransactionsChart = () => {
           }
           return acc;
         }, []);
-
         setChartData({
           labels: transactionData.map((item) => item.label),
           datasets: [
             {
               label: 'Total Incoming Transactions',
               data: transactionData.map((item) => item.data),
-              backgroundColor: 'rgba(75, 192, 192, 0.2)',
+              backgroundColor: 'rgba(75, 192, 192, 0.2)', // Optional for line charts
               borderColor: 'rgba(75, 192, 192, 1)',
               borderWidth: 2,
             },
@@ -54,7 +53,7 @@ const IncomingTransactionsChart = () => {
 
   return (
     <div>
-      <Bar
+      <Line
         data={chartData}
         options={{
           responsive: true,

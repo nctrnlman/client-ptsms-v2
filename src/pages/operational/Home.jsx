@@ -8,9 +8,29 @@ import {
 import Layout from "../../components/layouts/OperasionalLayout";
 import TAChart from "../../components/chart/TAChart";
 import IncomingTransactionsChart from "../../components/chart/IncomingTransactionsChart";
-import TransactionChart from "../../components/chart/OutgoingTransactionsChart";
+import OutgoingTransactionsChart from "../../components/chart/OutgoingTransactionsChart";
+import axios from "axios";
+import { useState, useEffect } from "react";
 
 export default function Home() {
+  const [data, setdata] = useState([1,2,3,4]);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/report`
+      );
+      console.log(responsedata.data)
+     
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   return (
     <Layout>
        <main className="pt-16 sm:pt-0">
@@ -84,7 +104,7 @@ export default function Home() {
         <div className="mt-10 p-2">
           <TAChart />
           <IncomingTransactionsChart />
-          <TransactionChart/>
+          <OutgoingTransactionsChart data={data} />
         </div>
       </main>
     </Layout>
