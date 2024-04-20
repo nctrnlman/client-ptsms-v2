@@ -57,7 +57,9 @@ export default function CustomerDetail() {
   ];
 
   const handleCreateClick = () => {
-    navigate(`/operasional/transaction/out/form/${encryptNumber(customerId)}`);
+    navigate(
+      `/operasional/customer/transaction/out/form/${encryptNumber(customerId)}`
+    );
   };
 
   const handleDelete = (id) => {

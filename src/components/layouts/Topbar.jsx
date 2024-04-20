@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import logo from "../../assets/logo/icon-dark.png";
 import ava from "../../assets/profile/ava.png";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Topbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const navigate = useNavigate();
   const userData = useSelector((state) => state.user.User);
 
   const toggleDropdown = () => {
@@ -23,14 +26,10 @@ const Topbar = ({ toggleSidebar }) => {
   };
 
   const handleSignOut = () => {
-    // Hapus token pengguna dari local storage
     localStorage.removeItem("user_token");
-
-    // Tutup dropdown
+    toast.success("Logout success");
     closeDropdown();
-
-    // Redirect atau lakukan tindakan lain setelah sign out jika diperlukan
-    // window.location.href = 'halaman_signin.html'; // Contoh pengalihan ke halaman sign in
+    navigate("/login");
   };
 
   return (
@@ -65,7 +64,7 @@ const Topbar = ({ toggleSidebar }) => {
                   className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
                   aria-expanded={isDropdownOpen}
                   onClick={toggleDropdown}
-                  onBlur={closeDropdown}
+                  // onBlur={closeDropdown}
                 >
                   <span className="sr-only">Open user menu</span>
                   <img

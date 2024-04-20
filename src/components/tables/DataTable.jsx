@@ -53,11 +53,17 @@ const DataTable = ({ rows, columns, loading }) => {
           columns={columns}
           pageSize={pageSize}
           disableSelectionOnClick
+          pageSizeOptions={[]}
           slots={{
             loadingOverlay: loading ? LinearProgress : undefined,
           }}
           loading={loading}
-          sx={{ "--DataGrid-overlayHeight": "300px" }}
+          sx={{
+            "--DataGrid-overlayHeight": "300px",
+            ".MuiDataGrid-columnsContainer": {
+              backgroundColor: "#2dd4bf", // Warna abu untuk latar belakang header kolom
+            },
+          }}
         />
       </div>
       <div className="flex justify-end mt-4 ">

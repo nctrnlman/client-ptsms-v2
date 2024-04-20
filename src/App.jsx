@@ -118,11 +118,11 @@ function App() {
             />
             <Route path="/" element={<Home />} />
             <Route
-              path="/operasional/transaction/out/form/:id"
+              path="/operasional/customer/transaction/out/form/:id"
               element={<OperasionalTransactionOutForm />}
             />
             <Route
-              path="/operasional/transaction/out/form"
+              path="/operasional/customer/transaction/out/form"
               element={<OperasionalTransactionOutForm />}
             />
             <Route

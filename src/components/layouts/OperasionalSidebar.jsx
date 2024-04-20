@@ -61,7 +61,8 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
-          activePage === "/operasional/suppliers"
+          activePage.includes("/operasional/suppliers") ||
+          activePage.includes("/operasional/supplier")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
@@ -79,7 +80,8 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
-          activePage === "/operasional/customers"
+          activePage.includes("/operasional/customers") ||
+          activePage.includes("/operasional/customer")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
@@ -97,7 +99,8 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
-          activePage === "/operasional/products"
+          activePage.includes("/operasional/products") ||
+          activePage.includes("/operasional/product")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
@@ -115,7 +118,8 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
-          activePage === "/operasional/distributors"
+          activePage.includes("/operasional/distributors") ||
+          activePage.includes("/operasional/distributor")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
@@ -133,7 +137,8 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
-          activePage === "/operasional/sales"
+          activePage.includes("/operasional/sales") ||
+          activePage.includes("/operasional/sale")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
