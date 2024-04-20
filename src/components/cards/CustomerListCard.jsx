@@ -2,9 +2,25 @@ import { useEffect, useState } from "react";
 import { Button, Card } from "flowbite-react";
 import { encryptNumber } from "../../utils/encryptionUtils";
 
-function CustomerListCard({ customer }) {
+function CustomerListCard({
+  customer,
+  setOpenModalEdit,
+  setOpenModalDelete,
+  setSelectedProductId,
+}) {
   const [encryptedCustomerId, setEncryptedCustomerId] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
+
+  const handleEditClick = () => {
+    console.log("tes", customer.customer_id);
+    setSelectedProductId(customer.customer_id);
+    setOpenModalEdit(true);
+  };
+
+  const handleDeleteClick = () => {
+    setOpenModalDelete(true);
+    setSelectedProductId(customer.customer_id);
+  };
 
   useEffect(() => {
     try {
@@ -36,7 +52,7 @@ function CustomerListCard({ customer }) {
         </div>
 
         <div className=" flex gap-2 top-0">
-          <button className="text-blueSecondary">
+          <button className="text-blueSecondary" onClick={handleEditClick}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="1em"
@@ -51,7 +67,7 @@ function CustomerListCard({ customer }) {
               <path fill="none" d="M0 0h36v36H0z"></path>
             </svg>
           </button>
-          <button className="text-red-600">
+          <button className="text-red-600" onClick={handleDeleteClick}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="1em"

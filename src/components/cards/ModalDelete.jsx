@@ -11,7 +11,7 @@ export default function ModalDelete({ id, onDeleteComponent, open, onClose }) {
       await onDeleteComponent(id);
       onClose();
     } catch (error) {
-      console.error("Error deleting distributor:", error);
+      console.error("Error deleting :", error);
     } finally {
       setLoading(false);
     }

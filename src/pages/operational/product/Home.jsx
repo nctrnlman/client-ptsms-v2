@@ -21,7 +21,7 @@ export default function Home() {
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
-  const [openModalEdit, setOpenModalEdit] = useState(false); // tambahkan state untuk modal edit
+  const [openModalEdit, setOpenModalEdit] = useState(false);
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "product_name", headerName: "Product Name", flex: 1 },
