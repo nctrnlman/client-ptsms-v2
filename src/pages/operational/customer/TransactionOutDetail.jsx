@@ -9,6 +9,9 @@ export default function TransactionOutDetail() {
   const { id } = useParams();
   const [rows, setRows] = useState([]);
   const [customerId, setCustomerId] = useState(0);
+  const [totalTransaction, setTotalTransaction] = useState("");
+  const [totalTransactionTax, setTotalTransactionTax] = useState("");
+  const [createdDate, setCreatedDate] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -19,30 +22,51 @@ export default function TransactionOutDetail() {
     { field: "merk_name", headerName: "Merk", flex: 1 },
     { field: "expired_date", headerName: "Expired Date", flex: 1 },
     { field: "akl_akd", headerName: "No AKL/AKD", flex: 1 },
-    { field: "price", headerName: "Price", flex: 1 },
-    { field: "stock", headerName: "Stock", flex: 1 },
+    { field: "price", headerName: "Price/Unit", flex: 1 },
+    { field: "qty", headerName: "Qty", flex: 1 },
+    { field: "ppn", headerName: "PPN", flex: 1 },
+    { field: "pph", headerName: "PPH", flex: 1 },
+    { field: "cn", headerName: "CN", flex: 1 },
+    { field: "amount", headerName: "Total", flex: 1 },
+    { field: "amount_tax", headerName: "Total with Tax", flex: 1 },
   ];
 
   const handleCreateClick = () => {
-    navigate(`/operasional/supplier/form/${encryptNumber(customerId)}`);
+    navigate(
+      `/operasional/customer/transaction/edit/${encryptNumber(customerId)}`
+    );
   };
   const fetchData = async (id) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/detail/${id}`
       );
-      const modifiedData = response.data.data.map((item, index) => ({
-        id: index + 1,
-        product_name: item.product_name,
-        type_name: item.type_name,
-        merk_name: item.merk_name,
-        expired_date: formatDate(item.expired_date),
-        akl_akd: item.akl_akd,
-        price: formatCurrency(item.price),
-        stock: item.stock,
-      }));
+      const modifiedData = response.data.data.transactionOutDetail.map(
+        (item, index) => ({
+          id: index + 1,
+          product_name: item.product_name,
+          type_name: item.type_name,
+          merk_name: item.merk_name,
+          expired_date: formatDate(item.expired_date),
+          akl_akd: item.akl_akd,
+          price: formatCurrency(item.price),
+          qty: item.qty,
+          ppn: item.ppn,
+          pph: item.pph,
+          cn: item.cn,
+          amount: formatCurrency(item.amount),
+          amount_tax: formatCurrency(item.amount_tax),
+        })
+      );
       setRows(modifiedData);
+      setTotalTransaction(
+        formatCurrency(response.data.data.transactionOut.amount)
+      );
+      setTotalTransactionTax(
+        formatCurrency(response.data.data.transactionOut.amount_tax)
+      );
+      setCreatedDate(formatDate(response.data.data.transactionOut.created_at));
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -52,7 +76,7 @@ export default function TransactionOutDetail() {
 
   useEffect(() => {
     setCustomerId(decryptNumber(id));
-    fetchData(customerId);
+    fetchData(decryptNumber(id));
   }, []);
 
   return (
@@ -179,6 +203,12 @@ export default function TransactionOutDetail() {
               </svg>
             </button>
           </div>
+        </div>
+
+        <div className="flex gap-2 flex-col">
+          <p>Created Date : {createdDate}</p>
+          <p>Total Transaction : {totalTransaction}</p>
+          <p>Total Transaction with Tax : {totalTransactionTax}</p>
         </div>
 
         <DataTable rows={rows} columns={columns} loading={loading} />

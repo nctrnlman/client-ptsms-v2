@@ -4,12 +4,10 @@ import Layout from "../../../components/layouts/OperasionalLayout";
 import DataTable from "../../../components/tables/DataTable";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import ModalAddProduct from "../../../components/cards/ModalAddProduct";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { formatDate, formatCurrency } from "../../../utils/converter";
-import { encryptNumber } from "../../../utils/encryptionUtils";
 import ModalDelete from "../../../components/cards/ModalDelete";
 import ModalEdit from "../../../components/cards/ModalEditProduct";
 
@@ -24,7 +22,6 @@ export default function Home() {
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [openModalEdit, setOpenModalEdit] = useState(false); // tambahkan state untuk modal edit
-  const navigate = useNavigate();
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "product_name", headerName: "Product Name", flex: 1 },

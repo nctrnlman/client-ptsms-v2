@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { RiCloseCircleLine, RiAddLine } from "react-icons/ri";
 
-function TransactionOutRepeater({ product, setProduct }) {
+function TransactionOutRepeater({ product, setProduct, formData }) {
   const [inputs, setInputs] = useState([
     {
       productName: "",
@@ -90,6 +90,23 @@ function TransactionOutRepeater({ product, setProduct }) {
         }
       }
     });
+
+    if (formData?.productList?.length > 0) {
+      setInputs(
+        formData.productList?.map((productItem) => ({
+          ...productItem,
+          productName: productItem.product_id,
+          productQty: productItem.qty,
+          productPrice: productItem.price,
+          productDisc: productItem.discount,
+          productPpn: productItem.ppn,
+          productPph: productItem.pph,
+          productCn: productItem.cn,
+          productTotalPrice: productItem.amount_tax,
+          // Map other properties accordingly
+        }))
+      );
+    }
   }, [product]);
   return (
     <div className="gap-6 ">

@@ -91,7 +91,10 @@ function ModalEditDistributor({
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
-        <Button onClick={updateDistributor} className="bg-teal-500">
+        <Button
+          onClick={updateDistributor}
+          className="bg-teal-500 hover:bg-teal-800"
+        >
           Update
         </Button>
       </Modal.Footer>
