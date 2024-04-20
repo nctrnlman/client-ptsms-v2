@@ -26,7 +26,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       path: "/operasional/distributors",
       icon: DistributorIcon,
       title: "Distributors",
-    },    
+    },
     {
       path: "/",
       icon: BackToAccessIcon,
@@ -51,7 +51,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function SuppliersIcon() {
     return (
       <svg
@@ -69,7 +69,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function CustomersIcon() {
     return (
       <svg
@@ -87,7 +87,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function ProductIcon() {
     return (
       <svg
@@ -105,7 +105,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function DistributorIcon() {
     return (
       <svg
@@ -123,7 +123,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
+
   function BackToAccessIcon() {
     return (
       <svg
@@ -143,8 +143,6 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       </svg>
     );
   }
-  
-  
 
   const handlePageClick = (pagePath) => {
     setActivePage(pagePath);

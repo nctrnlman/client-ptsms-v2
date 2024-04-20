@@ -225,7 +225,7 @@ export default function Home() {
           <div className="flex justify-end gap-3">
             <button
               onClick={handleToggleModal}
-              className="flex items-center text-white hover:bg-brand-800 font-bold p-3 border bg-brand-500 rounded-full "
+              className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full "
             >
               Add Distributor
               <svg

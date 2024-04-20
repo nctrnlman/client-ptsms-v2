@@ -66,6 +66,7 @@ export default function CustomerDetail() {
   };
 
   const handleEdit = (id) => {
+    console.log(id);
     navigate(`/operasional/customer/transaction/detail/${encryptNumber(id)}`);
   };
 

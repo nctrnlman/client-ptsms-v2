@@ -1,12 +1,16 @@
-import Layout from "../../../components/layouts/OperasionalLayout";
-import CustomerListCard from "../../../components/cards/CustomerListCard";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Layout from "../../../components/layouts/OperasionalLayout";
+import CustomerListCard from "../../../components/cards/CustomerListCard";
+import ModalAddCustomer from "../../../components/cards/ModalAddCustomer";
 export default function Home() {
   const [customerData, setCustomerData] = useState([]);
   const [totalCustomer, setTotalCustomer] = useState(0);
+  const [openModal, setOpenModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const fetchData = async () => {
@@ -24,8 +28,28 @@ export default function Home() {
     }
   };
 
-  const handleCreateClick = () => {
-    navigate(`/operasional/transaction/out/form`);
+  const handleCreateCustomer = async (newCustomer) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/supplier/create`,
+        {
+          supplierName: newCustomer.name,
+          supplierCode: newCustomer.code,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error creating distributor:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleToggleModal = () => {
+    setOpenModal(!openModal);
   };
 
   useEffect(() => {
@@ -96,20 +120,22 @@ export default function Home() {
           </div>
           <div className="mt-4 md:mt-0">
             <button
-              onClick={handleCreateClick}
-              className="bg-teal-500 flex items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-full"
+              onClick={handleToggleModal}
+              className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full "
             >
-              Add Transaction
+              Add Customer
               <svg
-                className="-mr-1 ml-2 h-4 w-4"
-                fill="currentColor"
+                className="-mr-1 ml-2 h-4 w-4 text-white"
+                fill="none"
+                stroke="currentColor"
                 viewBox="0 0 20 20"
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  fillRule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clipRule="evenodd"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                 />
               </svg>
             </button>
@@ -127,6 +153,11 @@ export default function Home() {
             ))}
           </div>
         )}
+        <ModalAddCustomer
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          onCreateCustomer={handleCreateCustomer}
+        />
       </main>
     </Layout>
   );
