@@ -60,14 +60,14 @@ const IncomingTransactionsChart = ({ data }) => {
         position: "bottom",
       },
     },
-    layout: {
-      padding: {
-        top: 50, // Atur padding atas sesuai kebutuhan
-        bottom: 50, // Atur padding bawah sesuai kebutuhan
-      },
-    },
+    // layout: {
+    //   padding: {
+    //     top: 50, // Atur padding atas sesuai kebutuhan
+    //     bottom: 50, // Atur padding bawah sesuai kebutuhan
+    //   },
+    // },
     responsive: true,
-    maintainAspectRatio: false,
+    // maintainAspectRatio: false,
   };
 
   return (

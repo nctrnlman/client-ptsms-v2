@@ -12,6 +12,7 @@ import OperasionalTransactionInDetail from "./pages/operational/supplier/Transac
 import OperasionalTransactionOutForm from "./pages/operational/customer/TransactionOutForm.jsx";
 import OperasionalTransactionOutDetail from "./pages/operational/customer/TransactionOutDetail.jsx";
 import OperasionalTransactionOutEdit from "./pages/operational/customer/TransactionOutEdit.jsx";
+import SettingDashboard from "./pages/setting/Home.jsx";
 
 import Login from "./pages/auth/Login.jsx";
 import { useDispatch, useSelector } from "react-redux";
@@ -134,6 +135,7 @@ function App() {
               path="/operasional/distributors"
               element={<OperasionalDistributorDashboard />}
             />
+            <Route path="/setting/dashboard" element={<SettingDashboard />} />
             <Route path="/login" element={<Login />} />
           </>
         ) : (
