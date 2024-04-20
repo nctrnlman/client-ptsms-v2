@@ -10,18 +10,36 @@ import "react-toastify/dist/ReactToastify.css";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import ModalDelete from "../../../components/cards/ModalDelete";
 import ModalEdit from "../../../components/cards/ModalEditProduct";
+import ModalAddProductType from "../../../components/cards/ModalAddProductType";
+import ModalEditProductType from "../../../components/cards/ModalEditProductType";
+import ModalEditProductMerk from "../../../components/cards/ModalEditProductMerk";
+import ModalAddProductMerk from "../../../components/cards/ModalAddProductMerk";
+import ModalDeleteMerk from "../../../components/cards/ModalDelete";
+import ModalDeleteType from "../../../components/cards/ModalDelete";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
+  const [rowTypes, setRowTypes] = useState([]);
+  const [rowMerk, setRowMerk] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalProduct, setTotalProduct] = useState(0);
   const [totalProductMerk, setTotalProductMerk] = useState(0);
   const [totalProductType, setTotalProductType] = useState(0);
   const [mostStockProduct, setMostStockProduct] = useState("");
   const [openModal, setOpenModal] = useState(false);
+  const [openModalMerk, setOpenModalMerk] = useState(false);
+  const [openModalType, setOpenModalType] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [openModalTypeDelete, setOpenModalTypeDelete] = useState(false);
+  const [openModalMerkDelete, setOpenModalMerkDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [openModalEdit, setOpenModalEdit] = useState(false);
+  const [selectedProductTypeId, setSelectedProductTypeId] = useState(null);
+  const [openModalEditProductType, setOpenModalEditProductType] =
+    useState(false);
+  const [selectedProductMerkId, setSelectedProductMerkId] = useState(null);
+  const [openModalEditProductMerk, setOpenModalEditProductMerk] =
+    useState(false);
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "product_name", headerName: "Product Name", flex: 1 },
@@ -54,9 +72,73 @@ export default function Home() {
     },
   ];
 
+  const columnType = [
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "type_name", headerName: "Product Type Name", flex: 1 },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      renderCell: (params) => (
+        <div className="flex gap-3">
+          <button
+            className="text-brand-500 hover:text-teal-800 font-bold"
+            onClick={() => handleEditProductType(params.row.product_type_id)}
+          >
+            Edit
+          </button>
+          <button
+            className="text-red-500 hover:text-red-800 font-bold"
+            onClick={() =>
+              handleModalDeleteProductType(params.row.product_type_id)
+            }
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  const columnMerk = [
+    { field: "id", headerName: "ID", flex: 1 },
+    { field: "merk_name", headerName: "Product Merk Name", flex: 1 },
+    {
+      field: "action",
+      headerName: "Action",
+      flex: 1,
+      renderCell: (params) => (
+        <div className="flex gap-3">
+          <button
+            className="text-brand-500 hover:text-teal-800 font-bold"
+            onClick={() => handleEditProductMerk(params.row.product_merk_id)}
+          >
+            Edit
+          </button>
+          <button
+            className="text-red-500 hover:text-red-800 font-bold"
+            onClick={() =>
+              handleModalDeleteProductMerk(params.row.product_merk_id)
+            }
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   const handleToggleModalDelete = (id) => {
     setSelectedProductId(id);
     setOpenModalDelete(true);
+  };
+  const handleModalDeleteProductType = (id) => {
+    setSelectedProductTypeId(id);
+    setOpenModalTypeDelete(true);
+  };
+  const handleModalDeleteProductMerk = (id) => {
+    setSelectedProductMerkId(id);
+    setOpenModalMerkDelete(true);
   };
   const handleDeleteProduct = async (id) => {
     try {
@@ -70,13 +152,54 @@ export default function Home() {
       setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
-      console.error("Error deleting distributor:", error);
+      console.error("Error deleting product:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProductType = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/product/type/delete/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchDataType();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting product type:", error);
+      setLoading(false);
+    }
+  };
+  const handleDeleteProductMerk = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/product/merk/delete/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchDataMerk();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting product merk:", error);
       setLoading(false);
     }
   };
   const handleEdit = (id) => {
     setSelectedProductId(id);
     setOpenModalEdit(true);
+  };
+  const handleEditProductType = (id) => {
+    setSelectedProductTypeId(id);
+    setOpenModalEditProductType(true);
+  };
+  const handleEditProductMerk = (id) => {
+    setSelectedProductMerkId(id);
+    setOpenModalEditProductMerk(true);
   };
   const fetchData = async () => {
     try {
@@ -96,6 +219,43 @@ export default function Home() {
         expired_date: formatDate(item.expired_date),
       }));
       setRows(modifiedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
+  const fetchDataType = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/product/type/all`
+      );
+      const modifiedData = response.data.data.map((item, index) => ({
+        id: index + 1,
+        product_type_id: item.product_type_id,
+        type_name: item.type_name,
+      }));
+      setRowTypes(modifiedData);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
+
+  const fetchDataMerk = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/product/merk/all`
+      );
+      const modifiedData = response.data.data.map((item, index) => ({
+        id: index + 1,
+        product_merk_id: item.product_merk_id,
+        merk_name: item.merk_name,
+      }));
+      setRowMerk(modifiedData);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -123,30 +283,11 @@ export default function Home() {
   const handleToggleModal = () => {
     setOpenModal(!openModal);
   };
-
-  const handleCreateProduct = async (newProduct) => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/product/create`,
-        newProduct
-      );
-      toast.success(response.data.message);
-      await fetchData();
-      await fetchMasterData();
-      setLoading(false);
-    } catch (error) {
-      if (error.response && error.response.data && error.response.data.errors) {
-        const errorMessages = error.response.data.errors.map(
-          (error) => error.message
-        );
-        toast.error(errorMessages.join(", "));
-      } else {
-        toast.error(error.response.data.message || "Failed to create product");
-      }
-      console.error("Error creating product:", error);
-      setLoading(false);
-    }
+  const handleToggleModalMerk = () => {
+    setOpenModalMerk(!openModalMerk);
+  };
+  const handleToggleModalType = () => {
+    setOpenModalType(!openModalType);
   };
 
   const updateProduct = async (id, newData) => {
@@ -177,7 +318,138 @@ export default function Home() {
       } else {
         toast.error(error.response.data.message || "Failed to create product");
       }
-      console.error("Error updating distributor:", error);
+      console.error("Error updating product:", error);
+      setLoading(false);
+    }
+  };
+
+  const updateProductType = async (id, newData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/product/type/update/${id}`,
+        {
+          typeName: newData.name,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchDataType();
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(
+          error.response.data.message || "Failed to create product type"
+        );
+      }
+      console.error("Error updating product type:", error);
+      setLoading(false);
+    }
+  };
+  const updateProductMerk = async (id, newData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/product/merk/update/${id}`,
+        {
+          merkName: newData.name,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchDataMerk();
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(
+          error.response.data.message || "Failed to create product merk"
+        );
+      }
+      console.error("Error updating product merk:", error);
+      setLoading(false);
+    }
+  };
+  const handleCreateProduct = async (newProduct) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/product/create`,
+        newProduct
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message || "Failed to create product");
+      }
+      console.error("Error creating product:", error);
+      setLoading(false);
+    }
+  };
+  const handleCreateProductType = async (newProduct) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/product/type/create`,
+        newProduct
+      );
+      toast.success(response.data.message);
+      await fetchDataType();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(
+          error.response.data.message || "Failed to create product Type"
+        );
+      }
+      console.error("Error creating product type:", error);
+      setLoading(false);
+    }
+  };
+  const handleCreateProductMerk = async (newProduct) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/product/merk/create`,
+        newProduct
+      );
+      toast.success(response.data.message);
+      await fetchDataMerk();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(
+          error.response.data.message || "Failed to create product Merk"
+        );
+      }
+      console.error("Error creating product Merk:", error);
       setLoading(false);
     }
   };
@@ -185,6 +457,8 @@ export default function Home() {
   useEffect(() => {
     fetchMasterData();
     fetchData();
+    fetchDataMerk();
+    fetchDataType();
   }, []);
 
   return (
@@ -237,30 +511,8 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div className="flex justify-between">
+        <div className="">
           <h1 className="text-3xl pb-3 font-medium">Products Dashboard</h1>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={handleToggleModal}
-              className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full"
-            >
-              Add Product
-              <svg
-                className="-mr-1 ml-2 h-4 w-4 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </button>
-          </div>
         </div>
 
         <div className="flex gap-6">
@@ -270,7 +522,7 @@ export default function Home() {
             icon={FaBox}
           />
           <DashboardCard
-            title="Today Product Merk"
+            title="Total Product Merk"
             description={totalProductMerk}
             icon={FaCalendarDay}
           />
@@ -285,7 +537,92 @@ export default function Home() {
             icon={FaTags}
           />
         </div>
-        <DataTable rows={rows} columns={columns} loading={loading} />
+        <div className="mt-3">
+          <div className="flex justify-between pt-3 pb-4 ">
+            <h3 className="text-2xl  font-medium">Product List</h3>
+            <div className="flex justify-end gap-3 ">
+              <button
+                onClick={handleToggleModal}
+                className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full"
+              >
+                Add Product
+                <svg
+                  className=" ml-2 h-4 w-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <DataTable rows={rows} columns={columns} loading={loading} />
+        </div>
+
+        <div className="mt-5">
+          <div className="flex justify-between pt-3 pb-4 ">
+            <h3 className="text-2xl  font-medium">Product Type List</h3>
+            <div className="flex justify-end gap-3 ">
+              <button
+                onClick={handleToggleModalType}
+                className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full"
+              >
+                Add Product Type
+                <svg
+                  className=" ml-2 h-4 w-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <DataTable rows={rowTypes} columns={columnType} loading={loading} />
+        </div>
+
+        <div className="mt-5">
+          <div className="flex justify-between pt-3 pb-4 ">
+            <h3 className="text-2xl  font-medium">Product Merk List</h3>
+            <div className="flex justify-end gap-3 ">
+              <button
+                onClick={handleToggleModalMerk}
+                className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full"
+              >
+                Add Product Merk
+                <svg
+                  className=" ml-2 h-4 w-4 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <DataTable rows={rowMerk} columns={columnMerk} loading={loading} />
+        </div>
 
         <ModalAddProduct
           openModal={openModal}
@@ -303,6 +640,41 @@ export default function Home() {
           onEditProduct={updateProduct}
           open={openModalEdit}
           onClose={() => setOpenModalEdit(false)}
+        />
+
+        <ModalAddProductMerk
+          openModal={openModalMerk}
+          setOpenModal={setOpenModalMerk}
+          onCreateProductMerk={handleCreateProductMerk}
+        />
+        <ModalAddProductType
+          openModal={openModalType}
+          setOpenModal={setOpenModalType}
+          onCreateProductType={handleCreateProductType}
+        />
+        <ModalEditProductType
+          id={selectedProductTypeId}
+          onUpdateProductType={updateProductType}
+          openModal={openModalEditProductType}
+          setOpenModal={setOpenModalEditProductType}
+        />
+        <ModalEditProductMerk
+          id={selectedProductMerkId}
+          onUpdateProductMerk={updateProductMerk}
+          openModal={openModalEditProductMerk}
+          setOpenModal={setOpenModalEditProductMerk}
+        />
+        <ModalDeleteType
+          id={selectedProductTypeId}
+          onDeleteComponent={handleDeleteProductType}
+          open={openModalTypeDelete}
+          onClose={() => setOpenModalTypeDelete(false)}
+        />
+        <ModalDeleteMerk
+          id={selectedProductMerkId}
+          onDeleteComponent={handleDeleteProductMerk}
+          open={openModalMerkDelete}
+          onClose={() => setOpenModalMerkDelete(false)}
         />
       </main>
     </Layout>

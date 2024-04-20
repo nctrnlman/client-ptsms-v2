@@ -12,6 +12,7 @@ import OperasionalTransactionInDetail from "./pages/operational/supplier/Transac
 import OperasionalTransactionOutForm from "./pages/operational/customer/TransactionOutForm.jsx";
 import OperasionalTransactionOutDetail from "./pages/operational/customer/TransactionOutDetail.jsx";
 import OperasionalTransactionOutEdit from "./pages/operational/customer/TransactionOutEdit.jsx";
+import OperasionalSalesDashboard from "./pages/operational/sales/Home.jsx";
 import SettingDashboard from "./pages/setting/Home.jsx";
 import MarketingDashboard from "./pages/marketing/Home.jsx";
 
@@ -135,6 +136,10 @@ function App() {
             <Route
               path="/operasional/distributors"
               element={<OperasionalDistributorDashboard />}
+            />
+            <Route
+              path="/operasional/sales"
+              element={<OperasionalSalesDashboard />}
             />
             <Route path="/setting/dashboard" element={<SettingDashboard />} />
             <Route
