@@ -76,7 +76,7 @@ export default function Home() {
   };
   const handleEdit = (id) => {
     setSelectedProductId(id);
-    setOpenModalEdit(true); // Buka modal edit saat tombol Edit ditekan
+    setOpenModalEdit(true);
   };
   const fetchData = async () => {
     try {
@@ -128,7 +128,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/products/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/product/create`,
         newProduct
       );
       toast.success(response.data.message);
@@ -136,8 +136,48 @@ export default function Home() {
       await fetchMasterData();
       setLoading(false);
     } catch (error) {
-      toast.error(error.response.data.message);
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message || "Failed to create product");
+      }
       console.error("Error creating product:", error);
+      setLoading(false);
+    }
+  };
+
+  const updateProduct = async (id, newData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/product/update/${id}`,
+        {
+          name: newData.name,
+          aklAkd: newData.aklAkd,
+          expiredDate: newData.expiredDate,
+          price: newData.price,
+          stock: newData.stock,
+          productType: newData.productType,
+          productMerk: newData.productMerk,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message || "Failed to create product");
+      }
+      console.error("Error updating distributor:", error);
       setLoading(false);
     }
   };
@@ -260,7 +300,7 @@ export default function Home() {
         />
         <ModalEdit
           id={selectedProductId}
-          onEditComponent={handleEdit}
+          onEditProduct={updateProduct}
           open={openModalEdit}
           onClose={() => setOpenModalEdit(false)}
         />

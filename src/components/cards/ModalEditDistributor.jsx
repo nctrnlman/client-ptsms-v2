@@ -12,13 +12,12 @@ function ModalEditDistributor({
   const [distributorCode, setDistributorCode] = useState("");
   const distributorNameInputRef = useRef(null);
 
-  // Fungsi untuk mengambil detail distributor dari API berdasarkan ID
   const fetchDistributorDetail = async () => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/supplier/detail/${id}`
       );
-      const { supplier_name, supplier_code } = response.data.data; // Sesuaikan dengan struktur data dari API Anda
+      const { supplier_name, supplier_code } = response.data.data;
       setDistributorName(supplier_name);
       setDistributorCode(supplier_code);
     } catch (error) {

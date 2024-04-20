@@ -40,7 +40,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
   const fetchProductData = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/product/detail/${id}`
       );
       const productData = response.data.data;
       setProductName(productData.product_name);
@@ -48,8 +48,8 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
       setStock(productData.stock);
       setAklAkd(productData.akl_akd);
       setExpiredDate(productData.expired_date);
-      setSelectedProductType(productData.product_type_id);
-      setSelectedProductMerk(productData.product_merk_id);
+      setSelectedProductType(productData.product_type);
+      setSelectedProductMerk(productData.product_merk);
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -57,19 +57,15 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
 
   const handleUpdateProduct = async () => {
     try {
-      await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/product/update/${id}`,
-        {
-          name: productName,
-          aklAkd: aklAkd,
-          expiredDate: expiredDate,
-          price: price,
-          stock: stock,
-          productType: selectedProductType,
-          productMerk: selectedProductMerk,
-        }
-      );
-      onEditProduct();
+      onEditProduct(id, {
+        name: productName,
+        aklAkd: aklAkd,
+        expiredDate: expiredDate,
+        price: price,
+        stock: stock,
+        productType: selectedProductType,
+        productMerk: selectedProductMerk,
+      });
       onClose();
     } catch (error) {
       console.error("Error updating product:", error);
@@ -120,8 +116,8 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
             >
               <option value="">Select product type</option>
               {productType.map((type) => (
-                <option key={type.id} value={type.id}>
-                  {type.name}
+                <option key={type.product_type_id} value={type.product_type_id}>
+                  {type.type_name}
                 </option>
               ))}
             </Select>
@@ -138,8 +134,8 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
             >
               <option value="">Select product merk</option>
               {productMerk.map((merk) => (
-                <option key={merk.id} value={merk.id}>
-                  {merk.name}
+                <option key={merk.product_merk_id} value={merk.product_merk_id}>
+                  {merk.merk_name}
                 </option>
               ))}
             </Select>

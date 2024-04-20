@@ -21,7 +21,6 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   const [selectedProductType, setSelectedProductType] = useState("");
   const [selectedProductMerk, setSelectedProductMerk] = useState("");
 
-
   const productNameInputRef = useRef(null);
 
   const getMasterDynamic = async () => {
