@@ -18,13 +18,13 @@ function Cards() {
       icon: "mdi:cog-outline",
     },
     {
-      title: "Master",
-      link: "#",
+      title: "Setting",
+      link: "setting/dashboard",
       icon: "mdi:database",
     },
     {
       title: "Marketing",
-      link: "#",
+      link: "marketing/dashboard",
       icon: "mdi:bullhorn",
     },
   ];

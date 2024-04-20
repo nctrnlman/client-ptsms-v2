@@ -131,13 +131,13 @@ export default function Home() {
             <TAChart />
           </div> */}
           <div className="pb-5">
-            <h1 className="text-2xl pb-3 font-medium">
+            <h1 className="text-2xl pb-10 font-medium">
               Transaction Incoming Report
             </h1>
             <IncomingTransactionsChart data={transactionIn} />
           </div>
           <div>
-            <h1 className="text-2xl pb-3 font-medium">
+            <h1 className="text-2xl pb-10 font-medium">
               Transaction Outgoing Report
             </h1>
             <OutgoingTransactionsChart data={transactionOut} />
