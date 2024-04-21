@@ -109,10 +109,6 @@ export default function AttendanceForm() {
     }
   };
 
-  const toggleCamera = () => {
-    setIsCameraActive(!isCameraActive);
-  };
-
   const toggleLocation = () => {
     enableGeolocation();
   };
@@ -357,7 +353,13 @@ export default function AttendanceForm() {
             <p className="text-sm">
               <span>
                 - If Camera is not active, please{" "}
-                <button onClick={toggleLocation} className="text-brand-500">
+                <button
+                  onClick={() => {
+                    setIsCameraActive(true);
+                    setCapturedPhoto(false);
+                  }}
+                  className="text-brand-500"
+                >
                   click here
                 </button>
                 .
@@ -366,7 +368,7 @@ export default function AttendanceForm() {
             <p className="text-sm">
               <span>
                 - If Location is not active. Please{" "}
-                <button onClick={toggleCamera} className="text-brand-500">
+                <button onClick={toggleLocation} className="text-brand-500">
                   click here
                 </button>
                 .

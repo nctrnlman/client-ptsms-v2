@@ -39,14 +39,14 @@ function Login() {
   };
 
   return (
-    <div className="bg-lightPrimary min-h-screen flex flex-col md:flex-row justify-between overflow-y-hidden">
+    <div className="bg-lightPrimary min-h-screen flex flex-col md:flex-row justify-center md:justify-between overflow-y-hidden">
       <div className="flex flex-col justify-center mx-auto p-4 md:p-8 w-full md:w-1/2">
         <div className="login-card relative overflow-hidden">
           <div className="relative z-10">
-            <h4 className="mb-2.5 text-2xl md:text-4xl font-bold text-navy-700 dark:text-white text-center">
+            <h4 className="mb-2.5 text-3xl md:text-4xl font-bold text-navy-700 dark:text-white  md:text-center pb-3">
               Sign In
             </h4>
-            <p className="mb-9 text-base text-gray-600 text-center">
+            <p className="mb-9 text-base text-gray-600 md:text-center">
               Welcome! Please Sign In to access Sehat Murni Sejahtera System.
             </p>
             <form className="max-w-md mx-auto" onSubmit={handleSubmit}>
