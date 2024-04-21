@@ -11,7 +11,7 @@ function Home() {
       className="min-h-screen bg-cover bg-center"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-        {/* <header className="bg-white shadow-md">
+      {/* <header className="bg-white shadow-md">
           <div className="container mx-auto flex items-center justify-between px-4 py-2">
             <img src={smsLogo} alt="SMS Logo" width={80} />
           </div>
@@ -26,30 +26,55 @@ function Home() {
           </p>
         </section>
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          <AccessManagementCard
-            card={{
-              title: "Operasional",
-              link: "operasional/dashboard",
-              description: "Manage operational activities",
-              icon: "mdi:database",
-            }}
-          />
-          <AccessManagementCard
-            card={{
-              title: "Setting",
-              link: "setting/dashboard",
-              description: "Configure system settings",
-              icon: "mdi:cog-outline",
-            }}
-          />
-          <AccessManagementCard
-            card={{
-              title: "Marketing",
-              link: "marketing/dashboard",
-              description: "Manage marketing campaigns",
-              icon: "mdi:bullhorn",
-            }}
-          />
+          {userData.role_id === 1 && (
+            <>
+              <AccessManagementCard
+                card={{
+                  title: "Operasional",
+                  link: "operasional/dashboard",
+                  description: "Manage operational activities",
+                  icon: "mdi:database",
+                }}
+              />
+              <AccessManagementCard
+                card={{
+                  title: "Setting",
+                  link: "setting/dashboard",
+                  description: "Configure system settings",
+                  icon: "mdi:cog-outline",
+                }}
+              />
+              <AccessManagementCard
+                card={{
+                  title: "Marketing",
+                  link: "marketing/dashboard",
+                  description: "Manage marketing campaigns",
+                  icon: "mdi:bullhorn",
+                }}
+              />
+            </>
+          )}
+          {userData.role_id === 2 && (
+            <AccessManagementCard
+              card={{
+                title: "Marketing",
+                link: "marketing/dashboard",
+                description: "Manage marketing campaigns",
+                icon: "mdi:bullhorn",
+              }}
+            />
+          )}
+
+          {userData.role_id === 3 && (
+            <AccessManagementCard
+              card={{
+                title: "Operasional",
+                link: "operasional/dashboard",
+                description: "Manage operational activities",
+                icon: "mdi:database",
+              }}
+            />
+          )}
         </section>
       </main>
       {/* <footer className="bg-white shadow-md mt-8 backdrop-filter backdrop-blur-lg position-bottom-6">
