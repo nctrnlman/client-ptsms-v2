@@ -330,7 +330,7 @@ export default function AttendanceForm() {
                 ref={signatureRef}
                 canvasProps={{
                   className:
-                    "signature-canvas w-full md:max-w-3xl h-auto md:h-64 rounded-3xl",
+                    "signature-canvas w-full md:max-w-3xl h-32 md:h-64 rounded-3xl",
                 }}
                 penColor="black"
                 backgroundColor="white"
