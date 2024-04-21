@@ -60,18 +60,12 @@ const IncomingTransactionsChart = ({ data }) => {
         position: "bottom",
       },
     },
-    // layout: {
-    //   padding: {
-    //     top: 50, // Atur padding atas sesuai kebutuhan
-    //     bottom: 50, // Atur padding bawah sesuai kebutuhan
-    //   },
-    // },
+    maintainAspectRatio: false,
     responsive: true,
-    // maintainAspectRatio: false,
   };
 
   return (
-    <div className="w-[50%]">
+    <div className="">
       <Line data={chartData} options={options} />
     </div>
   );
