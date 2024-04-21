@@ -15,7 +15,7 @@ import OperasionalTransactionOutEdit from "./pages/operational/customer/Transact
 import OperasionalSalesDashboard from "./pages/operational/sales/Home.jsx";
 import SettingDashboard from "./pages/setting/Home.jsx";
 import MarketingDashboard from "./pages/marketing/Home.jsx";
-
+import MarketingAttendanceForm from "./pages/marketing/attendance/AttendanceForm.jsx";
 import Login from "./pages/auth/Login.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { jwtDecode } from "jwt-decode";
@@ -145,6 +145,10 @@ function App() {
             <Route
               path="/marketing/dashboard"
               element={<MarketingDashboard />}
+            />
+            <Route
+              path="/marketing/attendance"
+              element={<MarketingAttendanceForm />}
             />
             <Route path="/login" element={<Login />} />
           </>
