@@ -242,7 +242,7 @@ export default function AttendanceForm() {
                     ref={videoRef}
                     audio={false}
                     screenshotFormat="image/jpeg"
-                    className="max-w-3xl rounded-3xl"
+                    className="w-full h-auto max-w-3xl rounded-3xl"
                   />
                 </div>
 
@@ -262,9 +262,7 @@ export default function AttendanceForm() {
                   <img
                     src={capturedPhoto}
                     alt="Captured"
-                    width={600}
-                    height={600}
-                    className="max-w-3xl rounded-3xl"
+                    className="w-full h-auto max-w-3xl md:max-w-none rounded-3xl"
                   />
                 </div>
               </div>
@@ -331,9 +329,8 @@ export default function AttendanceForm() {
               <SignatureCanvas
                 ref={signatureRef}
                 canvasProps={{
-                  className: "signature-canvas",
-                  width: 400,
-                  height: 200,
+                  className:
+                    "signature-canvas w-full md:max-w-3xl h-auto md:h-64 rounded-3xl",
                 }}
                 penColor="black"
                 backgroundColor="white"
@@ -356,7 +353,7 @@ export default function AttendanceForm() {
             </button>
           </div>
           {/* Warning */}
-          <div className="w-[50%]">
+          <div className="w-full">
             <h1 className="text-md font-medium mb-3">Note:</h1>
             <p className="text-sm">
               <span>
