@@ -24,7 +24,6 @@ export default function AttendanceForm() {
   const [capturedPhoto, setCapturedPhoto] = useState(null);
   const [signature, setSignature] = useState(null);
   const [isCameraActive, setIsCameraActive] = useState(false);
-  const [isLocationEnabled, setIsLocationEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loclatitude, setLatitude] = useState("");
   const [loclongitude, setlongitude] = useState("");
@@ -115,40 +114,22 @@ export default function AttendanceForm() {
   };
 
   const toggleLocation = () => {
-    setIsLocationEnabled(!isLocationEnabled);
+    enableGeolocation();
   };
 
-  const enableGps = async () => {
-    if (isLocationEnabled && navigator.geolocation) {
-      try {
-        await new Promise((resolve, reject) => {
-          navigator.geolocation.getCurrentPosition(resolve, reject);
-        });
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            setLatitude(latitude);
-            setlongitude(longitude);
-            console.log(latitude);
-            console.log(longitude);
-            const apiKey = "39c16ccc43b54fb697f38ab5adbcfe4e";
-            const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
-            const axiosResponse = await axios.get(apiUrl);
-            const data = axiosResponse.data;
-            console.log(data);
+  const enableGps = async (latitude, longitude) => {
+    try {
+      const apiKey = "39c16ccc43b54fb697f38ab5adbcfe4e";
+      const apiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${apiKey}`;
+      const axiosResponse = await axios.get(apiUrl);
+      const data = axiosResponse.data;
 
-            if (data.results.length > 0) {
-              const formattedAddress = data.results[0].formatted;
-              setAddress(formattedAddress);
-            }
-          },
-          (error) => {
-            console.error("Error akses GPS:", error.message);
-          }
-        );
-      } catch (error) {
-        console.error("Error akses GPS:", error.message);
+      if (data.results.length > 0) {
+        const formattedAddress = data.results[0].formatted;
+        setAddress(formattedAddress);
       }
+    } catch (error) {
+      console.error("Error akses GPS:", error.message);
     }
   };
 
@@ -164,11 +145,29 @@ export default function AttendanceForm() {
       setSignature(blob);
     }
   };
-
+  const enableGeolocation = () => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+          setLatitude(latitude);
+          setlongitude(longitude);
+          enableGps(latitude, longitude);
+        },
+        (error) => {
+          toast.error("Tidak dapat mengakses lokasi:", error.message);
+          console.error("Tidak dapat mengakses lokasi:", error.message);
+        }
+      );
+    } else {
+      toast.error("Browser tidak mendukung Geolocation ");
+      console.error("Browser tidak mendukung Geolocation API");
+    }
+  };
   useEffect(() => {
-    setIsLocationEnabled(true);
+    enableGeolocation();
     setIsCameraActive(true);
-    enableGps();
   }, []);
 
   return (
