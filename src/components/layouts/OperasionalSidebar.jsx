@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
-const OperasionalSidebar = ({ isOpen, onClose }) => {
+const OperasionalSidebar = ({ isOpen, onOpen }) => {
   const location = useLocation();
   const [activePage, setActivePage] = useState("");
 
@@ -180,21 +180,24 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
 
   const handlePageClick = (pagePath) => {
     setActivePage(pagePath);
-    onClose();
+    onOpen();
   };
 
   return (
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-20 bg-gray-600 bg-opacity-50 sm:hidden"
-          onClick={onClose}
+          className={`fixed z-20 bg-gray-600 ${
+            isOpen ? "bg-opacity-50" : "bg-opacity-0"
+          } sm:hidden`}
+          onClick={onOpen}
         ></div>
       )}
+
       <aside
         id="default-sidebar"
-        className={`fixed sm:relative left-0 z-20 sm:z-0 w-64 h-screen transition-transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed sm:relative z-20 sm:z-0 w-64 h-screen transition-transform ${
+          isOpen ? "-translate-x-full" : "translate-x-0"
         } bg-white dark:bg-gray-800`}
         aria-label="Sidebar"
       >
