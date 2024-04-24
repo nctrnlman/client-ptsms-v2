@@ -14,3 +14,12 @@ export function formatCurrency(amount) {
   });
   return formatter.format(amount);
 }
+
+export const formatDateMonth = (dateString) => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString([], {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+};

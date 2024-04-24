@@ -1,11 +1,4 @@
 import { useState, useEffect } from "react";
-import DashboardCard from "../../../components/cards/DashboardCard";
-import {
-  FaUsers,
-  FaCalendarDay,
-  FaClipboardList,
-  FaUser,
-} from "react-icons/fa";
 import Layout from "../../../components/layouts/SettingLayout";
 import DataTable from "../../../components/tables/DataTable";
 import axios from "axios";
@@ -13,10 +6,6 @@ import axios from "axios";
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalSupplier, setTotalSupplier] = useState(0);
-  const [todayTransaction, setTodayTransaction] = useState(0);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Role Name", flex: 1 },
@@ -42,25 +31,7 @@ export default function Home() {
     }
   };
 
-  const fetchMasterData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master`
-      );
-      setTotalSupplier(response.data.data.totalSupplier);
-      setMostSupplierTransaction(response.data.data.mostSupplierTransaction);
-      setTotalTransaction(response.data.data.totalTransaction);
-      setTodayTransaction(response.data.data.todayTransaction);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchMasterData();
     fetchData();
   }, []);
 
@@ -118,28 +89,6 @@ export default function Home() {
           <h1 className="text-3xl pb-3 font-medium">Roles Page</h1>
         </div>
 
-        <div className="flex gap-6 ">
-          <DashboardCard
-            title="Total Supplier"
-            description={totalSupplier}
-            icon={FaUsers}
-          />
-          <DashboardCard
-            title="Today Transaction"
-            description={todayTransaction}
-            icon={FaCalendarDay}
-          />
-          <DashboardCard
-            title="Total Transaction"
-            description={totalTransaction}
-            icon={FaClipboardList}
-          />
-          <DashboardCard
-            title="Most Frequent Distributor"
-            description={mostSupplierTransaction}
-            icon={FaUser}
-          />
-        </div>
         <DataTable rows={rows} columns={columns} loading={loading} />
       </main>
     </Layout>

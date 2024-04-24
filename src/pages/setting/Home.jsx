@@ -1,29 +1,15 @@
-import DashboardCard from "../../components/cards/DashboardCard";
-import {
-  FaUsers,
-  FaCalendarDay,
-  FaClipboardList,
-  FaUser,
-} from "react-icons/fa";
 import Layout from "../../components/layouts/SettingLayout";
 import DataTable from "../../components/tables/DataTable";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import ModalAddDistributor from "../../components/cards/ModalAddDistributor";
+import ModalAddUser from "../../components/cards/ModalAddUser";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { encryptNumber } from "../../utils/encryptionUtils";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalSupplier, setTotalSupplier] = useState(0);
-  const [todayTransaction, setTodayTransaction] = useState(0);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
   const [openModal, setOpenModal] = useState(false);
-  const navigate = useNavigate();
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Username", flex: 1 },
@@ -60,12 +46,13 @@ export default function Home() {
   ];
 
   const handleDelete = (id) => {
-    // Logika untuk menghapus data dengan ID yang diteruskan
     console.log(`Delete data with ID: ${id}`);
   };
-  const handleEdit = (id) => {
-    navigate(`/operasional/supplier/transaction/detail/${encryptNumber(id)}`);
-  };
+  //  const handleToggleModalEdit = (id) => {
+  //    setSelectedDistributorId(id);
+  //    setOpenModalEdit(!openModalEdit);
+  //  };
+  const handleEdit = (id) => {};
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -88,50 +75,33 @@ export default function Home() {
     }
   };
 
-  const fetchMasterData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master`
-      );
-      setTotalSupplier(response.data.data.totalSupplier);
-      setMostSupplierTransaction(response.data.data.mostSupplierTransaction);
-      setTotalTransaction(response.data.data.totalTransaction);
-      setTodayTransaction(response.data.data.todayTransaction);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setLoading(false);
-    }
-  };
-
   const handleToggleModal = () => {
     setOpenModal(!openModal);
   };
 
-  const handleCreateDistributor = async (newDistributor) => {
+  const handleCreateUser = async (newUser) => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/auth/register`,
         {
-          supplierName: newDistributor.name,
-          supplierCode: newDistributor.code,
+          name: newUser.username,
+          email: newUser.email,
+          password: newUser.password,
+          role: newUser.role_id,
         }
       );
       toast.success(response.data.message);
       await fetchData();
-      await fetchMasterData();
       setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
-      console.error("Error creating distributor:", error);
+      console.error("Error creating User:", error);
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMasterData();
     fetchData();
   }, []);
 
@@ -186,7 +156,9 @@ export default function Home() {
         </nav>
 
         <div className="flex justify-between">
-          <h1 className="text-3xl pb-3 font-medium">Setting Dashboard Page</h1>
+          <h1 className="text-3xl pb-3 font-medium">
+            Setting User Dashboard Page
+          </h1>
           <div className="flex justify-end gap-3">
             <button
               onClick={handleToggleModal}
@@ -211,34 +183,12 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="flex gap-6 ">
-          <DashboardCard
-            title="Total Supplier"
-            description={totalSupplier}
-            icon={FaUsers}
-          />
-          <DashboardCard
-            title="Today Transaction"
-            description={todayTransaction}
-            icon={FaCalendarDay}
-          />
-          <DashboardCard
-            title="Total Transaction"
-            description={totalTransaction}
-            icon={FaClipboardList}
-          />
-          <DashboardCard
-            title="Most Frequent Distributor"
-            description={mostSupplierTransaction}
-            icon={FaUser}
-          />
-        </div>
         <DataTable rows={rows} columns={columns} loading={loading} />
 
-        <ModalAddDistributor
+        <ModalAddUser
           openModal={openModal}
           setOpenModal={setOpenModal}
-          onCreateDistributor={handleCreateDistributor}
+          onCreateUser={handleCreateUser}
         />
       </main>
     </Layout>
