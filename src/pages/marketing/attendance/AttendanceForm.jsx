@@ -55,6 +55,7 @@ export default function AttendanceForm() {
       // 1. Upload foto
       const blob = await fetch(capturedPhoto).then((res) => res.blob());
       const photoFileName = `images/${userData.id}_${Date.now()}.jpg`;
+
       const photoStorageRef = ref(storage, photoFileName);
       const photoUploadTask = uploadBytes(photoStorageRef, blob);
 
@@ -62,9 +63,11 @@ export default function AttendanceForm() {
       const photoDownloadURL = await photoUploadTask.then((snapshot) => {
         return getDownloadURL(photoStorageRef);
       });
+
       // 2. Upload tanda tangan
       if (signature) {
         const signatureFileName = `signatures/${userData.id}_${Date.now()}.png`;
+
         const signatureStorageRef = ref(storage, signatureFileName);
         const signatureUploadTask = uploadBytes(signatureStorageRef, signature);
         const signatureDownloadURL = await signatureUploadTask.then(
@@ -164,7 +167,7 @@ export default function AttendanceForm() {
   useEffect(() => {
     enableGeolocation();
     setIsCameraActive(true);
-  }, []);
+  }, [userData]);
 
   return (
     <Layout>
