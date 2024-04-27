@@ -5,11 +5,18 @@ import { useState, useEffect } from "react";
 import ModalAddUser from "../../components/cards/ModalAddUser";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ModalEditUser from "../../components/cards/ModalEditUser";
+import ModalDelete from "../../components/cards/ModalDelete";
+import ModalResetPasswordUser from "../../components/cards/ModalResetPasswordUser";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openModal, setOpenModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [openModalDelete, setOpenModalDelete] = useState(false);
+  const [openModalEdit, setOpenModalEdit] = useState(false);
+  const [openModalReset, setOpenModalReset] = useState(false);
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Username", flex: 1 },
@@ -23,20 +30,20 @@ export default function Home() {
         <div className="flex gap-3 ">
           <button
             className=" text-brand-500  hover:text-brand-800 font-bold"
-            onClick={() => handleEdit(params.row.user_id)}
+            onClick={() => handleToggleModalEdit(params.row.user_id)}
           >
             Edit
           </button>
 
           <button
             className=" text-red-500 hover:text-red-800 font-bold "
-            onClick={() => handleDelete(params.row.user_id)}
+            onClick={() => handleToggleModalDelete(params.row.user_id)}
           >
             Delete
           </button>
           <button
             className=" text-teal-500  hover:text-teal-800 font-bold"
-            onClick={() => handleEdit(params.row.user_id)}
+            onClick={() => handleToggleModalReset(params.row.user_id)}
           >
             Reset Password
           </button>
@@ -45,14 +52,90 @@ export default function Home() {
     },
   ];
 
-  const handleDelete = (id) => {
-    console.log(`Delete data with ID: ${id}`);
+  const handleToggleModalDelete = (id) => {
+    setSelectedId(id);
+    setOpenModalDelete(true);
   };
-  //  const handleToggleModalEdit = (id) => {
-  //    setSelectedDistributorId(id);
-  //    setOpenModalEdit(!openModalEdit);
-  //  };
-  const handleEdit = (id) => {};
+  const handleToggleModalEdit = (id) => {
+    setSelectedId(id);
+    setOpenModalEdit(!openModalEdit);
+  };
+  const handleToggleModalReset = (id) => {
+    setSelectedId(id);
+    setOpenModalReset(!openModalReset);
+  };
+  const handleDeleteUser = async (id) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user/delete/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting sales:", error);
+      setLoading(false);
+    }
+  };
+  const updateUser = async (id, newData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user/update`,
+        {
+          user_id: id,
+          name: newData.username,
+          email: newData.email,
+          role_id: newData.role_id,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchData();
+
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message);
+      }
+      console.error("Error updating sales:", error);
+      setLoading(false);
+    }
+  };
+  const resetPasswordUser = async (id, newData) => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user/reset/password`,
+        {
+          id: id,
+          password: newData.password,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchData();
+
+      setLoading(false);
+    } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message);
+      }
+      console.error("Error updating sales:", error);
+      setLoading(false);
+    }
+  };
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -189,6 +272,24 @@ export default function Home() {
           openModal={openModal}
           setOpenModal={setOpenModal}
           onCreateUser={handleCreateUser}
+        />
+        <ModalDelete
+          id={selectedId}
+          onDeleteComponent={handleDeleteUser}
+          open={openModalDelete}
+          onClose={() => setOpenModalDelete(false)}
+        />
+        <ModalEditUser
+          id={selectedId}
+          openModal={openModalEdit}
+          setOpenModal={setOpenModalEdit}
+          onUpdateUser={updateUser}
+        />
+        <ModalResetPasswordUser
+          id={selectedId}
+          openModal={openModalReset}
+          setOpenModal={setOpenModalReset}
+          onResetPasswordUser={resetPasswordUser}
         />
       </main>
     </Layout>
