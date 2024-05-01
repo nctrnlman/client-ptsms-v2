@@ -1,12 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import {
-  Button,
-  Label,
-  Modal,
-  Select,
-  TextInput,
-  Datepicker,
-} from "flowbite-react";
+import { Button, Label, Modal, Select, TextInput } from "flowbite-react";
 import axios from "axios";
 
 function ModalEditProduct({ id, open, onClose, onEditProduct }) {
@@ -14,10 +7,10 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [aklAkd, setAklAkd] = useState("");
-  const [expiredDate, setExpiredDate] = useState("");
   const [loading, setLoading] = useState(true);
   const [productType, setProductType] = useState([]);
   const [productMerk, setProductMerk] = useState([]);
+  const [expired, setExpired] = useState("");
   const [selectedProductType, setSelectedProductType] = useState("");
   const [selectedProductMerk, setSelectedProductMerk] = useState("");
 
@@ -46,8 +39,8 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
       setProductName(productData.product_name);
       setPrice(productData.price);
       setStock(productData.stock);
+      setExpired(productData.isExpired);
       setAklAkd(productData.akl_akd);
-      setExpiredDate(productData.expired_date);
       setSelectedProductType(productData.product_type);
       setSelectedProductMerk(productData.product_merk);
     } catch (error) {
@@ -57,12 +50,13 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
 
   const handleUpdateProduct = async () => {
     try {
+      console.log(expired);
       onEditProduct(id, {
         name: productName,
         aklAkd: aklAkd,
-        expiredDate: expiredDate,
         price: price,
         stock: stock,
+        expired: expired,
         productType: selectedProductType,
         productMerk: selectedProductMerk,
       });
@@ -168,28 +162,32 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="stock" value="Stock" />
+              <Label htmlFor="productExpired" value="Product Expired" />
             </div>
-            <TextInput
-              id="stock"
-              type="number"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-              placeholder="Enter product stock"
-              required={true}
-            />
+            <Select
+              id="productExpired"
+              value={expired}
+              onChange={(e) => setExpired(e.target.value)}
+            >
+              <option value="">Expired and Not Expired</option>
+              <option value="1">Expired</option>
+              <option value="0">Not Expired</option>
+            </Select>
           </div>
-          <div>
-            <div className="mb-2 block">
-              <Label htmlFor="expiredDate" value="Expired Date" />
+          {expired === "0" && (
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="stock" value="Stock" />
+              </div>
+              <TextInput
+                id="stock"
+                type="number"
+                placeholder="Enter stock"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+              />
             </div>
-            <Datepicker
-              id="expiredDate"
-              value={expiredDate}
-              onChange={(date) => setExpiredDate(date)}
-              required={true}
-            />
-          </div>
+          )}
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">

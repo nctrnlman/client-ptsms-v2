@@ -10,9 +10,6 @@ import DataTable from "../../../components/tables/DataTable";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import ModalAddDistributor from "../../../components/cards/ModalAddDistributor";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import { encryptNumber } from "../../../utils/encryptionUtils";
 
@@ -24,27 +21,29 @@ export default function Home() {
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
   const [openModal, setOpenModal] = useState(false);
+
   const navigate = useNavigate();
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "no_faktur", headerName: "No Faktur", flex: 1 },
-    { field: "supplier_name", headerName: "Distributor name", flex: 1 },
-    { field: "payment_method", headerName: "Payment Method", flex: 1 },
-    { field: "created_at", headerName: "Created Date", flex: 1 },
-    { field: "time_to_payment", headerName: "Time To Payment", flex: 1 },
-    { field: "amount", headerName: "Total Amount", flex: 1 },
-    { field: "note", headerName: "Note", flex: 1 },
+    { field: "id", headerName: "ID" },
+    { field: "no_faktur", headerName: "No Faktur" },
+    { field: "supplier_name", headerName: "Distributor name" },
+    { field: "payment_method", headerName: "Payment Method" },
+    { field: "created_at", headerName: "Created Date" },
+    { field: "time_to_payment", headerName: "Time To Payment" },
+    { field: "amount", headerName: "Total Amount" },
+    { field: "amount_tax", headerName: "Total Amount with Tax" },
+    { field: "pic", headerName: "PIC" },
+    { field: "note", headerName: "Note" },
     {
       field: "action",
       headerName: "Action",
-      flex: 1,
       renderCell: (params) => (
         <div className="flex gap-3 ">
           <button
             className=" text-brand-500  hover:text-brand-800 font-bold"
             onClick={() => handleEdit(params.row.transaction_id)}
           >
-            Edit
+            Detail
           </button>
           <button
             className=" text-red-500 hover:text-red-800 font-bold "
@@ -58,10 +57,9 @@ export default function Home() {
   ];
 
   const handleCreateClick = () => {
-    navigate("/operasional/supplier/form");
+    navigate("/operasional/supplier/transaction/in/form");
   };
   const handleDelete = (id) => {
-    // Logika untuk menghapus data dengan ID yang diteruskan
     console.log(`Delete data with ID: ${id}`);
   };
   const handleEdit = (id) => {
@@ -82,8 +80,9 @@ export default function Home() {
         created_at: formatDate(item.created_at),
         time_to_payment: formatDate(item.time_to_payment),
         amount: formatCurrency(item.amount),
+        amount_tax: formatCurrency(item.amount_tax),
+        pic: item.name,
         note: item.note,
-        action: item.note,
       }));
       setRows(modifiedData);
 
@@ -108,31 +107,6 @@ export default function Home() {
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setLoading(false);
-    }
-  };
-
-  const handleToggleModal = () => {
-    setOpenModal(!openModal);
-  };
-
-  const handleCreateDistributor = async (newDistributor) => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/create`,
-        {
-          supplierName: newDistributor.name,
-          supplierCode: newDistributor.code,
-        }
-      );
-      toast.success(response.data.message);
-      await fetchData();
-      await fetchMasterData();
-      setLoading(false);
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error creating distributor:", error);
       setLoading(false);
     }
   };
@@ -198,31 +172,10 @@ export default function Home() {
           </h1>
           <div className="flex justify-end gap-3">
             <button
-              onClick={handleToggleModal}
-              className="flex items-center text-teal-500 hover:bg-gray-50 font-bold p-3 border border-gray-500 rounded-full "
-            >
-              Add Distributor
-              <svg
-                className="-mr-1 ml-2 h-4 w-4 text-teal-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                />
-              </svg>
-            </button>
-
-            <button
               onClick={handleCreateClick}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
             >
-              Create
+              Add Transaction In
               <svg
                 className="-mr-1 ml-2 h-4 w-4"
                 fill="currentColor"
@@ -262,12 +215,6 @@ export default function Home() {
           />
         </div>
         <DataTable rows={rows} columns={columns} loading={loading} />
-
-        <ModalAddDistributor
-          openModal={openModal}
-          setOpenModal={setOpenModal}
-          onCreateDistributor={handleCreateDistributor}
-        />
       </main>
     </Layout>
   );

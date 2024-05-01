@@ -4,26 +4,38 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
-import { decryptNumber } from "../../../utils/encryptionUtils";
+import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import { useSelector } from "react-redux";
 export default function TransactionInDetail() {
   const { id } = useParams();
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [transactionId, setTransactionId] = useState(0);
+  const [distributor, setDistributor] = useState("");
+  const [totalTransaction, setTotalTransaction] = useState("");
+  const [totalTransactionTax, setTotalTransactionTax] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
+  const [updateAt, setUpdateAt] = useState("");
+  const userData = useSelector((state) => state.user.User);
   const navigate = useNavigate();
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "product_name", headerName: "Product Name", flex: 1 },
-    { field: "type_name", headerName: "Type", flex: 1 },
-    { field: "merk_name", headerName: "Merk", flex: 1 },
-    { field: "expired_date", headerName: "Expired Date", flex: 1 },
-    { field: "akl_akd", headerName: "No AKL/AKD", flex: 1 },
-    { field: "price", headerName: "Price", flex: 1 },
-    { field: "stock", headerName: "Stock", flex: 1 },
+    { field: "id", headerName: "ID" },
+    { field: "product_name", headerName: "Product Name" },
+    { field: "type_name", headerName: "Type" },
+    { field: "merk_name", headerName: "Merk" },
+    { field: "expired_date", headerName: "Expired Date" },
+    { field: "akl_akd", headerName: "No AKL/AKD" },
+    { field: "price", headerName: "Price" },
+    { field: "quantity", headerName: "Qty" },
   ];
 
   const handleCreateClick = () => {
-    navigate("/operasional/supplier/form");
+    navigate(
+      `/operasional/supplier/transaction/in/edit/${encryptNumber(
+        transactionId
+      )}`
+    );
   };
   const fetchData = async (id) => {
     try {
@@ -31,17 +43,28 @@ export default function TransactionInDetail() {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/transactions/in/detail/${id}`
       );
-      const modifiedData = response.data.data.map((item, index) => ({
-        id: index + 1,
-        product_name: item.product_name,
-        type_name: item.type_name,
-        merk_name: item.merk_name,
-        expired_date: formatDate(item.expired_date),
-        akl_akd: item.akl_akd,
-        price: formatCurrency(item.price),
-        stock: item.stock,
-      }));
+      const modifiedData = response.data.data.transactionInDetail.map(
+        (item, index) => ({
+          id: index + 1,
+          product_name: item.product_name,
+          type_name: item.type_name,
+          merk_name: item.merk_name,
+          expired_date: item.expired_date ? formatDate(item.expired_date) : "-",
+          akl_akd: item.akl_akd,
+          price: formatCurrency(item.price),
+          quantity: item.quantity,
+        })
+      );
       setRows(modifiedData);
+      setDistributor(response.data.data.transactionIn.supplier_name);
+      setTotalTransaction(response.data.data.transactionIn.amount);
+      setTotalTransactionTax(response.data.data.transactionIn.amount_tax);
+      setCreatedAt(formatDate(response.data.data.transactionIn.created_at));
+      setUpdateAt(
+        response.data.data.transactionIn.updated_at
+          ? formatDate(response.data.data.transactionIn.updated_at)
+          : "-"
+      );
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -50,6 +73,7 @@ export default function TransactionInDetail() {
   };
 
   useEffect(() => {
+    setTransactionId(decryptNumber(id));
     fetchData(decryptNumber(id));
   }, []);
 
@@ -157,26 +181,37 @@ export default function TransactionInDetail() {
           <h1 className="text-3xl pb-3 font-medium">
             Suppliers Transaction Detail
           </h1>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={handleCreateClick}
-              className="bg-brand-500 flex  items-center hover:bg-brand-800 text-white font-bold p-3 rounded-full"
-            >
-              Edit Transaction
-              <svg
-                className="-mr-1 ml-2 h-4 w-4"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
+          {userData?.role_id == 1 && (
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={handleCreateClick}
+                className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
-          </div>
+                Edit Transaction
+                <svg
+                  className="-mr-1 ml-2 h-4 w-4"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="flex gap-4 flex-row">
+          <p>Distributor : {distributor}</p>
+          <p>Created Date : {createdAt}</p>
+          <p>Update Date : {updateAt}</p>
+          <p>Total Transaction : {formatCurrency(totalTransaction)}</p>
+          <p>
+            Total Transaction with Tax : {formatCurrency(totalTransactionTax)}
+          </p>
         </div>
 
         <DataTable rows={rows} columns={columns} loading={loading} />

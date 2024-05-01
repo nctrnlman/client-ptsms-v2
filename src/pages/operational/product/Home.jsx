@@ -16,7 +16,8 @@ import ModalEditProductMerk from "../../../components/cards/ModalEditProductMerk
 import ModalAddProductMerk from "../../../components/cards/ModalAddProductMerk";
 import ModalDeleteMerk from "../../../components/cards/ModalDelete";
 import ModalDeleteType from "../../../components/cards/ModalDelete";
-
+import { encryptNumber } from "../../../utils/encryptionUtils";
+import { useNavigate } from "react-router-dom";
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [rowTypes, setRowTypes] = useState([]);
@@ -40,21 +41,30 @@ export default function Home() {
   const [selectedProductMerkId, setSelectedProductMerkId] = useState(null);
   const [openModalEditProductMerk, setOpenModalEditProductMerk] =
     useState(false);
+  const navigate = useNavigate();
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
+    { field: "id", headerName: "No", flex: 1 },
+    { field: "product_id", headerName: "Product Code", flex: 1 },
     { field: "product_name", headerName: "Product Name", flex: 1 },
     { field: "product_type", headerName: "Product Type", flex: 1 },
     { field: "product_merk", headerName: "Product Merk", flex: 1 },
     { field: "akl_akd", headerName: "No AKL/AKD", flex: 1 },
     { field: "price", headerName: "Price", flex: 1 },
     { field: "stock", headerName: "Stock", flex: 1 },
-    { field: "expired_date", headerName: "Expired Date", flex: 1 },
     {
       field: "action",
       headerName: "Action",
       flex: 1,
       renderCell: (params) => (
         <div className="flex gap-3">
+          {params.row.isExpired == "1" && (
+            <button
+              className="text-teal-500 hover:text-teal-800 font-bold"
+              onClick={() => handleMoveToDetail(params.row.product_id)}
+            >
+              Expired Detail
+            </button>
+          )}
           <button
             className="text-brand-500 hover:text-teal-800 font-bold"
             onClick={() => handleEdit(params.row.product_id)}
@@ -71,6 +81,10 @@ export default function Home() {
       ),
     },
   ];
+
+  const handleMoveToDetail = (id) => {
+    navigate(`/operasional/product/detail/${encryptNumber(id)}`);
+  };
 
   const columnType = [
     { field: "id", headerName: "ID", flex: 1 },
@@ -210,13 +224,15 @@ export default function Home() {
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
         product_id: item.product_id,
+        isExpired: item.isExpired,
+        code: item.supplier_code + "-" + item.product_id,
         product_name: item.product_name,
         product_type: item.type_name,
         product_merk: item.merk_name,
         akl_akd: item.akl_akd,
         price: formatCurrency(item.price),
         stock: item.stock,
-        expired_date: formatDate(item.expired_date),
+        total_stock: item.total_stock,
       }));
       setRows(modifiedData);
       setLoading(false);
@@ -641,7 +657,6 @@ export default function Home() {
           open={openModalEdit}
           onClose={() => setOpenModalEdit(false)}
         />
-
         <ModalAddProductMerk
           openModal={openModalMerk}
           setOpenModal={setOpenModalMerk}

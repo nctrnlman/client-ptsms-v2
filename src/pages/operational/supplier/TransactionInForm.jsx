@@ -1,72 +1,69 @@
 import Layout from "../../../components/layouts/OperasionalLayout";
 import { Datepicker } from "flowbite-react";
-import TransactionOutRepeater from "../../../components/form/TransactionOutRepeater";
+import Repeater from "../../../components/form/Repeater";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate, useParams } from "react-router-dom";
-import { formatCurrency } from "../../../utils/converter";
-import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-export default function TransactionOutFrom() {
-  const { id } = useParams();
-  const [customerId, setCustomerId] = useState(0);
+export default function TransactionInForm() {
+  const [options, setOptions] = useState([]);
   const [product, setProduct] = useState([]);
-  const [customer, setCustomer] = useState([]);
-  const [salesman, setSalesman] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [totalTransactionTax, setTotalTransactionTax] = useState(0);
   const navigate = useNavigate();
   const userData = useSelector((state) => state.user.User);
   const [formData, setFormData] = useState({
     noFaktur: "",
-    noPo: "",
-    cn: "",
-    customerId: "",
-    userId: userData.id,
-    salesman: "",
+    supplierId: "",
     paymentMethod: "",
     timeToPayment: "",
-    deliveryDate: "",
+    tax: "",
     note: "",
+    userId: userData.id,
     productList: [],
   });
-
-  const calculateTotalTransaction = () => {
-    let total = 0;
-    formData.productList.forEach((product) => {
-      total += product.productPrice;
-    });
-    let totalWithTax = 0;
-    formData.productList.forEach((product) => {
-      totalWithTax += product.productTotalPrice;
-    });
-    setTotalTransaction(total);
-    setTotalTransactionTax(totalWithTax);
-  };
-
   const getMasterDynamic = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/data/master/transaction`
+        `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
       );
-      setProduct(response.data.data.product);
-      setCustomer(response.data.data.customer);
-      setSalesman(response.data.data.salesman);
+      setOptions(response.data.data.supplier);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
       setLoading(false);
     }
   };
+  const getMasterDynamicProduct = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/product/supplier/${id}`
+      );
+
+      setProduct(response.data.data.product);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching options:", error);
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    getMasterDynamic();
+  }, []);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     let filteredValue = value;
-    if (name === "cn") {
+    if (name === "supplierId") {
+      getMasterDynamicProduct(value);
+    }
+
+    if (name === "tax") {
       filteredValue = value.replace(/[^0-9.]/g, "");
       const decimalIndex = filteredValue.indexOf(".");
       if (decimalIndex !== -1) {
@@ -78,6 +75,7 @@ export default function TransactionOutFrom() {
         filteredValue = `${integerPart}.${decimalPart}`;
       }
     }
+
     setFormData({
       ...formData,
       [name]: filteredValue,
@@ -86,32 +84,25 @@ export default function TransactionOutFrom() {
 
   const handleSubmit = async () => {
     try {
-      setLoading(true);
+      setLoading(loading);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/create`,
-        {
-          ...formData,
-          totalPayment: totalTransaction,
-          totalPaymentTax: totalTransactionTax,
-        }
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/create`,
+        formData
       );
       setFormData({
         noFaktur: "",
-        noPo: "",
-        customerId: "",
-        salesman: "",
+        supplierId: "",
         paymentMethod: "",
         timeToPayment: "",
-        deliveryDate: "",
+        tax: "",
         note: "",
+        userId: "",
         productList: [],
       });
-      setTotalTransaction("");
-      setTotalTransactionTax("");
+
       toast.success(response.data.message);
-      navigate(`/operasional/customer/${encryptNumber(customerId)}`);
+      navigate(`/operasional/suppliers`);
     } catch (error) {
-      setLoading(false);
       setLoading(false);
       if (error.response && error.response.data && error.response.data.errors) {
         const errorMessages = error.response.data.errors.map(
@@ -128,13 +119,6 @@ export default function TransactionOutFrom() {
     }
   };
 
-  useEffect(() => {
-    getMasterDynamic();
-    setCustomerId(decryptNumber(id));
-    setFormData({ ...formData, customerId: decryptNumber(id) });
-    calculateTotalTransaction();
-  }, [formData.productList]);
-
   return (
     <Layout>
       <main className="flex flex-col gap-4 ">
@@ -143,7 +127,7 @@ export default function TransactionOutFrom() {
             <li className="inline-flex items-center">
               <a
                 href="/operasional/dashboard"
-                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
+                className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-teal-600 dark:text-gray-400 dark:hover:text-white"
               >
                 <svg
                   className="w-3 h-3 me-2.5"
@@ -176,9 +160,9 @@ export default function TransactionOutFrom() {
                 </svg>
                 <a
                   href="#"
-                  className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
+                  className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Customer
+                  Supplier
                 </a>
               </div>
             </li>
@@ -201,9 +185,9 @@ export default function TransactionOutFrom() {
                 </svg>
                 <a
                   href="#"
-                  className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
+                  className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Transaction Out
+                  Transaction In
                 </a>
               </div>
             </li>
@@ -226,7 +210,7 @@ export default function TransactionOutFrom() {
                 </svg>
                 <a
                   href="#"
-                  className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
+                  className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
                   Form
                 </a>
@@ -237,7 +221,7 @@ export default function TransactionOutFrom() {
 
         <div>
           <h1 className="text-3xl pb-3 font-medium">
-            Transaction Out Create Form
+            Transaction In Create Form
           </h1>
           <p>
             Please use this form carefully to ensure the accuracy and
@@ -246,12 +230,12 @@ export default function TransactionOutFrom() {
           </p>
         </div>
 
-        <div className=" flex flex-col gap-3">
+        <div className=" flex flex-col gap-6">
           <h4 className="pt-3 block mb-2 text-xl font-medium text-gray-900 dark:text-white">
             Transaction Information
           </h4>
           {/* Form fields */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {/* No Faktur */}
             <div>
               <label
@@ -266,119 +250,41 @@ export default function TransactionOutFrom() {
                 name="noFaktur"
                 value={formData.noFaktur}
                 onChange={handleInputChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
                 placeholder="No Faktur"
                 required
               />
             </div>
-            {/* No PO */}
+            {/* Supplier */}
             <div>
               <label
-                htmlFor="no_po"
+                htmlFor="supplier"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No PO
-              </label>
-              <input
-                type="text"
-                id="no_po"
-                name="noPo"
-                value={formData.noPo}
-                onChange={handleInputChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="No PO"
-                required
-              />
-            </div>
-
-            {/* Customer */}
-            <div>
-              <label
-                htmlFor="customer"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Customer{" "}
+                Supplier{" "}
                 {loading && (
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
               <select
-                id="customer"
-                name="customerId"
-                value={formData.customerId}
+                id="supplier"
+                name="supplierId"
+                value={formData.supplierId}
                 onChange={(e) => {
                   handleInputChange(e);
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                disabled={true}
-              >
-                <option value="">Choose a Customer</option>
-                {!loading &&
-                  customer?.map((option) => (
-                    <option
-                      key={option.customer_id}
-                      value={parseInt(option.customer_id)}
-                    >
-                      {option.customer_name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            {/* Salesman */}
-            <div>
-              <label
-                htmlFor="salesman"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                Salesman{" "}
-                {loading && (
-                  <ClipLoader color="#4A90E2" loading={loading} size={10} />
-                )}
-              </label>
-              <select
-                id="salesman"
-                name="salesman"
-                value={formData.salesman}
-                onChange={(e) => {
-                  handleInputChange(e);
-                }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
                 disabled={loading}
               >
-                <option value="">Choose a Salesman</option>
+                <option value="">Choose a supplier</option>
                 {!loading &&
-                  salesman?.map((option) => (
-                    <option
-                      key={option.sales_id}
-                      value={parseInt(option.sales_id)}
-                    >
-                      {option.sales_name}
+                  options?.map((option) => (
+                    <option key={option.supplier_id} value={option.supplier_id}>
+                      {option.supplier_code + "-" + option.supplier_name}
                     </option>
                   ))}
               </select>
             </div>
-            {/* CN */}
-            <div>
-              <label
-                htmlFor="cn"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                CN
-              </label>
-              <input
-                type="text"
-                id="cn"
-                name="cn"
-                value={formData.cn}
-                onChange={handleInputChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="CN"
-                pattern="^\d+(\.\d+)?$"
-                title="Enter a valid number"
-                required
-              />
-            </div>
-
             {/* Payment Method */}
             <div>
               <label
@@ -392,35 +298,35 @@ export default function TransactionOutFrom() {
                 name="paymentMethod"
                 value={formData.paymentMethod}
                 onChange={handleInputChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
               >
                 <option value="">Choose a payment method</option>
                 <option value="Cash">Cash</option>
                 <option value="Credit">Credit</option>
               </select>
             </div>
-            {/* Delivery Date */}
+            {/* Tax */}
             <div>
               <label
-                htmlFor="deliveryDate"
+                htmlFor="tax"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Delivery Date
+                Tax
               </label>
-              <Datepicker
-                id="deliveryDate"
-                name="timeToPayment"
-                // selected={formData.timeToPayment}
-                value={formData.deliveryDate}
-                onSelectedDateChanged={(date) =>
-                  setFormData({ ...formData, deliveryDate: date })
-                }
-                title="Delivery Date"
-                language="en"
-                labelTodayButton="Today"
-                labelClearButton="Clear"
+              <input
+                type="text"
+                id="tax"
+                name="tax"
+                value={formData.tax}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                placeholder="Tax"
+                pattern="^\d+(\.\d+)?$"
+                title="Enter a valid number"
+                required
               />
             </div>
+
             {/* Time to Payment */}
             <div>
               <label
@@ -458,8 +364,8 @@ export default function TransactionOutFrom() {
               name="note"
               value={formData.note}
               onChange={handleInputChange}
-              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              placeholder="Insert Note here..."
+              className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+              placeholder="Insert Note here.."
               required
             />
           </div>
@@ -470,19 +376,15 @@ export default function TransactionOutFrom() {
               htmlFor=""
               className="block mb-2 text-xl font-medium text-gray-900 dark:text-white"
             >
-              Product Information{" "}
+              Product Information
               {loading && (
                 <ClipLoader color="#4A90E2" loading={loading} size={10} />
               )}
             </label>
-            <TransactionOutRepeater
-              product={product}
-              setProduct={setFormData}
-            />
+            <Repeater product={product} setProduct={setFormData} />
           </div>
 
-          <div className="flex items-center justify-end mt-10 gap-4">
-            {/* <p>Total Price: {formatCurrency(totalTransactionTax)}</p> */}
+          <div className="flex justify-end mt-4">
             <button
               onClick={handleSubmit}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"

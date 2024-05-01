@@ -14,12 +14,14 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [aklAkd, setAklAkd] = useState("");
-  const [expiredDate, setExpiredDate] = useState("");
+  const [expired, setExpired] = useState("");
   const [loading, setLoading] = useState(true);
   const [productType, setProductType] = useState([]);
   const [productMerk, setProductMerk] = useState([]);
+  const [supplier, setSupplier] = useState([]);
   const [selectedProductType, setSelectedProductType] = useState("");
   const [selectedProductMerk, setSelectedProductMerk] = useState("");
+  const [selectedSupplier, setSelectedSupplier] = useState("");
 
   const productNameInputRef = useRef(null);
 
@@ -30,6 +32,7 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
       );
       setProductType(response.data.data.productType);
       setProductMerk(response.data.data.productMerk);
+      setSupplier(response.data.data.supplier);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
@@ -41,18 +44,22 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
     setOpenModal(false);
     setProductName("");
     setAklAkd("");
-    setExpiredDate("");
     setPrice("");
     setStock("");
+    setExpired("");
+    setSelectedSupplier("");
+    setSelectedProductType("");
+    setSelectedProductMerk("");
   };
 
   const handleCreateProduct = () => {
     onCreateProduct({
       name: productName,
       aklAkd: aklAkd,
-      expiredDate: expiredDate,
       price: price,
       stock: stock,
+      expired: expired,
+      supplierId: selectedSupplier,
       productType: selectedProductType,
       productMerk: selectedProductMerk,
     });
@@ -88,6 +95,23 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
             />
+          </div>
+          <div>
+            <div className="mb-2 block">
+              <Label htmlFor="distributor" value="Distributor" />
+            </div>
+            <Select
+              id="distributor"
+              value={selectedSupplier}
+              onChange={(e) => setSelectedSupplier(e.target.value)}
+            >
+              <option value="">Choose Distributor</option>
+              {supplier.map((item) => (
+                <option key={item.supplier_id} value={item.supplier_id}>
+                  {item.supplier_code + "-" + item.supplier_name}
+                </option>
+              ))}
+            </Select>
           </div>
           <div>
             <div className="mb-2 block">
@@ -136,22 +160,6 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="expiredDate" value="Expired Date" />
-            </div>
-            <Datepicker
-              id="expiredDate"
-              name="expiredDate"
-              // selected={formData.timeToPayment}
-              value={expiredDate}
-              onSelectedDateChanged={(date) => setExpiredDate(date)}
-              title="Expired Date"
-              language="en"
-              labelTodayButton="Today"
-              labelClearButton="Clear"
-            />
-          </div>
-          <div>
-            <div className="mb-2 block">
               <Label htmlFor="price" value="Price" />
             </div>
             <TextInput
@@ -164,16 +172,32 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="stock" value="Stock" />
+              <Label htmlFor="productExpired" value="Product Expired" />
             </div>
-            <TextInput
-              id="stock"
-              type="number"
-              placeholder="Enter stock"
-              value={stock}
-              onChange={(e) => setStock(e.target.value)}
-            />
+            <Select
+              id="productExpired"
+              value={expired}
+              onChange={(e) => setExpired(e.target.value)}
+            >
+              <option value="">Expired and Not Expired</option>
+              <option value="1">Expired</option>
+              <option value="0">Not Expired</option>
+            </Select>
           </div>
+          {expired === "0" && (
+            <div>
+              <div className="mb-2 block">
+                <Label htmlFor="stock" value="Stock" />
+              </div>
+              <TextInput
+                id="stock"
+                type="number"
+                placeholder="Enter stock"
+                value={stock}
+                onChange={(e) => setStock(e.target.value)}
+              />
+            </div>
+          )}
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">

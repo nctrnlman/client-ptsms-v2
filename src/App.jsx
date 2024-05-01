@@ -6,8 +6,9 @@ import OperasionalCustomerDashboard from "./pages/operational/customer/Home.jsx"
 import OperasionalDistributorDashboard from "./pages/operational/distributor/Home.jsx";
 import OperasionalCustomerDetail from "./pages/operational/customer/CustomerDetail.jsx";
 import OperasionalProductDashboard from "./pages/operational/product/Home.jsx";
-// import OperasionalProductDetail from "./pages/operational/product/Home.jsx";
-import OperasionalForm from "./pages/operational/supplier/SupplierForm.jsx";
+import OperasionalProductDetail from "./pages/operational/product/DetailProduct.jsx";
+import OperasionalTransactionInForm from "./pages/operational/supplier/TransactionInForm.jsx";
+import OperasionalTransactionInEdit from "./pages/operational/supplier/TransactionInEdit.jsx";
 import OperasionalTransactionInDetail from "./pages/operational/supplier/TransactionInDetail.jsx";
 import OperasionalTransactionOutForm from "./pages/operational/customer/TransactionOutForm.jsx";
 import OperasionalTransactionOutDetail from "./pages/operational/customer/TransactionOutDetail.jsx";
@@ -110,8 +111,16 @@ function App() {
               element={<OperasionalProductDashboard />}
             />
             <Route
-              path="/operasional/supplier/form"
-              element={<OperasionalForm />}
+              path="/operasional/product/detail/:id"
+              element={<OperasionalProductDetail />}
+            />
+            <Route
+              path="/operasional/supplier/transaction/in/form"
+              element={<OperasionalTransactionInForm />}
+            />
+            <Route
+              path="/operasional/supplier/transaction/in/edit/:id"
+              element={<OperasionalTransactionInEdit />}
             />
             <Route
               path="/operasional/supplier/transaction/detail/:id"
