@@ -6,12 +6,12 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
-export default function SupplierForm() {
+import { useNavigate, useParams } from "react-router-dom";
+import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+export default function TransactionInEdit() {
+  const { id } = useParams();
   const [options, setOptions] = useState([]);
   const [product, setProduct] = useState([]);
-  const [productType, setProductType] = useState([]);
-  const [productMerk, setProductMerk] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -19,6 +19,7 @@ export default function SupplierForm() {
     supplierId: "",
     paymentMethod: "",
     timeToPayment: "",
+    tax: "",
     note: "",
     productList: [],
   });
@@ -29,9 +30,6 @@ export default function SupplierForm() {
         `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
       );
       setOptions(response.data.data.supplier);
-      setProduct(response.data.data.product);
-      setProductType(response.data.data.productType);
-      setProductMerk(response.data.data.productMerk);
 
       setLoading(false);
     } catch (error) {
@@ -39,22 +37,88 @@ export default function SupplierForm() {
       setLoading(false);
     }
   };
+  const getMasterDynamicProduct = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/product/supplier/${id}`
+      );
+
+      setProduct(response.data.data.product);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching options:", error);
+      setLoading(false);
+    }
+  };
+  const getTransactionDetail = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/detail/${id}`
+      );
+      console.log(response.data.data.transactionInDetail);
+      const transactionDetail = response.data.data;
+      setFormData({
+        ...formData,
+        noFaktur: transactionDetail.transactionIn.no_faktur || "",
+        noPo: transactionDetail.transactionIn.no_po || "",
+        supplierId: transactionDetail.transactionIn.supplier_id || "",
+        paymentMethod: transactionDetail.transactionIn.payment_method || "",
+        timeToPayment: transactionDetail.transactionIn.time_to_payment || "",
+        tax: transactionDetail.transactionIn.tax || "",
+        note: transactionDetail.transactionIn.note || "",
+        productList: response.data.data.transactionInDetail || [],
+      });
+      if (transactionDetail.transactionIn?.supplier_id) {
+        getMasterDynamicProduct(transactionDetail.transactionIn.supplier_id);
+      }
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     getMasterDynamic();
+    getTransactionDetail(decryptNumber(id));
   }, []);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
+    let filteredValue = value;
+    console.log(filteredValue, "cekvalue");
+    if (name === "supplierId") {
+      getMasterDynamicProduct(value);
+    }
+
+    if (name === "tax") {
+      filteredValue = value.replace(/[^0-9.]/g, "");
+      const decimalIndex = filteredValue.indexOf(".");
+      if (decimalIndex !== -1) {
+        const integerPart = filteredValue.slice(0, decimalIndex);
+        const decimalPart = filteredValue.slice(
+          decimalIndex + 1,
+          decimalIndex + 3
+        );
+        filteredValue = `${integerPart}.${decimalPart}`;
+      }
+    }
+
     setFormData({
       ...formData,
-      [name]: value,
+      [name]: filteredValue,
     });
   };
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/create`,
+      const response = await axios.put(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/transactions/in/update/${decryptNumber(id)}`,
         formData
       );
       setFormData({
@@ -62,12 +126,13 @@ export default function SupplierForm() {
         supplierId: "",
         paymentMethod: "",
         timeToPayment: "",
+        tax: "",
         note: "",
         productList: [],
       });
 
       toast.success(response.data.message);
-      navigate(`/operasional/supplier`);
+      navigate(`/operasional/suppliers`);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(error.response.data.message);
@@ -142,7 +207,32 @@ export default function SupplierForm() {
                   href="#"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Form
+                  Transaction In
+                </a>
+              </div>
+            </li>
+            <li>
+              <div className="flex items-center">
+                <svg
+                  className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 6 10"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m1 9 4-4-4-4"
+                  />
+                </svg>
+                <a
+                  href="#"
+                  className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
+                >
+                  Edit
                 </a>
               </div>
             </li>
@@ -150,7 +240,9 @@ export default function SupplierForm() {
         </nav>
 
         <div>
-          <h1 className="text-3xl pb-3 font-medium">Supplier Create Form</h1>
+          <h1 className="text-3xl pb-3 font-medium">
+            Transaction In Edit Form
+          </h1>
           <p>
             Please use this form carefully to ensure the accuracy and
             completeness of the data. Every piece of information entered will
@@ -159,8 +251,11 @@ export default function SupplierForm() {
         </div>
 
         <div className=" flex flex-col gap-6">
+          <h4 className="pt-3 block mb-2 text-xl font-medium text-gray-900 dark:text-white">
+            Transaction Information
+          </h4>
           {/* Form fields */}
-          <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
             {/* No Faktur */}
             <div>
               <label
@@ -173,7 +268,7 @@ export default function SupplierForm() {
                 type="text"
                 id="no_faktur"
                 name="noFaktur"
-                value={formData.noFaktur}
+                value={formData.noFaktur || ""}
                 onChange={handleInputChange}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
                 placeholder="No Faktur"
@@ -194,7 +289,7 @@ export default function SupplierForm() {
               <select
                 id="supplier"
                 name="supplierId"
-                value={formData.supplierId}
+                value={formData.supplierId || ""}
                 onChange={(e) => {
                   handleInputChange(e);
                 }}
@@ -221,7 +316,7 @@ export default function SupplierForm() {
               <select
                 id="payment_method"
                 name="paymentMethod"
-                value={formData.paymentMethod}
+                value={formData.paymentMethod || ""}
                 onChange={handleInputChange}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
               >
@@ -230,6 +325,28 @@ export default function SupplierForm() {
                 <option value="Credit">Credit</option>
               </select>
             </div>
+            {/* Tax */}
+            <div>
+              <label
+                htmlFor="tax"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Tax
+              </label>
+              <input
+                type="text"
+                id="tax"
+                name="tax"
+                value={formData.tax || ""}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                placeholder="Tax"
+                pattern="^\d+(\.\d+)?$"
+                title="Enter a valid number"
+                required
+              />
+            </div>
+
             {/* Time to Payment */}
             <div>
               <label
@@ -242,7 +359,7 @@ export default function SupplierForm() {
                 id="time_to_payment"
                 name="timeToPayment"
                 // selected={formData.timeToPayment}
-                value={formData.timeToPayment}
+                value={formData.timeToPayment || ""}
                 onSelectedDateChanged={(date) =>
                   setFormData({ ...formData, timeToPayment: date })
                 }
@@ -265,7 +382,7 @@ export default function SupplierForm() {
             <textarea
               id="note"
               name="note"
-              value={formData.note}
+              value={formData.note || ""}
               onChange={handleInputChange}
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
               placeholder="Insert Note here.."
@@ -274,21 +391,20 @@ export default function SupplierForm() {
           </div>
 
           {/* Product List */}
-          <div className="">
+          <div className="pt-3 ">
             <label
               htmlFor=""
-              className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              className="block mb-2 text-xl font-medium text-gray-900 dark:text-white"
             >
-              Product List{" "}
+              Product Information
               {loading && (
                 <ClipLoader color="#4A90E2" loading={loading} size={10} />
               )}
             </label>
             <Repeater
               product={product}
-              productType={productType}
-              productMerk={productMerk}
-              setProduct={setFormData} // Set the product data in the form data state
+              setProduct={setFormData}
+              formData={formData ? formData : []}
             />
           </div>
 

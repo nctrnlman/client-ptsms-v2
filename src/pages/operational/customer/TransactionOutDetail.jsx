@@ -11,24 +11,24 @@ export default function TransactionOutDetail() {
   const [customerId, setCustomerId] = useState(0);
   const [totalTransaction, setTotalTransaction] = useState("");
   const [totalTransactionTax, setTotalTransactionTax] = useState("");
+  const [pic, setPic] = useState("");
   const [createdDate, setCreatedDate] = useState("");
+  const [updatedDate, setUpdatedDate] = useState("");
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "product_name", headerName: "Product Name", flex: 1 },
-    { field: "type_name", headerName: "Type", flex: 1 },
-    { field: "merk_name", headerName: "Merk", flex: 1 },
-    { field: "expired_date", headerName: "Expired Date", flex: 1 },
-    { field: "akl_akd", headerName: "No AKL/AKD", flex: 1 },
-    { field: "price", headerName: "Price/Unit", flex: 1 },
-    { field: "qty", headerName: "Qty", flex: 1 },
-    { field: "ppn", headerName: "PPN", flex: 1 },
-    { field: "pph", headerName: "PPH", flex: 1 },
-    { field: "cn", headerName: "CN", flex: 1 },
-    { field: "amount", headerName: "Total", flex: 1 },
-    { field: "amount_tax", headerName: "Total with Tax", flex: 1 },
+    { field: "id", headerName: "ID" },
+    { field: "product_name", headerName: "Product Name" },
+    { field: "type_name", headerName: "Type" },
+    { field: "merk_name", headerName: "Merk" },
+    { field: "akl_akd", headerName: "No AKL/AKD" },
+    { field: "price", headerName: "Price/Unit" },
+    { field: "qty", headerName: "Qty" },
+    { field: "ppn", headerName: "PPN" },
+    { field: "pph", headerName: "PPH" },
+    { field: "amount", headerName: "Total" },
+    { field: "amount_tax", headerName: "Total with Tax" },
   ];
 
   const handleCreateClick = () => {
@@ -48,25 +48,26 @@ export default function TransactionOutDetail() {
           product_name: item.product_name,
           type_name: item.type_name,
           merk_name: item.merk_name,
-          expired_date: formatDate(item.expired_date),
           akl_akd: item.akl_akd,
           price: formatCurrency(item.price),
           qty: item.qty,
           ppn: item.ppn,
           pph: item.pph,
-          cn: item.cn,
           amount: formatCurrency(item.amount),
           amount_tax: formatCurrency(item.amount_tax),
         })
       );
       setRows(modifiedData);
-      setTotalTransaction(
-        formatCurrency(response.data.data.transactionOut.amount)
-      );
-      setTotalTransactionTax(
-        formatCurrency(response.data.data.transactionOut.amount_tax)
-      );
+      setPic(response.data.data.transactionOut.name);
+      setTotalTransaction(response.data.data.transactionOut.amount);
+
+      setTotalTransactionTax(response.data.data.transactionOut.amount_tax);
       setCreatedDate(formatDate(response.data.data.transactionOut.created_at));
+      setUpdatedDate(
+        response.data.data.transactionOut.updated_at
+          ? formatDate(response.data.data.transactionOut.updated_at)
+          : "-"
+      );
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -205,10 +206,14 @@ export default function TransactionOutDetail() {
           </div>
         </div>
 
-        <div className="flex gap-2 flex-col">
+        <div className="flex gap-4 ">
+          <p>PIC : {pic}</p>
           <p>Created Date : {createdDate}</p>
-          <p>Total Transaction : {totalTransaction}</p>
-          <p>Total Transaction with Tax : {totalTransactionTax}</p>
+          <p>Update Date : {updatedDate}</p>
+          <p>Total Transaction : {formatCurrency(totalTransaction)}</p>
+          <p>
+            Total Transaction with Tax : {formatCurrency(totalTransactionTax)}
+          </p>
         </div>
 
         <DataTable rows={rows} columns={columns} loading={loading} />

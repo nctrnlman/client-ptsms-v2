@@ -28,13 +28,13 @@ export default function Home() {
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [selectedDistributorId, setSelectedDistributorId] = useState(null);
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "supplier_code", headerName: "Distributor Code", flex: 1 },
-    { field: "supplier_name", headerName: "Distributor Name", flex: 1 },
+    { field: "id", headerName: "ID" },
+    { field: "supplier_code", headerName: "Distributor Code" },
+    { field: "supplier_name", headerName: "Distributor Name" },
     {
       field: "action",
       headerName: "Action",
-      flex: 1,
+
       renderCell: (params) => (
         <div className="flex gap-3 ">
           <button
@@ -267,7 +267,9 @@ export default function Home() {
             icon={FaUser}
           />
         </div>
-        <DataTable rows={rows} columns={columns} loading={loading} />
+        <div className="">
+          <DataTable rows={rows} columns={columns} loading={loading} />
+        </div>
         <ModalAddDistributor
           openModal={openModal}
           setOpenModal={setOpenModal}

@@ -25,6 +25,7 @@ export default function TransactionOutEdit() {
     noPo: "",
     customerId: "",
     salesman: "",
+    cn: "",
     paymentMethod: "",
     timeToPayment: "",
     deliveryDate: "",
@@ -106,7 +107,6 @@ export default function TransactionOutEdit() {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/transactions/out/detail/${id}`
       );
-      console.log(response.data.data);
 
       const transactionDetail = response.data.data;
 
@@ -114,6 +114,7 @@ export default function TransactionOutEdit() {
         ...formData,
         noFaktur: transactionDetail.transactionOut.no_faktur || "",
         noPo: transactionDetail.transactionOut.no_po || "",
+        cn: transactionDetail.transactionOut.sales_cn || "",
         customerId: transactionDetail.transactionOut.customer_id || "",
         salesman: transactionDetail.transactionOut.salesman || "",
         paymentMethod: transactionDetail.transactionOut.payment_method || "",
@@ -324,7 +325,7 @@ export default function TransactionOutEdit() {
                   handleInputChange(e);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                disabled={loading}
+                disabled={true}
               >
                 <option value="">Choose a Customer</option>
                 {!loading &&
@@ -370,6 +371,27 @@ export default function TransactionOutEdit() {
                     </option>
                   ))}
               </select>
+            </div>
+            {/* CN */}
+            <div>
+              <label
+                htmlFor="cn"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                CN
+              </label>
+              <input
+                type="text"
+                id="cn"
+                name="cn"
+                value={formData.cn}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                placeholder="CN"
+                pattern="^\d+(\.\d+)?$"
+                title="Enter a valid number"
+                required
+              />
             </div>
             {/* Payment Method */}
             <div>
