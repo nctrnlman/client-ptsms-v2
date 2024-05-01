@@ -1,7 +1,7 @@
 import AccessManagementCard from "../components/cards/AccessManagementCard";
 import { useSelector } from "react-redux";
 import smsLogo from "../assets/logo/sms-logo.jpeg";
-import backgroundImage from "../assets/background/bg-login.jpg";
+import backgroundImage from "../assets/background/bg-menu.jpg";
 
 function Home() {
   const userData = useSelector((state) => state.user.User);
@@ -18,10 +18,10 @@ function Home() {
         </header> */}
       <main className="container mx-auto px-4 py-8">
         <section className="bg-white bg-opacity-50 p-8 rounded-lg shadow-md mb-8 backdrop-filter backdrop-blur-lg animate-fade-in glassmorphism">
-          <h1 className="text-4xl font-bold text-center text-teal-800 mb-4 animate-slide-up">
+          <h1 className="text-4xl font-bold text-center text-teal-200 mb-4 animate-slide-up">
             Welcome back, {userData.name}!
           </h1>
-          <p className="text-xl text-center text-gray-600 animate-slide-up animate-delay-200">
+          <p className="text-xl text-center text-white animate-slide-up animate-delay-200">
             We're glad to see you back at PT Sehat Murni Sejahtera System.
           </p>
         </section>

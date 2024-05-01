@@ -1,7 +1,6 @@
 import DashboardCard from "../../components/cards/DashboardCard";
 import { FaBox, FaTruck, FaShoppingCart, FaExchangeAlt } from "react-icons/fa";
 import Layout from "../../components/layouts/OperasionalLayout";
-import TAChart from "../../components/chart/TAChart";
 import IncomingTransactionsChart from "../../components/chart/IncomingTransactionsChart";
 import OutgoingTransactionsChart from "../../components/chart/OutgoingTransactionsChart";
 import axios from "axios";
@@ -15,6 +14,7 @@ export default function Home() {
   const [totalSupplier, setTotalSupplier] = useState(0);
   const [totalTransactionIn, setTotalTransactionIn] = useState(0);
   const [totalTransactionOut, settotalTransactionOut] = useState(0);
+
   const fetchDataTransaction = async () => {
     try {
       setLoading(true);
@@ -46,6 +46,7 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     fetchCardData();
     fetchDataTransaction();
@@ -53,7 +54,7 @@ export default function Home() {
 
   return (
     <Layout>
-      <main className="flex flex-col gap-4 ">
+      <main className="flex flex-col gap-4">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex flex-wrap items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
@@ -101,9 +102,11 @@ export default function Home() {
           </ol>
         </nav>
         <div>
-          <h1 className="text-3xl pb-3 font-medium">Dashboard Page</h1>
+          <h1 className="text-2xl sm:text-3xl pb-3 font-medium">
+            Dashboard Page
+          </h1>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
             title="Total Products"
             description={totalProduct}
@@ -125,22 +128,22 @@ export default function Home() {
             icon={FaExchangeAlt}
           />
         </div>
-        <div className="mt-10 p-4 ">
-          {/* <div>
-            <h1 className="text-2xl pb-3 font-medium">Total Transaction </h1>
-            <TAChart />
-          </div> */}
+        <div className="mt-10 p-4">
           <div className="pb-5">
             <h1 className="text-2xl pb-10 font-medium">
               Transaction Incoming Report
             </h1>
-            <IncomingTransactionsChart data={transactionIn} />
+            <div className="overflow-x-auto">
+              <IncomingTransactionsChart data={transactionIn} />
+            </div>
           </div>
           <div>
             <h1 className="text-2xl pb-10 font-medium">
               Transaction Outgoing Report
             </h1>
-            <OutgoingTransactionsChart data={transactionOut} />
+            <div className="overflow-x-auto">
+              <OutgoingTransactionsChart data={transactionOut} />
+            </div>
           </div>
         </div>
       </main>
