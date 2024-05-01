@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ClipLoader } from "react-spinners";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -17,7 +16,6 @@ export default function Home() {
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const fetchData = async () => {
     try {
       const response = await axios.get(
