@@ -11,9 +11,9 @@ import "react-toastify/dist/ReactToastify.css";
 import DashboardCard from "../../../components/cards/DashboardCard";
 import Layout from "../../../components/layouts/OperasionalLayout";
 import DataTable from "../../../components/tables/DataTable";
-import ModalDelete from "../../../components/cards/ModalDelete";
 import ModalEditDistributor from "../../../components/cards/ModalEditDistributor";
 import ModalAddDistributor from "../../../components/cards/ModalAddDistributor";
+import ModalDelete from "../../../components/cards/ModalDelete";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
@@ -176,7 +176,7 @@ export default function Home() {
           <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
               <a
-                href="#"
+                href="/operasional/dashboard"
                 className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
               >
                 <svg
