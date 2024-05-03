@@ -224,23 +224,26 @@ export default function Home() {
           </h1>
         </div>
 
-        <div className="flex gap-6 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4 ">
           <DashboardCard
             title={userData.id === 1 ? "Total User" : "Last Attendance"}
             description={
               userData.id === 1 ? totalUser : formatDateMonth(lastAttendance)
             }
             icon={userData.id === 1 ? FaUsers : MdCalendarToday}
+            className="w-full sm:w-auto"
           />
           <DashboardCard
             title="Today Attendance"
             description={todayAttendance}
             icon={FaCalendarDay}
+            className="w-full sm:w-auto"
           />
           <DashboardCard
             title="Total Attendance"
             description={totalAttendance}
             icon={FaClipboardList}
+            className="w-full sm:w-auto"
           />
           <DashboardCard
             title={userData.id === 1 ? "Most Frequent User" : "Last Location"}
@@ -259,6 +262,7 @@ export default function Home() {
               )
             }
             icon={userData.id === 1 ? FaUser : MdLocationOn}
+            className="w-full sm:w-auto"
           />
         </div>
         <DataTable rows={rows} columns={columns} loading={loading} />

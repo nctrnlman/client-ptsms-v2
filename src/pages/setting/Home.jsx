@@ -238,11 +238,11 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">
             Setting User Dashboard Page
           </h1>
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleToggleModal}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-4 rounded-full"
