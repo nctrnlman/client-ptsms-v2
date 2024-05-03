@@ -166,7 +166,7 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">
             Suppliers Dashboard Page
           </h1>
@@ -191,30 +191,37 @@ export default function Home() {
             </button>
           </div>
         </div>
-
-        <div className="flex gap-6 ">
-          <DashboardCard
-            title="Total Supplier"
-            description={totalSupplier}
-            icon={FaUsers}
-          />
-          <DashboardCard
-            title="Today Transaction"
-            description={todayTransaction}
-            icon={FaCalendarDay}
-          />
-          <DashboardCard
-            title="Total Transaction"
-            description={totalTransaction}
-            icon={FaClipboardList}
-          />
-          <DashboardCard
-            title="Most Frequent Distributor"
-            description={mostSupplierTransaction}
-            icon={FaUser}
-          />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+       
+            <DashboardCard
+              title="Total Supplier"
+              description={totalSupplier}
+              icon={FaUsers}
+              className="w-full sm:w-auto"
+            />
+            <DashboardCard
+              title="Today Transaction"
+              description={todayTransaction}
+              icon={FaCalendarDay}
+              className="w-full sm:w-auto"
+            />
+            <DashboardCard
+              title="Total Transaction"
+              description={totalTransaction}
+              icon={FaClipboardList}
+              className="w-full sm:w-auto"
+            />
+            <DashboardCard
+              title="Most Frequent Distributor"
+              description={mostSupplierTransaction}
+              icon={FaUser}
+              className="w-full sm:w-auto"
+            />
+        
         </div>
-        <DataTable rows={rows} columns={columns} loading={loading} />
+        <div className="overflow-x-auto">
+          <DataTable rows={rows} columns={columns} loading={loading} />
+        </div>
       </main>
     </Layout>
   );
