@@ -218,11 +218,11 @@ export default function Home() {
             </li>
           </ol>
         </nav>
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">
             Distributors Dashboard Page
           </h1>
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleToggleModal}
               className="flex items-center text-white hover:bg-teal-800 font-bold p-3 border bg-teal-500 rounded-full "
@@ -245,7 +245,7 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div className="flex gap-6 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
             title="Total Distributor"
             description={totalDistributor}

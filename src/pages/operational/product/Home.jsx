@@ -530,8 +530,7 @@ export default function Home() {
         <div className="">
           <h1 className="text-3xl pb-3 font-medium">Products Dashboard</h1>
         </div>
-
-        <div className="flex gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
             title="Total Products"
             description={totalProduct}
@@ -553,6 +552,7 @@ export default function Home() {
             icon={FaTags}
           />
         </div>
+
         <div className="mt-3">
           <div className="flex justify-between pt-3 pb-4 ">
             <h3 className="text-2xl  font-medium">Product List</h3>

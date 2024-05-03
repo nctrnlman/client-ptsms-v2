@@ -170,7 +170,7 @@ export default function Home() {
           <h1 className="text-3xl pb-3 font-medium">
             Suppliers Dashboard Page
           </h1>
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleCreateClick}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
@@ -192,7 +192,6 @@ export default function Home() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-       
             <DashboardCard
               title="Total Supplier"
               description={totalSupplier}

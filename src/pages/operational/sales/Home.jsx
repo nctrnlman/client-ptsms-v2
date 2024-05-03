@@ -215,9 +215,9 @@ export default function Home() {
             </li>
           </ol>
         </nav>
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">Sales Dashboard Page</h1>
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleToggleModal}
               className="flex items-center text-white hover:bg-teal-800 font-bold p-3 border bg-teal-500 rounded-full "
