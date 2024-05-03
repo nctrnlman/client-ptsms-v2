@@ -1,28 +1,32 @@
 import AccessManagementCard from "../components/cards/AccessManagementCard";
 import { useSelector } from "react-redux";
-import smsLogo from "../assets/logo/sms-logo.jpeg";
+// import smsLogo from "../assets/logo/sms-logo.jpeg";
 import backgroundImage from "../assets/background/bg-menu.jpg";
+import Particles from "@tsparticles/react";
+import particlesConfig from "../components/particle/particleConfig";
 
 function Home() {
   const userData = useSelector((state) => state.user.User);
 
   return (
     <div
-      className="min-h-screen bg-cover bg-center"
+      className="min-h-screen bg-cover bg-center relative"
       style={{ backgroundImage: `url(${backgroundImage})` }}
     >
-      {/* <header className="bg-white shadow-md">
-          <div className="container mx-auto flex items-center justify-between px-4 py-2">
-            <img src={smsLogo} alt="SMS Logo" width={80} />
-          </div>
-        </header> */}
-      <main className="container mx-auto px-4 py-8">
+      <Particles params={particlesConfig} className="absolute inset-0 " />
+      <header className="shadow-md">
+        <div className="container mx-auto flex items-center justify-center">
+          
+        </div>
+      </header>
+
+      <main className="container mx-auto px-4 py-8 relative">
         <section className="bg-white bg-opacity-50 p-8 rounded-lg shadow-md mb-8 backdrop-filter backdrop-blur-lg animate-fade-in glassmorphism">
           <h1 className="text-4xl font-bold text-center text-teal-200 mb-4 animate-slide-up">
             Welcome back, {userData.name}!
           </h1>
           <p className="text-xl text-center text-white animate-slide-up animate-delay-200">
-            We're glad to see you back at PT Sehat Murni Sejahtera System.
+            We are glad to see you back at PT Sehat Murni Sejahtera System.
           </p>
         </section>
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -77,13 +81,14 @@ function Home() {
           )}
         </section>
       </main>
-      {/* <footer className="bg-white shadow-md mt-8 backdrop-filter backdrop-blur-lg position-bottom-6">
+      
+      <footer className="mt-8 position-bottom-6">
         <div className="container mx-auto px-4 py-4 text-center">
           <p className="text-gray-600">
             &copy; 2024 PT Sehat Murni Sejahtera System. All rights reserved.
           </p>
         </div>
-      </footer> */}
+      </footer>
     </div>
   );
 }
