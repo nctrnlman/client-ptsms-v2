@@ -88,6 +88,7 @@ const DataTable = ({ rows, columns, loading }) => {
           loading={loading}
           columnBuffer={columns.length}
           columnThreshold={columns.length}
+          rowHeight={100}
         />
       </div>
       <div className="flex justify-end mt-4">
