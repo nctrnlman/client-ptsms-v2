@@ -73,12 +73,12 @@ export default function TransactionOutEdit() {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/create`,
+      const response = await axios.put(
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/transactions/out/update/${decryptNumber(id)}`,
         {
           ...formData,
-          totalPayment: totalTransaction,
-          totalPaymentTax: totalTransactionTax,
         }
       );
       setFormData({
@@ -95,7 +95,7 @@ export default function TransactionOutEdit() {
       setTotalTransaction("");
       setTotalTransactionTax("");
       toast.success(response.data.message);
-      navigate(`operasional/customer/${encryptNumber(customerId)}`);
+      navigate(`/operasional/customer/${id}`);
     } catch (error) {
       console.error("Error submitting form:", error);
       toast.error(error.response.data.message);
@@ -123,6 +123,7 @@ export default function TransactionOutEdit() {
         note: transactionDetail.transactionOut.note || "",
         productList: transactionDetail.transactionOutDetail || [],
       });
+
       setProductLength(transactionDetail.transactionOutDetail.length);
       console.log(transactionDetail.transactionOutDetail.length);
       setTotalTransaction(parseInt(transactionDetail.transactionOut.amount));
