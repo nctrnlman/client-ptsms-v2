@@ -6,7 +6,11 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
-import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import {
+  decryptNumber,
+  encryptNumber,
+  decryptString,
+} from "../../../utils/encryptionUtils";
 import ModalDelete from "../../../components/cards/ModalDelete";
 
 export default function DetailProduct() {
@@ -67,7 +71,6 @@ export default function DetailProduct() {
         id: index + 1,
         product_expired_id: item.product_expired_id,
         product_id: item.product_id,
-        product_name: item.product_name,
         quantity: item.quantity,
         expired_date: formatDate(item.expired_date),
       }));
@@ -95,9 +98,9 @@ export default function DetailProduct() {
   };
 
   useEffect(() => {
-    setCustomerId(decryptNumber(id));
-    fetchMasterData(decryptNumber(id));
-    fetchData(decryptNumber(id));
+    setCustomerId(decryptString(id));
+    fetchMasterData(decryptString(id));
+    fetchData(decryptString(id));
   }, []);
 
   return (
