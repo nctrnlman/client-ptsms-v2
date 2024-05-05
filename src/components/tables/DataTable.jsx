@@ -4,10 +4,11 @@ import { Pagination } from "@mui/material";
 import LinearProgress from "@mui/material/LinearProgress";
 import { FaSearch } from "react-icons/fa";
 
-const DataTable = ({ rows, columns, loading }) => {
+const DataTable = ({ rows, loading }) => {
   const [filterText, setFilterText] = useState("");
-  const [includeOutliers, setIncludeOutliers] = useState(true); // Set includeOutliers sebagai state
+  const [includeOutliers, setIncludeOutliers] = useState(true);
   const apiRef = useGridApiRef();
+
   const handleFilterChange = (event) => {
     setFilterText(event.target.value);
   };
@@ -29,7 +30,7 @@ const DataTable = ({ rows, columns, loading }) => {
 
   const autosizeOptions = {
     includeHeaders: true,
-    includeOutliers, // Gunakan includeOutliers dari state
+    includeOutliers,
   };
 
   const pageSize = 10;
@@ -39,17 +40,65 @@ const DataTable = ({ rows, columns, loading }) => {
 
   const totalPages = Math.ceil(filteredRows.length / pageSize);
 
+  const columns = [
+    { field: "id", headerName: "ID", width: 70 },
+    { field: "no_faktur", headerName: "No Faktur", width: 150 },
+    { field: "supplier_name", headerName: "Distributor name", width: 200 },
+    { field: "payment_method", headerName: "Payment Method", width: 150 },
+    { field: "created_at", headerName: "Created Date", width: 150 },
+    { field: "time_to_payment", headerName: "Time To Payment", width: 150 },
+    { field: "amount", headerName: "Total Amount", width: 150 },
+    { field: "amount_tax", headerName: "Total Amount with Tax", width: 180 },
+    { field: "pic", headerName: "PIC", width: 150 },
+    {
+      field: "note",
+      headerName: "Note",
+      width: 200,
+      renderCell: (params) => (
+        <div style={{ whiteSpace: "nowrap" }}>{params.value}</div>
+      ),
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 350,
+      renderCell: (params) => (
+        <div className="flex gap-3">
+          <button
+            className="text-brand-500 hover:text-brand-800 font-bold"
+            onClick={() => handleEdit(params.row.transaction_id)}
+          >
+            Detail
+          </button>
+          <button
+            className="text-red-500 hover:text-red-800 font-bold"
+            onClick={() => handleDelete(params.row.transaction_id)}
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   useEffect(() => {
-    // if (loading) {
     apiRef.current.autosizeColumns(autosizeOptions);
-    // }
-    // apiRef.current?.autosizeColumns(); // Mengaktifkan auto-resize untuk kolom
   }, [loading]);
 
+  const handleEdit = (transactionId) => {
+    // Implementasikan logika untuk mengedit transaksi dengan ID tertentu
+    console.log("Edit transaction with ID:", transactionId);
+  };
+
+  const handleDelete = (transactionId) => {
+    // Implementasikan logika untuk menghapus transaksi dengan ID tertentu
+    console.log("Delete transaction with ID:", transactionId);
+  };
+
   return (
-    <div className="flex flex-col  w-full">
-      <div className="flex gap-4">
-        <div className="relative mb-4">
+    <div className="flex flex-col w-full">
+      <div className="flex gap-4 items-center mb-4">
+        <div className="relative">
           <input
             type="text"
             placeholder="Search..."
@@ -70,9 +119,8 @@ const DataTable = ({ rows, columns, loading }) => {
           </button>
         </div>
       </div>
-      <div>
+      <div style={{ flexGrow: 1, overflowX: "auto" }}>
         <DataGrid
-          autoWidth
           autoHeight
           rows={pageRows}
           columns={columns}
@@ -80,14 +128,14 @@ const DataTable = ({ rows, columns, loading }) => {
           disableSelectionOnClick
           apiRef={apiRef}
           density="compact"
-          pageSizeOptions={[]}
+          pageSizeOptions={[pageSize]}
           slots={{
             loadingOverlay: loading ? LinearProgress : undefined,
           }}
           loading={loading}
         />
       </div>
-      <div className="flex justify-end mt-4 ">
+      <div className="flex justify-end mt-4">
         <Pagination
           count={totalPages}
           page={page}
