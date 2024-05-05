@@ -4,7 +4,7 @@ import { Pagination } from "@mui/material";
 import LinearProgress from "@mui/material/LinearProgress";
 import { FaSearch } from "react-icons/fa";
 
-const DataTable = ({ rows, loading }) => {
+const DataTable = ({ rows, columns, loading }) => {
   const [filterText, setFilterText] = useState("");
   const [includeOutliers, setIncludeOutliers] = useState(true);
   const apiRef = useGridApiRef();
@@ -40,60 +40,9 @@ const DataTable = ({ rows, loading }) => {
 
   const totalPages = Math.ceil(filteredRows.length / pageSize);
 
-  const columns = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "no_faktur", headerName: "No Faktur", width: 150 },
-    { field: "supplier_name", headerName: "Distributor name", width: 200 },
-    { field: "payment_method", headerName: "Payment Method", width: 150 },
-    { field: "created_at", headerName: "Created Date", width: 150 },
-    { field: "time_to_payment", headerName: "Time To Payment", width: 150 },
-    { field: "amount", headerName: "Total Amount", width: 150 },
-    { field: "amount_tax", headerName: "Total Amount with Tax", width: 180 },
-    { field: "pic", headerName: "PIC", width: 150 },
-    {
-      field: "note",
-      headerName: "Note",
-      width: 200,
-      renderCell: (params) => (
-        <div style={{ whiteSpace: "nowrap" }}>{params.value}</div>
-      ),
-    },
-    {
-      field: "action",
-      headerName: "Action",
-      width: 350,
-      renderCell: (params) => (
-        <div className="flex gap-3">
-          <button
-            className="text-brand-500 hover:text-brand-800 font-bold"
-            onClick={() => handleEdit(params.row.transaction_id)}
-          >
-            Detail
-          </button>
-          <button
-            className="text-red-500 hover:text-red-800 font-bold"
-            onClick={() => handleDelete(params.row.transaction_id)}
-          >
-            Delete
-          </button>
-        </div>
-      ),
-    },
-  ];
-
   useEffect(() => {
     apiRef.current.autosizeColumns(autosizeOptions);
   }, [loading]);
-
-  const handleEdit = (transactionId) => {
-    // Implementasikan logika untuk mengedit transaksi dengan ID tertentu
-    console.log("Edit transaction with ID:", transactionId);
-  };
-
-  const handleDelete = (transactionId) => {
-    // Implementasikan logika untuk menghapus transaksi dengan ID tertentu
-    console.log("Delete transaction with ID:", transactionId);
-  };
 
   return (
     <div className="flex flex-col w-full">

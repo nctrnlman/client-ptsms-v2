@@ -9,6 +9,9 @@ import DataTable from "../../../components/tables/DataTable";
 import ModalDelete from "../../../components/cards/ModalDelete";
 import ModalEditSales from "../../../components/cards/ModalEditSales";
 import ModalAddSales from "../../../components/cards/ModalAddSales";
+import { formatCurrency } from "../../../utils/converter";
+import { encryptNumber } from "../../../utils/encryptionUtils";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
@@ -18,13 +21,35 @@ export default function Home() {
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [selectedDistributorId, setSelectedDistributorId] = useState(null);
+  const navigate = useNavigate();
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "sales_name", headerName: "Sales Name", flex: 1 },
+    { field: "id", headerName: "ID" },
+    { field: "sales_name", headerName: "Sales Name" },
+    { field: "total_transaction", headerName: "Total Transaction" },
+    {
+      field: "detail_transaction",
+      headerName: "Detail Transaction",
+      renderCell: (params) => (
+        <div className="flex gap-3 ">
+          <button
+            className=" text-teal-500  hover:text-teal-800 font-bold"
+            onClick={() =>
+              navigate(
+                `/operasional/sales/transaction/${encryptNumber(
+                  params.row.sales_id
+                )}`
+              )
+            }
+          >
+            Click Here
+          </button>
+        </div>
+      ),
+    },
+
     {
       field: "action",
       headerName: "Action",
-      flex: 1,
       renderCell: (params) => (
         <div className="flex gap-3 ">
           <button
@@ -65,6 +90,7 @@ export default function Home() {
         id: index + 1,
         sales_id: item.sales_id,
         sales_name: item.sales_name,
+        total_transaction: formatCurrency(item.total_transaction),
       }));
       setRows(modifiedData);
 
@@ -173,7 +199,7 @@ export default function Home() {
           <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
               <a
-               href="/operasional/dashboard"
+                href="/operasional/dashboard"
                 className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
               >
                 <svg
