@@ -130,7 +130,7 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
               <option value="">Select Product</option>
               {product?.map((item) => (
                 <option key={item.product_id} value={item.product_id}>
-                  {item.product_id + item.product_name}
+                  {item.product_id + "-" + item.product_name}
                 </option>
               ))}
             </select>
