@@ -72,7 +72,11 @@ const DataTable = ({ rows, columns, loading }) => {
         <DataGrid
           autoHeight
           rows={pageRows}
-          columns={columns}
+          columns={columns.map((column) => ({
+            ...column,
+            flex: 1,
+            minWidth: 150,
+          }))}
           pageSize={pageSize}
           disableSelectionOnClick
           apiRef={apiRef}
@@ -82,6 +86,8 @@ const DataTable = ({ rows, columns, loading }) => {
             loadingOverlay: loading ? LinearProgress : undefined,
           }}
           loading={loading}
+          columnBuffer={columns.length}
+          columnThreshold={columns.length}
         />
       </div>
       <div className="flex justify-end mt-4">
