@@ -224,11 +224,11 @@ export default function CustomerDetail() {
           </ol>
         </nav>
 
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">
             {customerName} Transaction List
           </h1>
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-center gap-3">
             <button
               onClick={handleCreateClick}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
@@ -250,16 +250,18 @@ export default function CustomerDetail() {
           </div>
         </div>
 
-        <div className="flex gap-6 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4">
           <DashboardCard
             title="Today Transaction"
             description={todayTransaction}
             icon={FaCalendarDay}
+            className="w-full sm:w-auto"
           />
           <DashboardCard
             title="Total Transaction"
             description={totalTransaction}
             icon={FaClipboardList}
+            className="w-full sm:w-auto"
           />
         </div>
 
