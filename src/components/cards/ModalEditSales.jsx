@@ -11,7 +11,7 @@ function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/sales/detail/${id}`
       );
-      const { sales_name } = response.data.data;
+      const { sales_name } = response.data.data.salesDetail;
       setSalesName(sales_name);
     } catch (error) {
       console.error("Error fetching Sales detail:", error);

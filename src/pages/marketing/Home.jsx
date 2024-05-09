@@ -142,7 +142,6 @@ export default function Home() {
           role_id: userData.role_id,
         }
       );
-      console.log(response.data.data);
       if (userData.role_id == 1) {
         setTotalUser(response.data.data.totalUsers);
         setTotalAttendance(response.data.data.totalAttendance);

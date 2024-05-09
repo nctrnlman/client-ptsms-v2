@@ -115,6 +115,7 @@ export default function TransactionInEdit() {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
       const response = await axios.put(
         `${
           import.meta.env.VITE_API_BASE_URL
@@ -134,6 +135,7 @@ export default function TransactionInEdit() {
       toast.success(response.data.message);
       navigate(`/operasional/suppliers`);
     } catch (error) {
+      setLoading(false);
       console.error("Error submitting form:", error);
       toast.error(error.response.data.message);
     }
@@ -412,8 +414,13 @@ export default function TransactionInEdit() {
             <button
               onClick={handleSubmit}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"
+              disabled={loading}
             >
-              Submit
+              {loading ? (
+                <ClipLoader size={20} color={"#ffffff"} loading={loading} />
+              ) : (
+                "Submit"
+              )}
             </button>
           </div>
         </div>

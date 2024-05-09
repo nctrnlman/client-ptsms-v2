@@ -7,8 +7,8 @@ export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "name", headerName: "Role Name", flex: 1 },
+    { field: "id", headerName: "ID" },
+    { field: "name", headerName: "Role Name" },
   ];
 
   const fetchData = async () => {

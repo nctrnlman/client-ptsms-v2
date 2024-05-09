@@ -84,7 +84,7 @@ export default function TransactionInForm() {
 
   const handleSubmit = async () => {
     try {
-      setLoading(loading);
+      setLoading(true);
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/transactions/in/create`,
         formData

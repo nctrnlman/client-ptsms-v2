@@ -18,14 +18,27 @@ export default function Home() {
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalReset, setOpenModalReset] = useState(false);
   const columns = [
-    { field: "id", headerName: "ID", flex: 1 },
-    { field: "name", headerName: "Username", flex: 1 },
-    { field: "email", headerName: "Email", flex: 1 },
-    { field: "role_name", headerName: "Role", flex: 1 },
+    { field: "id", headerName: "ID" },
+    { field: "name", headerName: "Username" },
+    { field: "email", headerName: "Email" },
+    { field: "role_name", headerName: "Role" },
+    {
+      field: "reset",
+      headerName: "Optional",
+      renderCell: (params) => (
+        <div className="flex gap-3 ">
+          <button
+            className=" text-teal-500  hover:text-teal-800 font-bold"
+            onClick={() => handleToggleModalReset(params.row.user_id)}
+          >
+            Reset Password
+          </button>
+        </div>
+      ),
+    },
     {
       field: "action",
       headerName: "Action",
-      flex: 1,
       renderCell: (params) => (
         <div className="flex gap-3 ">
           <button
@@ -40,12 +53,6 @@ export default function Home() {
             onClick={() => handleToggleModalDelete(params.row.user_id)}
           >
             Delete
-          </button>
-          <button
-            className=" text-teal-500  hover:text-teal-800 font-bold"
-            onClick={() => handleToggleModalReset(params.row.user_id)}
-          >
-            Reset Password
           </button>
         </div>
       ),
@@ -63,6 +70,9 @@ export default function Home() {
   const handleToggleModalReset = (id) => {
     setSelectedId(id);
     setOpenModalReset(!openModalReset);
+  };
+  const handleToggleModal = () => {
+    setOpenModal(!openModal);
   };
   const handleDeleteUser = async (id) => {
     try {
@@ -136,32 +146,6 @@ export default function Home() {
       setLoading(false);
     }
   };
-  const fetchData = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/user/all`
-      );
-      const modifiedData = response.data.data.map((item, index) => ({
-        id: index + 1,
-        user_id: item.user_id,
-        name: item.name,
-        email: item.email,
-        role_name: item.role_name,
-      }));
-      setRows(modifiedData);
-
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setLoading(false);
-    }
-  };
-
-  const handleToggleModal = () => {
-    setOpenModal(!openModal);
-  };
-
   const handleCreateUser = async (newUser) => {
     try {
       setLoading(true);
@@ -180,6 +164,27 @@ export default function Home() {
     } catch (error) {
       toast.error(error.response.data.message);
       console.error("Error creating User:", error);
+      setLoading(false);
+    }
+  };
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user/all`
+      );
+      const modifiedData = response.data.data.map((item, index) => ({
+        id: index + 1,
+        user_id: item.user_id,
+        name: item.name,
+        email: item.email,
+        role_name: item.role_name,
+      }));
+      setRows(modifiedData);
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching data:", error);
       setLoading(false);
     }
   };

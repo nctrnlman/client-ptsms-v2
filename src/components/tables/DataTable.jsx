@@ -59,14 +59,14 @@ const DataTable = ({ rows, columns, loading }) => {
             <FaSearch className="h-5 w-5 text-gray-400" />
           </div>
         </div>
-        <div>
+        {/* <div>
           <button
             className="border border-teal-500 text-teal-500 font-bold py-2 px-4 rounded hover:bg-teal-800 hover:text-white"
             onClick={() => apiRef.current.autosizeColumns(autosizeOptions)}
           >
             Autosize all columns
           </button>
-        </div>
+        </div> */}
       </div>
       <div style={{ flexGrow: 1, overflowX: "auto" }}>
         <DataGrid

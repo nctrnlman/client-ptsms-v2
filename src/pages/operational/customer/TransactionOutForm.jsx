@@ -7,7 +7,6 @@ import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { formatCurrency } from "../../../utils/converter";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
 import { useSelector } from "react-redux";
 export default function TransactionOutFrom() {
