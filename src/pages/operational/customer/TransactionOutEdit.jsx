@@ -7,7 +7,6 @@ import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { formatCurrency } from "../../../utils/converter";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
 export default function TransactionOutEdit() {
   const { id } = useParams();
@@ -73,6 +72,7 @@ export default function TransactionOutEdit() {
 
   const handleSubmit = async () => {
     try {
+      setLoading(true);
       const response = await axios.put(
         `${
           import.meta.env.VITE_API_BASE_URL
@@ -95,8 +95,11 @@ export default function TransactionOutEdit() {
       setTotalTransaction("");
       setTotalTransactionTax("");
       toast.success(response.data.message);
-      navigate(`/operasional/customer/${id}`);
+      navigate(
+        `/operasional/customer/transaction/detail/${encryptNumber(customerId)}`
+      );
     } catch (error) {
+      setLoading(false);
       console.error("Error submitting form:", error);
       toast.error(error.response.data.message);
     }
@@ -148,8 +151,6 @@ export default function TransactionOutEdit() {
     if (formData.productList.length > productLength) {
       calculateTotalTransaction();
     }
-    console.log(totalTransaction, "tes a");
-    console.log(totalTransactionTax, "tes b");
   }, [formData.productList.length > productLength]);
   return (
     <Layout>
@@ -498,13 +499,16 @@ export default function TransactionOutEdit() {
           </div>
 
           <div className="flex items-center justify-end mt-10 gap-4">
-            <p>Total Price: {formatCurrency(totalTransactionTax)}</p>
-            <p>Total Price: {totalTransactionTax}</p>
             <button
               onClick={handleSubmit}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"
+              disabled={loading}
             >
-              Submit
+              {loading ? (
+                <ClipLoader size={20} color={"#ffffff"} loading={loading} />
+              ) : (
+                "Submit"
+              )}
             </button>
           </div>
         </div>
