@@ -177,12 +177,12 @@ export default function TransactionInDetail() {
           </ol>
         </nav>
 
-        <div className="flex justify-between">
+        <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">
             Suppliers Transaction Detail
           </h1>
           {userData?.role_id == 1 && (
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={handleCreateClick}
                 className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
@@ -204,7 +204,7 @@ export default function TransactionInDetail() {
             </div>
           )}
         </div>
-        <div className="flex gap-4 flex-row">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4">
           <p>Distributor : {distributor}</p>
           <p>Created Date : {createdAt}</p>
           <p>Update Date : {updateAt}</p>
