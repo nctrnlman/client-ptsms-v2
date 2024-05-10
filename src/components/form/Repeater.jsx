@@ -12,10 +12,30 @@ function Repeater({ product, setProduct, formData }) {
   ]);
 
   const handleChange = (index, name, value) => {
-    const newInputs = [...inputs];
-    newInputs[index][name] = value;
+    let newValue = value;
 
+    // Jika field yang diubah adalah 'quantity'
+    if (name === "quantity") {
+      // Memeriksa apakah nilai yang dimasukkan bukan string kosong
+      if (value !== "") {
+        // Memastikan bahwa nilai yang dimasukkan adalah angka
+        const parsedValue = parseFloat(value);
+        // Jika nilai yang dimasukkan bukan angka, atur nilainya ke 0
+        if (isNaN(parsedValue)) {
+          newValue = 0;
+        } else {
+          // Jika nilai yang dimasukkan adalah angka, tetapi kurang dari 0, atur nilainya ke 0
+          newValue = Math.max(0, parsedValue);
+        }
+      }
+    }
+
+    // Mengupdate state inputs
+    const newInputs = [...inputs];
+    newInputs[index][name] = newValue;
     setInputs(newInputs);
+
+    // Mengupdate state productList pada form data
     setProduct((prevData) => ({
       ...prevData,
       productList: newInputs,
@@ -45,7 +65,6 @@ function Repeater({ product, setProduct, formData }) {
 
   useEffect(() => {
     if (formData?.productList?.length > 0) {
-      console.log("tes");
       setInputs(
         formData.productList?.map((productItem) => ({
           ...productItem,
@@ -72,7 +91,7 @@ function Repeater({ product, setProduct, formData }) {
                 htmlFor="note"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Product Name
+                Product Name<span className="text-red-500">*</span>
               </label>
               <select
                 name="product_id"
@@ -106,9 +125,12 @@ function Repeater({ product, setProduct, formData }) {
                 id="expired_date"
                 name="expired_date"
                 value={input.expired_date}
-                onSelectedDateChanged={(date) =>
-                  handleChange(index, "expired_date", date)
-                }
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  handleChange(index, "expired_date", formattedDate);
+                }}
                 disabled={isExpired == 0} // Menonaktifkan Datepicker jika produk tidak kedaluwarsa
               />
             </div>
@@ -117,13 +139,13 @@ function Repeater({ product, setProduct, formData }) {
                 htmlFor="note"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Product Qty
+                Product Qty<span className="text-red-500">*</span>
               </label>
               <input
                 name="quantity"
                 placeholder="Product Quantity"
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                type="text"
+                type="number"
                 value={input.quantity}
                 onChange={(e) =>
                   handleChange(index, "quantity", e.target.value)

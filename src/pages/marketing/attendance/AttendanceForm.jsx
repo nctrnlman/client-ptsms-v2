@@ -53,6 +53,11 @@ export default function AttendanceForm() {
 
     try {
       // 1. Upload foto
+      if (!capturedPhoto) {
+        setLoading(false);
+        toast.error("Please take a photo before submitting");
+        throw new Error("Please take a photo before submitting");
+      }
       const blob = await fetch(capturedPhoto).then((res) => res.blob());
       const photoFileName = `images/${userData.id}_${Date.now()}.jpg`;
 
@@ -102,7 +107,7 @@ export default function AttendanceForm() {
           setLoading(false);
         }
       } else {
-        toast.error("Signature first");
+        toast.error("Please Signature before submitting");
         setLoading(false);
       }
     } catch (error) {
@@ -176,7 +181,7 @@ export default function AttendanceForm() {
           <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
               <a
-                href="#"
+                href="/marketing/dashboard"
                 className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
               >
                 <svg
