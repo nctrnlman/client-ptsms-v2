@@ -4,12 +4,12 @@ import { RiCloseCircleLine, RiAddLine } from "react-icons/ri";
 function TransactionOutRepeater({ product, setProduct, formData }) {
   const [inputs, setInputs] = useState([
     {
-      productName: "",
-      productQty: 0,
+      product_id: "",
+      qty: 0,
       productPrice: "",
-      productDisc: "",
-      productPpn: "11",
-      productPph: "1.5",
+      discount: "",
+      ppn: "11",
+      pph: "1.5",
     },
   ]);
 
@@ -18,9 +18,9 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
     newInputs[index][name] = value;
 
     // Update product price if product is selected and quantity is filled
-    if (name === "productQty" && value && newInputs[index]["productName"]) {
+    if (name === "qty" && value && newInputs[index]["product_id"]) {
       const selectedProduct = product.find(
-        (p) => p.product_id === parseInt(newInputs[index]["productName"])
+        (p) => p.product_id === parseInt(newInputs[index]["product_id"])
       );
       if (selectedProduct) {
         newInputs[index]["productPrice"] =
@@ -30,12 +30,10 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
 
     // Calculate total price
     const price = parseFloat(newInputs[index]["productPrice"]) || 0;
-    const qty = parseFloat(newInputs[index]["productQty"]) || 0;
-    const disc = parseFloat(newInputs[index]["productDisc"]) || 0;
-    const ppn =
-      parseFloat(newInputs[index]["productPpn"].replace("%", "")) || 0;
-    const pph =
-      parseFloat(newInputs[index]["productPph"].replace("%", "")) || 0;
+    const qty = parseFloat(newInputs[index]["qty"]) || 0;
+    const disc = parseFloat(newInputs[index]["discount"]) || 0;
+    const ppn = parseFloat(newInputs[index]["ppn"].replace("%", "")) || 0;
+    const pph = parseFloat(newInputs[index]["pph"].replace("%", "")) || 0;
 
     const totalPrice =
       price * qty * (1 - disc / 100) * (1 + ppn / 100) * (1 + pph / 100);
@@ -51,12 +49,12 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
     setInputs([
       ...inputs,
       {
-        productName: "",
-        productQty: 0,
+        product_id: "",
+        qty: 0,
         productPrice: "",
-        productDisc: "",
-        productPpn: "11",
-        productPph: "1.5",
+        discount: "",
+        ppn: "11",
+        pph: "1.5",
         productTotalPrice: "",
       },
     ]);
@@ -75,14 +73,14 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
   useEffect(() => {
     // Initial price update when products are pre-selected
     inputs.forEach((input, index) => {
-      if (input.productName && input.productQty) {
+      if (input.product_id && input.qty) {
         const selectedProduct = product.find(
-          (p) => p.product_id === parseInt(input.productName)
+          (p) => p.product_id === parseInt(input.product_id)
         );
         if (selectedProduct) {
           const newInputs = [...inputs];
           newInputs[index]["productPrice"] =
-            selectedProduct.price * parseInt(input.productQty);
+            selectedProduct.price * parseInt(input.qty);
           setInputs(newInputs);
         }
       }
@@ -92,12 +90,12 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
       setInputs(
         formData.productList?.map((productItem) => ({
           ...productItem,
-          productName: productItem.product_id,
-          productQty: productItem.qty,
+          product_id: productItem.product_id,
+          qty: productItem.qty,
           productPrice: productItem.price,
-          productDisc: productItem.discount,
-          productPpn: productItem.ppn,
-          productPph: productItem.pph,
+          discount: productItem.discount,
+          ppn: productItem.ppn,
+          pph: productItem.pph,
 
           productTotalPrice: productItem.amount_tax,
           // Map other properties accordingly
@@ -120,11 +118,11 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
               Product Name
             </label>
             <select
-              name="productName"
+              name="product_id"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              value={input.productName}
+              value={input.product_id}
               onChange={(e) =>
-                handleChange(index, "productName", e.target.value)
+                handleChange(index, "product_id", e.target.value)
               }
             >
               <option value="">Select Product</option>
@@ -137,78 +135,70 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
           </div>
           <div>
             <label
-              htmlFor="productQty"
+              htmlFor="qty"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Qty
             </label>
             <input
-              name="productQty"
+              name="qty"
               placeholder="Qty"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               type="number"
-              value={input.productQty}
-              onChange={(e) =>
-                handleChange(index, "productQty", e.target.value)
-              }
+              value={input.qty}
+              onChange={(e) => handleChange(index, "qty", e.target.value)}
             />
           </div>
 
           <div>
             <label
-              htmlFor="productDisc"
+              htmlFor="discount"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               Discount (%)
             </label>
             <input
               type="text"
-              id="productDisc"
+              id="discount"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Discount"
-              value={input.productDisc}
-              onChange={(e) =>
-                handleChange(index, "productDisc", e.target.value)
-              }
+              value={input.discount}
+              onChange={(e) => handleChange(index, "discount", e.target.value)}
               required
             />
           </div>
           <div>
             <label
-              htmlFor="productPpn"
+              htmlFor="ppn"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               PPN (%)
             </label>
             <input
               type="text"
-              id="productPpn"
+              id="ppn"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="PPN"
-              value={input.productPpn}
-              onChange={(e) =>
-                handleChange(index, "productPpn", e.target.value)
-              }
+              value={input.ppn}
+              onChange={(e) => handleChange(index, "ppn", e.target.value)}
               required
               disabled
             />
           </div>
           <div>
             <label
-              htmlFor="productPph"
+              htmlFor="pph"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
               PPH (%)
             </label>
             <input
               type="text"
-              id="productPph"
+              id="pph"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="PPH"
-              value={input.productPph}
-              onChange={(e) =>
-                handleChange(index, "productPph", e.target.value)
-              }
+              value={input.pph}
+              onChange={(e) => handleChange(index, "pph", e.target.value)}
               required
               disabled
             />

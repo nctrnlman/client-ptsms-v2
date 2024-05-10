@@ -24,6 +24,13 @@ export default function TransactionInForm() {
     userId: userData.id,
     productList: [],
   });
+  const [errors, setErrors] = useState({
+    noFaktur: "",
+    supplierId: "",
+    paymentMethod: "",
+    tax: "",
+    timeToPayment: "",
+  });
   const getMasterDynamic = async () => {
     try {
       const response = await axios.get(
@@ -104,11 +111,37 @@ export default function TransactionInForm() {
       navigate(`/operasional/suppliers`);
     } catch (error) {
       setLoading(false);
+
       if (error.response && error.response.data && error.response.data.errors) {
         const errorMessages = error.response.data.errors.map(
           (error) => error.message
         );
         toast.error(errorMessages.join(", "));
+        setErrors({
+          noFaktur:
+            error.response.data.errors.find(
+              (error) => error.field === "noFaktur"
+            )?.message || "",
+          supplierId:
+            error.response.data.errors.find(
+              (error) => error.field === "supplierId"
+            )?.message || "",
+          paymentMethod:
+            error.response.data.errors.find(
+              (error) => error.field === "paymentMethod"
+            )?.message || "",
+          tax:
+            error.response.data.errors.find((error) => error.field === "tax")
+              ?.message || "",
+          timeToPayment:
+            error.response.data.errors.find(
+              (error) => error.field === "timeToPayment"
+            )?.message || "",
+          productList:
+            error.response.data.errors.find(
+              (error) => error.field === "productList"
+            )?.message || "",
+        });
       } else {
         toast.error(
           error.response.data.message ||
@@ -118,7 +151,9 @@ export default function TransactionInForm() {
       toast.error(error.response.data.message);
     }
   };
-
+  const handleDateChange = (date) => {
+    console.log(date);
+  };
   return (
     <Layout>
       <main className="flex flex-col gap-4 ">
@@ -242,7 +277,7 @@ export default function TransactionInForm() {
                 htmlFor="no_faktur"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No Faktur
+                No Faktur <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -254,6 +289,9 @@ export default function TransactionInForm() {
                 placeholder="No Faktur"
                 required
               />
+              {errors.noFaktur && (
+                <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
+              )}
             </div>
             {/* Supplier */}
             <div>
@@ -261,7 +299,7 @@ export default function TransactionInForm() {
                 htmlFor="supplier"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Supplier{" "}
+                Supplier<span className="text-red-500">*</span>
                 {loading && (
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
@@ -284,6 +322,9 @@ export default function TransactionInForm() {
                     </option>
                   ))}
               </select>
+              {errors.supplierId && (
+                <p className="text-red-500 text-sm pt-2">{errors.supplierId}</p>
+              )}
             </div>
             {/* Payment Method */}
             <div>
@@ -291,7 +332,7 @@ export default function TransactionInForm() {
                 htmlFor="payment_method"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Payment Method
+                Payment Method<span className="text-red-500">*</span>
               </label>
               <select
                 id="payment_method"
@@ -304,6 +345,11 @@ export default function TransactionInForm() {
                 <option value="Cash">Cash</option>
                 <option value="Credit">Credit</option>
               </select>
+              {errors.paymentMethod && (
+                <p className="text-red-500 text-sm pt-2">
+                  {errors.paymentMethod}
+                </p>
+              )}
             </div>
             {/* Tax */}
             <div>
@@ -311,7 +357,7 @@ export default function TransactionInForm() {
                 htmlFor="tax"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Tax
+                Tax (%)
               </label>
               <input
                 type="text"
@@ -333,21 +379,29 @@ export default function TransactionInForm() {
                 htmlFor="time_to_payment"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Time to Payment
+                Time to Payment<span className="text-red-500">*</span>
               </label>
               <Datepicker
                 id="time_to_payment"
                 name="timeToPayment"
-                // selected={formData.timeToPayment}
                 value={formData.timeToPayment}
-                onSelectedDateChanged={(date) =>
-                  setFormData({ ...formData, timeToPayment: date })
-                }
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, timeToPayment: formattedDate });
+                }}
                 title="Time to Payment"
                 language="en"
                 labelTodayButton="Today"
                 labelClearButton="Clear"
+                format="MM/dd/yyyy"
               />
+              {errors.timeToPayment && (
+                <p className="text-red-500 text-sm pt-2">
+                  {errors.timeToPayment}
+                </p>
+              )}
             </div>
           </div>
 
@@ -382,6 +436,9 @@ export default function TransactionInForm() {
               )}
             </label>
             <Repeater product={product} setProduct={setFormData} />
+            {errors.productList && (
+              <p className="text-red-500 text-sm pt-2">{errors.productList}</p>
+            )}
           </div>
 
           <div className="flex justify-end mt-4">
