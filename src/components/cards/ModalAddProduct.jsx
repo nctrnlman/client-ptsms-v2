@@ -1,12 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
-import {
-  Button,
-  Label,
-  Modal,
-  Select,
-  TextInput,
-  Datepicker,
-} from "flowbite-react";
+import { Button, Label, Modal, TextInput } from "flowbite-react";
+import Select from "react-select";
 import axios from "axios";
 
 function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
@@ -19,9 +13,9 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   const [productType, setProductType] = useState([]);
   const [productMerk, setProductMerk] = useState([]);
   const [supplier, setSupplier] = useState([]);
-  const [selectedProductType, setSelectedProductType] = useState("");
-  const [selectedProductMerk, setSelectedProductMerk] = useState("");
-  const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [selectedProductType, setSelectedProductType] = useState(null);
+  const [selectedProductMerk, setSelectedProductMerk] = useState(null);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
   const [error, setError] = useState({
     productName: "",
     supplier: "",
@@ -53,9 +47,9 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
     setPrice("");
     setStock("");
     setExpired("");
-    setSelectedSupplier("");
-    setSelectedProductType("");
-    setSelectedProductMerk("");
+    setSelectedSupplier(null);
+    setSelectedProductType(null);
+    setSelectedProductMerk(null);
   };
 
   const handleCreateProduct = () => {
@@ -93,9 +87,9 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
         price: price,
         stock: stock,
         expired: expired,
-        supplierId: selectedSupplier,
-        productType: selectedProductType,
-        productMerk: selectedProductMerk,
+        supplierId: selectedSupplier.value,
+        productType: selectedProductType ? selectedProductType.value : "",
+        productMerk: selectedProductMerk ? selectedProductMerk.value : "",
       });
       handleCloseModal();
     }
@@ -143,15 +137,14 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             <Select
               id="distributor"
               value={selectedSupplier}
-              onChange={(e) => setSelectedSupplier(e.target.value)}
-            >
-              <option value="">Choose Distributor</option>
-              {supplier.map((item) => (
-                <option key={item.supplier_id} value={item.supplier_id}>
-                  {item.supplier_code + "-" + item.supplier_name}
-                </option>
-              ))}
-            </Select>
+              onChange={(selectedOption) => setSelectedSupplier(selectedOption)}
+              options={supplier.map((item) => ({
+                value: item.supplier_id,
+                label: item.supplier_code + "-" + item.supplier_name,
+              }))}
+              placeholder="Choose Distributor"
+              isClearable
+            />
             {error.supplier && (
               <p className="text-red-500 pt-2">{error.supplier}</p>
             )}
@@ -163,15 +156,16 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             <Select
               id="productType"
               value={selectedProductType}
-              onChange={(e) => setSelectedProductType(e.target.value)}
-            >
-              <option value="">Choose Product type</option>
-              {productType.map((type) => (
-                <option key={type.product_type_id} value={type.product_type_id}>
-                  {type.type_name}
-                </option>
-              ))}
-            </Select>
+              onChange={(selectedOption) =>
+                setSelectedProductType(selectedOption)
+              }
+              options={productType.map((type) => ({
+                value: type.product_type_id,
+                label: type.type_name,
+              }))}
+              placeholder="Choose Product type"
+              isClearable
+            />
           </div>
           <div>
             <div className="mb-2 block">
@@ -180,19 +174,20 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             <Select
               id="productMerk"
               value={selectedProductMerk}
-              onChange={(e) => setSelectedProductMerk(e.target.value)}
-            >
-              <option value="">Choose Product Merk</option>
-              {productMerk.map((merk) => (
-                <option key={merk.product_merk_id} value={merk.product_merk_id}>
-                  {merk.merk_name}
-                </option>
-              ))}
-            </Select>
+              onChange={(selectedOption) =>
+                setSelectedProductMerk(selectedOption)
+              }
+              options={productMerk.map((merk) => ({
+                value: merk.product_merk_id,
+                label: merk.merk_name,
+              }))}
+              placeholder="Choose Product Merk"
+              isClearable
+            />
           </div>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="akl_akd" value="N0 AKL/AKD" />
+              <Label htmlFor="akl_akd" value="No AKL/AKD" />
             </div>
             <TextInput
               id="akl_akd"
@@ -222,13 +217,22 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
             </div>
             <Select
               id="productExpired"
-              value={expired}
-              onChange={(e) => setExpired(e.target.value)}
-            >
-              <option value="">Expired and Not Expired</option>
-              <option value="1">Expired</option>
-              <option value="0">Not Expired</option>
-            </Select>
+              value={
+                expired
+                  ? {
+                      value: expired,
+                      label: expired === "1" ? "Expired" : "Not Expired",
+                    }
+                  : null
+              }
+              onChange={(selectedOption) => setExpired(selectedOption.value)}
+              options={[
+                { value: "1", label: "Expired" },
+                { value: "0", label: "Not Expired" },
+              ]}
+              placeholder="Expired and Not Expired"
+              isClearable
+            />
             {error.expired && (
               <p className="text-red-500 pt-2">{error.expired}</p>
             )}
