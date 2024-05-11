@@ -13,6 +13,11 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
   const [expired, setExpired] = useState("");
   const [selectedProductType, setSelectedProductType] = useState("");
   const [selectedProductMerk, setSelectedProductMerk] = useState("");
+  const [errors, setErrors] = useState({
+    productName: "",
+    price: "",
+    expired: "",
+  });
 
   const productNameInputRef = useRef(null);
 
@@ -50,8 +55,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
 
   const handleUpdateProduct = async () => {
     try {
-      console.log(expired);
-      onEditProduct(id, {
+      const updatedProduct = {
         name: productName,
         aklAkd: aklAkd,
         price: price,
@@ -59,7 +63,36 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
         expired: expired,
         productType: selectedProductType,
         productMerk: selectedProductMerk,
-      });
+      };
+
+      // Validate required fields
+      let isValid = true;
+      const newErrors = {
+        productName: "",
+        price: "",
+        expired: "",
+      };
+
+      if (!productName) {
+        newErrors.productName = "Product Name is required";
+        isValid = false;
+      }
+      if (!price) {
+        newErrors.price = "Price is required";
+        isValid = false;
+      }
+      if (!expired) {
+        newErrors.expired = "Expired status is required";
+        isValid = false;
+      }
+
+      if (!isValid) {
+        setErrors(newErrors);
+        return;
+      }
+
+      // Proceed with updating product if all fields are valid
+      await onEditProduct(id, updatedProduct);
       onClose();
     } catch (error) {
       console.error("Error updating product:", error);
@@ -87,6 +120,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productName" value="Product Name" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="productName"
@@ -97,6 +131,9 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
               required={true}
               ref={productNameInputRef}
             />
+            {errors.productName && (
+              <p className="text-red-500 pt-2">{errors.productName}</p>
+            )}
           </div>
           <div>
             <div className="mb-2 block">
@@ -150,6 +187,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="price" value="Price" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="price"
@@ -159,10 +197,14 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
               placeholder="Enter product price"
               required={true}
             />
+            {errors.price && (
+              <p className="text-red-500 pt-2">{errors.price}</p>
+            )}
           </div>
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productExpired" value="Product Expired" />
+              <span className="text-red-500">*</span>
             </div>
             <Select
               id="productExpired"
@@ -173,8 +215,11 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
               <option value="1">Expired</option>
               <option value="0">Not Expired</option>
             </Select>
+            {errors.expired && (
+              <p className="text-red-500 pt-2">{errors.expired}</p>
+            )}
           </div>
-          {expired === "0" && (
+          {expired == "0" && (
             <div>
               <div className="mb-2 block">
                 <Label htmlFor="stock" value="Stock" />

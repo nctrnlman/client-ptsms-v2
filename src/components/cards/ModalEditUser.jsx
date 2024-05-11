@@ -7,7 +7,9 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState([]);
   const [selectedRole, setSelectedRole] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [userNameError, setUserNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [roleError, setRoleError] = useState("");
   const userNameInputRef = useRef(null);
 
   const fetchUserDetail = async () => {
@@ -22,6 +24,7 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
       console.error("Error fetching User detail:", error);
     }
   };
+
   const getMasterDynamic = async () => {
     try {
       const response = await axios.get(
@@ -45,18 +48,46 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
     setUserName("");
     setEmail("");
     setRole([]);
+    setUserNameError("");
+    setEmailError("");
+    setRoleError("");
   };
 
   const updateUser = async () => {
-    try {
-      await onUpdateUser(id, {
-        username: userName,
-        email: email,
-        role_id: selectedRole,
-      });
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error updating user:", error);
+    let isValid = true;
+
+    if (!userName) {
+      setUserNameError("Username is required");
+      isValid = false;
+    } else {
+      setUserNameError("");
+    }
+
+    if (!email) {
+      setEmailError("Email is required");
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+
+    if (!selectedRole) {
+      setRoleError("Role is required");
+      isValid = false;
+    } else {
+      setRoleError("");
+    }
+
+    if (isValid) {
+      try {
+        await onUpdateUser(id, {
+          username: userName,
+          email: email,
+          role_id: selectedRole,
+        });
+        handleCloseModal();
+      } catch (error) {
+        console.error("Error updating user:", error);
+      }
     }
   };
 
@@ -77,6 +108,7 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="userName" value="Username" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="userName"
@@ -85,10 +117,12 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
             />
+            {userNameError && <p className="text-red-500">{userNameError}</p>}
           </div>
           <div>
             <div className="mb-2 block">
               <Label htmlFor="email" value="Email" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="email"
@@ -97,10 +131,12 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+            {emailError && <p className="text-red-500">{emailError}</p>}
           </div>
           <div>
             <div className="mb-2 block">
               <Label htmlFor="role" value="Role" />
+              <span className="text-red-500">*</span>
             </div>
             <Select
               id="role"
@@ -114,6 +150,7 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
                 </option>
               ))}
             </Select>
+            {roleError && <p className="text-red-500">{roleError}</p>}
           </div>
         </div>
       </Modal.Body>

@@ -115,7 +115,7 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
               htmlFor="note"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
-              Product Name
+              Product Name<span className="text-red-500">*</span>
             </label>
             <select
               name="product_id"
@@ -138,7 +138,7 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
               htmlFor="qty"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
-              Qty
+              Qty<span className="text-red-500">*</span>
             </label>
             <input
               name="qty"
@@ -172,7 +172,7 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
               htmlFor="ppn"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
-              PPN (%)
+              PPN (%)<span className="text-red-500">*</span>
             </label>
             <input
               type="text"
@@ -190,7 +190,7 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
               htmlFor="pph"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
             >
-              PPH (%)
+              PPH (%)<span className="text-red-500">*</span>
             </label>
             <input
               type="text"

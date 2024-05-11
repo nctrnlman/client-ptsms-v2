@@ -31,6 +31,14 @@ export default function TransactionOutEdit() {
     note: "",
     productList: [],
   });
+  const [errors, setErrors] = useState({
+    noFaktur: "",
+    noPo: "",
+    customerId: "",
+    paymentMethod: "",
+    timeToPayment: "",
+    deliveryDate: "",
+  });
 
   const calculateTotalTransaction = () => {
     let total = totalTransaction;
@@ -100,7 +108,47 @@ export default function TransactionOutEdit() {
       );
     } catch (error) {
       setLoading(false);
-      console.error("Error submitting form:", error);
+      setLoading(false);
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+        setErrors({
+          noFaktur:
+            error.response.data.errors.find(
+              (error) => error.field === "noFaktur"
+            )?.message || "",
+          noPo:
+            error.response.data.errors.find((error) => error.field === "noPo")
+              ?.message || "",
+          customerId:
+            error.response.data.errors.find(
+              (error) => error.field === "customerId"
+            )?.message || "",
+          paymentMethod:
+            error.response.data.errors.find(
+              (error) => error.field === "paymentMethod"
+            )?.message || "",
+          timeToPayment:
+            error.response.data.errors.find(
+              (error) => error.field === "timeToPayment"
+            )?.message || "",
+          deliveryDate:
+            error.response.data.errors.find(
+              (error) => error.field === "deliveryDate"
+            )?.message || "",
+          productList:
+            error.response.data.errors.find(
+              (error) => error.field === "productList"
+            )?.message || "",
+        });
+      } else {
+        toast.error(
+          error.response.data.message ||
+            "Error submitting form. Please try again."
+        );
+      }
       toast.error(error.response.data.message);
     }
   };
@@ -112,7 +160,12 @@ export default function TransactionOutEdit() {
       );
 
       const transactionDetail = response.data.data;
-
+      const formattedDateTP = new Date(
+        transactionDetail.transactionOut.time_to_payment
+      ).toLocaleDateString("en-CA");
+      const formattedDateDT = new Date(
+        transactionDetail.transactionOut.delivery_date
+      ).toLocaleDateString("en-CA");
       setFormData({
         ...formData,
         noFaktur: transactionDetail.transactionOut.no_faktur || "",
@@ -121,8 +174,8 @@ export default function TransactionOutEdit() {
         customerId: transactionDetail.transactionOut.customer_id || "",
         salesman: transactionDetail.transactionOut.salesman || "",
         paymentMethod: transactionDetail.transactionOut.payment_method || "",
-        timeToPayment: transactionDetail.transactionOut.time_to_payment || "",
-        deliveryDate: transactionDetail.transactionOut.delivery_date || "",
+        timeToPayment: formattedDateTP || "",
+        deliveryDate: formattedDateDT || "",
         note: transactionDetail.transactionOut.note || "",
         productList: transactionDetail.transactionOutDetail || [],
       });
@@ -275,7 +328,7 @@ export default function TransactionOutEdit() {
                 htmlFor="no_faktur"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No Faktur
+                No Faktur<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -287,6 +340,9 @@ export default function TransactionOutEdit() {
                 placeholder="No Faktur"
                 required
               />
+              {errors.noFaktur && (
+                <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
+              )}
             </div>
             {/* No PO */}
             <div>
@@ -294,7 +350,7 @@ export default function TransactionOutEdit() {
                 htmlFor="no_po"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No PO
+                No PO<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -306,6 +362,9 @@ export default function TransactionOutEdit() {
                 placeholder="No PO"
                 required
               />
+              {errors.noPo && (
+                <p className="text-red-500 text-sm pt-2">{errors.noPo}</p>
+              )}
             </div>
 
             {/* Customer */}
@@ -314,7 +373,7 @@ export default function TransactionOutEdit() {
                 htmlFor="customer"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Customer{" "}
+                Customer<span className="text-red-500">*</span>
                 {loading && (
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
@@ -340,6 +399,9 @@ export default function TransactionOutEdit() {
                     </option>
                   ))}
               </select>
+              {errors.customerId && (
+                <p className="text-red-500 text-sm pt-2">{errors.customerId}</p>
+              )}
             </div>
             {/* Salesman */}
             <div>
@@ -401,7 +463,7 @@ export default function TransactionOutEdit() {
                 htmlFor="payment_method"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Payment Method
+                Payment Method<span className="text-red-500">*</span>
               </label>
               <select
                 id="payment_method"
@@ -428,14 +490,22 @@ export default function TransactionOutEdit() {
                 name="timeToPayment"
                 // selected={formData.timeToPayment}
                 value={formData.deliveryDate}
-                onSelectedDateChanged={(date) =>
-                  setFormData({ ...formData, deliveryDate: date })
-                }
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, deliveryDate: formattedDate });
+                }}
                 title="Delivery Date"
                 language="en"
                 labelTodayButton="Today"
                 labelClearButton="Clear"
               />
+              {errors.deliveryDate && (
+                <p className="text-red-500 text-sm pt-2">
+                  {errors.deliveryDate}
+                </p>
+              )}
             </div>
             {/* Time to Payment */}
             <div>
@@ -443,21 +513,29 @@ export default function TransactionOutEdit() {
                 htmlFor="time_to_payment"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Time to Payment
+                Time to Payment<span className="text-red-500">*</span>
               </label>
               <Datepicker
                 id="time_to_payment"
                 name="timeToPayment"
                 // selected={formData.timeToPayment}
                 value={formData.timeToPayment}
-                onSelectedDateChanged={(date) =>
-                  setFormData({ ...formData, timeToPayment: date })
-                }
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, timeToPayment: formattedDate });
+                }}
                 title="Time to Payment"
                 language="en"
                 labelTodayButton="Today"
                 labelClearButton="Clear"
               />
+              {errors.timeToPayment && (
+                <p className="text-red-500 text-sm pt-2">
+                  {errors.timeToPayment}
+                </p>
+              )}
             </div>
           </div>
 
@@ -496,6 +574,9 @@ export default function TransactionOutEdit() {
               setProduct={setFormData}
               formData={formData}
             />
+            {errors.productList && (
+              <p className="text-red-500 text-sm pt-2">{errors.productList}</p>
+            )}
           </div>
 
           <div className="flex items-center justify-end mt-10 gap-4">

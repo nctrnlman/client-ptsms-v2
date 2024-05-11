@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Button,
   Label,
@@ -22,6 +22,12 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   const [selectedProductType, setSelectedProductType] = useState("");
   const [selectedProductMerk, setSelectedProductMerk] = useState("");
   const [selectedSupplier, setSelectedSupplier] = useState("");
+  const [error, setError] = useState({
+    productName: "",
+    supplier: "",
+    price: "",
+    expired: "",
+  });
 
   const productNameInputRef = useRef(null);
 
@@ -53,22 +59,51 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
   };
 
   const handleCreateProduct = () => {
-    onCreateProduct({
-      name: productName,
-      aklAkd: aklAkd,
-      price: price,
-      stock: stock,
-      expired: expired,
-      supplierId: selectedSupplier,
-      productType: selectedProductType,
-      productMerk: selectedProductMerk,
-    });
-    handleCloseModal();
+    let hasError = false;
+    const newError = {
+      productName: "",
+      supplier: "",
+      price: "",
+      expired: "",
+    };
+
+    if (!productName) {
+      newError.productName = "Product Name is required";
+      hasError = true;
+    }
+    if (!selectedSupplier) {
+      newError.supplier = "Distributor is required";
+      hasError = true;
+    }
+    if (!price) {
+      newError.price = "Price is required";
+      hasError = true;
+    }
+    if (!expired) {
+      newError.expired = "Expired status is required";
+      hasError = true;
+    }
+
+    setError(newError);
+
+    if (!hasError) {
+      onCreateProduct({
+        name: productName,
+        aklAkd: aklAkd,
+        price: price,
+        stock: stock,
+        expired: expired,
+        supplierId: selectedSupplier,
+        productType: selectedProductType,
+        productMerk: selectedProductMerk,
+      });
+      handleCloseModal();
+    }
   };
 
   useEffect(() => {
     getMasterDynamic();
-  }, []);
+  }, [openModal]);
 
   return (
     <Modal
@@ -87,6 +122,7 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productName" value="Product Name" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="productName"
@@ -95,10 +131,14 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
             />
+            {error.productName && (
+              <p className="text-red-500 pt-2">{error.productName}</p>
+            )}
           </div>
           <div>
             <div className="mb-2 block">
               <Label htmlFor="distributor" value="Distributor" />
+              <span className="text-red-500">*</span>
             </div>
             <Select
               id="distributor"
@@ -112,6 +152,9 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
                 </option>
               ))}
             </Select>
+            {error.supplier && (
+              <p className="text-red-500 pt-2">{error.supplier}</p>
+            )}
           </div>
           <div>
             <div className="mb-2 block">
@@ -161,6 +204,7 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="price" value="Price" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="price"
@@ -169,10 +213,12 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
             />
+            {error.price && <p className="text-red-500 pt-2">{error.price}</p>}
           </div>
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productExpired" value="Product Expired" />
+              <span className="text-red-500">*</span>
             </div>
             <Select
               id="productExpired"
@@ -183,6 +229,9 @@ function ModalAddProduct({ openModal, setOpenModal, onCreateProduct }) {
               <option value="1">Expired</option>
               <option value="0">Not Expired</option>
             </Select>
+            {error.expired && (
+              <p className="text-red-500 pt-2">{error.expired}</p>
+            )}
           </div>
           {expired === "0" && (
             <div>

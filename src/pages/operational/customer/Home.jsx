@@ -44,6 +44,14 @@ export default function Home() {
       await fetchData();
       setLoading(false);
     } catch (error) {
+      if (error.response && error.response.data && error.response.data.errors) {
+        const errorMessages = error.response.data.errors.map(
+          (error) => error.message
+        );
+        toast.error(errorMessages.join(", "));
+      } else {
+        toast.error(error.response.data.message || "Failed to create customer");
+      }
       toast.error(error.response.data.message);
       console.error("Error creating distributor:", error);
       setLoading(false);

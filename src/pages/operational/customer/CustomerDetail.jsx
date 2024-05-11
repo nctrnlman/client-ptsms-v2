@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
-import ModalDelete from "../../../components/cards/ModalDelete";
 
 export default function CustomerDetail() {
   const { id } = useParams();
@@ -18,7 +17,7 @@ export default function CustomerDetail() {
   const [customerName, setCustomerName] = useState("Customer");
   const [loading, setLoading] = useState(true);
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
   const navigate = useNavigate();
 
   const columns = [
@@ -46,12 +45,6 @@ export default function CustomerDetail() {
           >
             Detail
           </button>
-          <button
-            className=" text-red-500 hover:text-red-800 font-bold "
-            onClick={() => handleDelete(params.row.transaction_id)}
-          >
-            Delete
-          </button>
         </div>
       ),
     },
@@ -61,11 +54,6 @@ export default function CustomerDetail() {
     navigate(
       `/operasional/customer/transaction/out/form/${encryptNumber(customerId)}`
     );
-  };
-
-  const handleDelete = (id) => {
-    setSelectedTransactionId(id);
-    setDeleteModalOpen(true);
   };
 
   const handleEdit = (id) => {
@@ -266,17 +254,6 @@ export default function CustomerDetail() {
 
         {/* Render DataTable component */}
         <DataTable rows={rows} columns={columns} loading={loading} />
-
-        {/* Render ModalDelete component */}
-        <ModalDelete
-          id={selectedTransactionId}
-          onDeleteComponent={(id) => {
-            // Implement deletion logic here
-            setDeleteModalOpen(false); // Close the delete modal
-          }}
-          open={deleteModalOpen}
-          onClose={() => setDeleteModalOpen(false)} // Close the delete modal
-        />
       </main>
     </Layout>
   );

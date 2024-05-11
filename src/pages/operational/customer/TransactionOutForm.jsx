@@ -33,6 +33,14 @@ export default function TransactionOutFrom() {
     note: "",
     productList: [],
   });
+  const [errors, setErrors] = useState({
+    noFaktur: "",
+    noPo: "",
+    customerId: "",
+    paymentMethod: "",
+    timeToPayment: "",
+    deliveryDate: "",
+  });
 
   const calculateTotalTransaction = () => {
     let total = 0;
@@ -111,12 +119,40 @@ export default function TransactionOutFrom() {
       navigate(`/operasional/customer/${encryptNumber(customerId)}`);
     } catch (error) {
       setLoading(false);
-      setLoading(false);
       if (error.response && error.response.data && error.response.data.errors) {
         const errorMessages = error.response.data.errors.map(
           (error) => error.message
         );
         toast.error(errorMessages.join(", "));
+        setErrors({
+          noFaktur:
+            error.response.data.errors.find(
+              (error) => error.field === "noFaktur"
+            )?.message || "",
+          noPo:
+            error.response.data.errors.find((error) => error.field === "noPo")
+              ?.message || "",
+          customerId:
+            error.response.data.errors.find(
+              (error) => error.field === "customerId"
+            )?.message || "",
+          paymentMethod:
+            error.response.data.errors.find(
+              (error) => error.field === "paymentMethod"
+            )?.message || "",
+          timeToPayment:
+            error.response.data.errors.find(
+              (error) => error.field === "timeToPayment"
+            )?.message || "",
+          deliveryDate:
+            error.response.data.errors.find(
+              (error) => error.field === "deliveryDate"
+            )?.message || "",
+          productList:
+            error.response.data.errors.find(
+              (error) => error.field === "productList"
+            )?.message || "",
+        });
       } else {
         toast.error(
           error.response.data.message ||
@@ -257,7 +293,7 @@ export default function TransactionOutFrom() {
                 htmlFor="no_faktur"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No Faktur
+                No Faktur<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -269,6 +305,9 @@ export default function TransactionOutFrom() {
                 placeholder="No Faktur"
                 required
               />
+              {errors.noFaktur && (
+                <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
+              )}
             </div>
             {/* No PO */}
             <div>
@@ -276,7 +315,7 @@ export default function TransactionOutFrom() {
                 htmlFor="no_po"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No PO
+                No PO<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -288,6 +327,9 @@ export default function TransactionOutFrom() {
                 placeholder="No PO"
                 required
               />
+              {errors.noPo && (
+                <p className="text-red-500 text-sm pt-2">{errors.noPo}</p>
+              )}
             </div>
 
             {/* Customer */}
@@ -296,7 +338,7 @@ export default function TransactionOutFrom() {
                 htmlFor="customer"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Customer{" "}
+                Customer<span className="text-red-500">*</span>
                 {loading && (
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
@@ -322,6 +364,9 @@ export default function TransactionOutFrom() {
                     </option>
                   ))}
               </select>
+              {errors.customerId && (
+                <p className="text-red-500 text-sm pt-2">{errors.customerId}</p>
+              )}
             </div>
             {/* Salesman */}
             <div>
@@ -329,7 +374,7 @@ export default function TransactionOutFrom() {
                 htmlFor="salesman"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Salesman{" "}
+                Salesman
                 {loading && (
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
@@ -384,7 +429,7 @@ export default function TransactionOutFrom() {
                 htmlFor="payment_method"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Payment Method
+                Payment Method<span className="text-red-500">*</span>
               </label>
               <select
                 id="payment_method"
@@ -397,6 +442,11 @@ export default function TransactionOutFrom() {
                 <option value="Cash">Cash</option>
                 <option value="Credit">Credit</option>
               </select>
+              {errors.paymentMethod && (
+                <p className="text-red-500 text-sm pt-2">
+                  {errors.paymentMethod}
+                </p>
+              )}
             </div>
             {/* Delivery Date */}
             <div>
@@ -404,21 +454,29 @@ export default function TransactionOutFrom() {
                 htmlFor="deliveryDate"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Delivery Date
+                Delivery Date<span className="text-red-500">*</span>
               </label>
               <Datepicker
                 id="deliveryDate"
                 name="timeToPayment"
                 // selected={formData.timeToPayment}
                 value={formData.deliveryDate}
-                onSelectedDateChanged={(date) =>
-                  setFormData({ ...formData, deliveryDate: date })
-                }
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, deliveryDate: formattedDate });
+                }}
                 title="Delivery Date"
                 language="en"
                 labelTodayButton="Today"
                 labelClearButton="Clear"
               />
+              {errors.deliveryDate && (
+                <p className="text-red-500 text-sm pt-2">
+                  {errors.deliveryDate}
+                </p>
+              )}
             </div>
             {/* Time to Payment */}
             <div>
@@ -426,21 +484,29 @@ export default function TransactionOutFrom() {
                 htmlFor="time_to_payment"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Time to Payment
+                Time to Payment<span className="text-red-500">*</span>
               </label>
               <Datepicker
                 id="time_to_payment"
                 name="timeToPayment"
                 // selected={formData.timeToPayment}
                 value={formData.timeToPayment}
-                onSelectedDateChanged={(date) =>
-                  setFormData({ ...formData, timeToPayment: date })
-                }
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, timeToPayment: formattedDate });
+                }}
                 title="Time to Payment"
                 language="en"
                 labelTodayButton="Today"
                 labelClearButton="Clear"
               />
+              {errors.timeToPayment && (
+                <p className="text-red-500 text-sm pt-2">
+                  {errors.timeToPayment}
+                </p>
+              )}
             </div>
           </div>
 
@@ -478,6 +544,9 @@ export default function TransactionOutFrom() {
               product={product}
               setProduct={setFormData}
             />
+            {errors.productList && (
+              <p className="text-red-500 text-sm pt-2">{errors.productList}</p>
+            )}
           </div>
 
           <div className="flex items-center justify-end mt-10 gap-4">

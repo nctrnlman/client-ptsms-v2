@@ -58,15 +58,18 @@ export default function TransactionInEdit() {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/transactions/in/detail/${id}`
       );
-      console.log(response.data.data.transactionInDetail);
+
       const transactionDetail = response.data.data;
+      const formattedDate = new Date(
+        transactionDetail.transactionIn.time_to_payment
+      ).toLocaleDateString("en-CA");
       setFormData({
         ...formData,
         noFaktur: transactionDetail.transactionIn.no_faktur || "",
         noPo: transactionDetail.transactionIn.no_po || "",
         supplierId: transactionDetail.transactionIn.supplier_id || "",
         paymentMethod: transactionDetail.transactionIn.payment_method || "",
-        timeToPayment: transactionDetail.transactionIn.time_to_payment || "",
+        timeToPayment: formattedDate || "",
         tax: transactionDetail.transactionIn.tax || "",
         note: transactionDetail.transactionIn.note || "",
         productList: response.data.data.transactionInDetail || [],
@@ -89,7 +92,7 @@ export default function TransactionInEdit() {
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     let filteredValue = value;
-    console.log(filteredValue, "cekvalue");
+
     if (name === "supplierId") {
       getMasterDynamicProduct(value);
     }
@@ -264,7 +267,7 @@ export default function TransactionInEdit() {
                 htmlFor="no_faktur"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No Faktur
+                No Faktur<span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
@@ -283,7 +286,7 @@ export default function TransactionInEdit() {
                 htmlFor="supplier"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Supplier{" "}
+                Supplier<span className="text-red-500">*</span>
                 {loading && (
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
@@ -313,7 +316,7 @@ export default function TransactionInEdit() {
                 htmlFor="payment_method"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Payment Method
+                Payment Method<span className="text-red-500">*</span>
               </label>
               <select
                 id="payment_method"
@@ -333,7 +336,7 @@ export default function TransactionInEdit() {
                 htmlFor="tax"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Tax
+                Tax (%)
               </label>
               <input
                 type="text"
@@ -355,16 +358,19 @@ export default function TransactionInEdit() {
                 htmlFor="time_to_payment"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                Time to Payment
+                Time to Payment<span className="text-red-500">*</span>
               </label>
               <Datepicker
                 id="time_to_payment"
                 name="timeToPayment"
                 // selected={formData.timeToPayment}
                 value={formData.timeToPayment || ""}
-                onSelectedDateChanged={(date) =>
-                  setFormData({ ...formData, timeToPayment: date })
-                }
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, timeToPayment: formattedDate });
+                }}
                 title="Time to Payment"
                 language="en"
                 labelTodayButton="Today"
