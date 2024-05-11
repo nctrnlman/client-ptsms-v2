@@ -1,9 +1,10 @@
-import { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import { Button, Label, Modal, TextInput } from "flowbite-react";
 import axios from "axios";
 
 function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
   const [salesName, setSalesName] = useState("");
+  const [error, setError] = useState("");
   const salesNameInputRef = useRef(null);
 
   const fetchSalesDetail = async () => {
@@ -18,7 +19,7 @@ function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
     }
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (openModal) {
       fetchSalesDetail();
     }
@@ -27,16 +28,21 @@ function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
   const handleCloseModal = () => {
     setOpenModal(false);
     setSalesName("");
+    setError("");
   };
 
   const updateSales = async () => {
-    try {
-      await onUpdateSales(id, {
-        name: salesName,
-      });
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error updating distributor:", error);
+    if (salesName.trim() === "") {
+      setError("Sales Name is required.");
+    } else {
+      try {
+        await onUpdateSales(id, {
+          name: salesName,
+        });
+        handleCloseModal();
+      } catch (error) {
+        console.error("Error updating salesman:", error);
+      }
     }
   };
 
@@ -57,14 +63,19 @@ function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="salesName" value="SalesName" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="salesName"
               ref={salesNameInputRef}
               placeholder="PT Sehat Murni Sejahtera"
               value={salesName}
-              onChange={(e) => setSalesName(e.target.value)}
+              onChange={(e) => {
+                setSalesName(e.target.value);
+                setError("");
+              }}
             />
+            {error && <p className="text-red-500 pt-2">{error}</p>}{" "}
           </div>
         </div>
       </Modal.Body>

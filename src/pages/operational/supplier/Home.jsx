@@ -20,7 +20,6 @@ export default function Home() {
   const [todayTransaction, setTodayTransaction] = useState(0);
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
-  const [openModal, setOpenModal] = useState(false);
 
   const navigate = useNavigate();
   const columns = [
@@ -45,12 +44,6 @@ export default function Home() {
           >
             Detail
           </button>
-          <button
-            className=" text-red-500 hover:text-red-800 font-bold "
-            onClick={() => handleDelete(params.row.transaction_id)}
-          >
-            Delete
-          </button>
         </div>
       ),
     },
@@ -58,9 +51,6 @@ export default function Home() {
 
   const handleCreateClick = () => {
     navigate("/operasional/supplier/transaction/in/form");
-  };
-  const handleDelete = (id) => {
-    console.log(`Delete data with ID: ${id}`);
   };
   const handleEdit = (id) => {
     navigate(`/operasional/supplier/transaction/detail/${encryptNumber(id)}`);
@@ -192,31 +182,30 @@ export default function Home() {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <DashboardCard
-              title="Total Supplier"
-              description={totalSupplier}
-              icon={FaUsers}
-              className="w-full sm:w-auto"
-            />
-            <DashboardCard
-              title="Today Transaction"
-              description={todayTransaction}
-              icon={FaCalendarDay}
-              className="w-full sm:w-auto"
-            />
-            <DashboardCard
-              title="Total Transaction"
-              description={totalTransaction}
-              icon={FaClipboardList}
-              className="w-full sm:w-auto"
-            />
-            <DashboardCard
-              title="Most Frequent Distributor"
-              description={mostSupplierTransaction}
-              icon={FaUser}
-              className="w-full sm:w-auto"
-            />
-        
+          <DashboardCard
+            title="Total Supplier"
+            description={totalSupplier}
+            icon={FaUsers}
+            className="w-full sm:w-auto"
+          />
+          <DashboardCard
+            title="Today Transaction"
+            description={todayTransaction}
+            icon={FaCalendarDay}
+            className="w-full sm:w-auto"
+          />
+          <DashboardCard
+            title="Total Transaction"
+            description={totalTransaction}
+            icon={FaClipboardList}
+            className="w-full sm:w-auto"
+          />
+          <DashboardCard
+            title="Most Frequent Distributor"
+            description={mostSupplierTransaction}
+            icon={FaUser}
+            className="w-full sm:w-auto"
+          />
         </div>
         <div className="overflow-x-auto">
           <DataTable rows={rows} columns={columns} loading={loading} />

@@ -10,6 +10,8 @@ function ModalEditDistributor({
 }) {
   const [distributorName, setDistributorName] = useState("");
   const [distributorCode, setDistributorCode] = useState("");
+  const [nameError, setNameError] = useState("");
+  const [codeError, setCodeError] = useState("");
   const distributorNameInputRef = useRef(null);
 
   const fetchDistributorDetail = async () => {
@@ -26,7 +28,6 @@ function ModalEditDistributor({
   };
 
   useEffect(() => {
-    // Ketika modal dibuka, ambil detail distributor dari API
     if (openModal) {
       fetchDistributorDetail();
     }
@@ -36,17 +37,33 @@ function ModalEditDistributor({
     setOpenModal(false);
     setDistributorName("");
     setDistributorCode("");
+    setNameError("");
+    setCodeError("");
   };
 
   const updateDistributor = async () => {
-    try {
-      await onUpdateDistributor(id, {
-        name: distributorName,
-        code: distributorCode,
-      });
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error updating distributor:", error);
+    if (distributorName.trim() === "") {
+      setNameError("Distributor Name is required.");
+    } else {
+      setNameError("");
+    }
+
+    if (distributorCode.trim() === "") {
+      setCodeError("Distributor Code is required.");
+    } else {
+      setCodeError("");
+    }
+
+    if (distributorName.trim() !== "" && distributorCode.trim() !== "") {
+      try {
+        await onUpdateDistributor(id, {
+          name: distributorName,
+          code: distributorCode,
+        });
+        handleCloseModal();
+      } catch (error) {
+        console.error("Error updating distributor:", error);
+      }
     }
   };
 
@@ -67,25 +84,35 @@ function ModalEditDistributor({
           <div>
             <div className="mb-2 block">
               <Label htmlFor="distributorName" value="Distributor Name" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="distributorName"
               ref={distributorNameInputRef}
               placeholder="PT Sehat Murni Sejahtera"
               value={distributorName}
-              onChange={(e) => setDistributorName(e.target.value)}
+              onChange={(e) => {
+                setDistributorName(e.target.value);
+                setNameError("");
+              }}
             />
+            {nameError && <p className="text-red-500 pt-2">{nameError}</p>}{" "}
           </div>
           <div>
             <div className="mb-2 block">
               <Label htmlFor="distributorCode" value="Distributor Code" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="distributorCode"
               placeholder="AB"
               value={distributorCode}
-              onChange={(e) => setDistributorCode(e.target.value)}
+              onChange={(e) => {
+                setDistributorCode(e.target.value);
+                setCodeError("");
+              }}
             />
+            {codeError && <p className="text-red-500 pt-2">{codeError}</p>}
           </div>
         </div>
       </Modal.Body>

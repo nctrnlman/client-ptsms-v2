@@ -9,6 +9,7 @@ function ModalEditProductMerk({
   onUpdateProductMerk,
 }) {
   const [productMerk, setProductMerk] = useState("");
+  const [error, setError] = useState("");
   const productMerkNameInputRef = useRef(null);
 
   const fetchProductMerk = async () => {
@@ -32,16 +33,21 @@ function ModalEditProductMerk({
   const handleCloseModal = () => {
     setOpenModal(false);
     setProductMerk("");
+    setError("");
   };
 
   const updateProductMerk = async () => {
-    try {
-      await onUpdateProductMerk(id, {
-        name: productMerk,
-      });
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error updating distributor:", error);
+    if (productMerk.trim() === "") {
+      setError("Product Merk Name is required.");
+    } else {
+      try {
+        await onUpdateProductMerk(id, {
+          name: productMerk,
+        });
+        handleCloseModal();
+      } catch (error) {
+        console.error("Error updating distributor:", error);
+      }
     }
   };
 
@@ -62,14 +68,19 @@ function ModalEditProductMerk({
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productMerk" value="Product Merk Name" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="productMerk"
               ref={productMerkNameInputRef}
               placeholder="Merk A"
               value={productMerk}
-              onChange={(e) => setProductMerk(e.target.value)}
+              onChange={(e) => {
+                setProductMerk(e.target.value);
+                setError("");
+              }}
             />
+            {error && <p className="text-red-500 pt-2">{error}</p>}{" "}
           </div>
         </div>
       </Modal.Body>

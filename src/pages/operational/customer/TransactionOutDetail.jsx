@@ -51,7 +51,7 @@ export default function TransactionOutDetail() {
           merk_name: item.merk_name,
           akl_akd: item.akl_akd,
           price: formatCurrency(item.price),
-          discount: item.discount + "%",
+          discount: item.discount ? item.discount + "%" : "-",
           qty: item.qty,
           ppn: item.ppn,
           pph: item.pph,

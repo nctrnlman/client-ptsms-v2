@@ -3,16 +3,22 @@ import { Button, Label, Modal, TextInput } from "flowbite-react";
 
 function ModalAddProductMerk({ openModal, setOpenModal, onCreateProductMerk }) {
   const [productMerk, setProductMerk] = useState("");
+  const [error, setError] = useState("");
   const productMerkInputRef = useRef(null);
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setProductMerk("");
+    setError("");
   };
 
   const handleProductMerkName = () => {
-    onCreateProductMerk({ merkName: productMerk });
-    handleCloseModal();
+    if (productMerk.trim() === "") {
+      setError("Product Merk Name is required.");
+    } else {
+      onCreateProductMerk({ merkName: productMerk });
+      handleCloseModal();
+    }
   };
 
   return (
@@ -32,14 +38,19 @@ function ModalAddProductMerk({ openModal, setOpenModal, onCreateProductMerk }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productMerk" value="Product Merk Name" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="productMerk"
               ref={productMerkInputRef}
               placeholder="Merk A"
               value={productMerk}
-              onChange={(e) => setProductMerk(e.target.value)}
+              onChange={(e) => {
+                setProductMerk(e.target.value);
+                setError("");
+              }}
             />
+            {error && <p className="text-red-500 pt-2">{error}</p>}
           </div>
         </div>
       </Modal.Body>

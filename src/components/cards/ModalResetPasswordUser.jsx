@@ -5,31 +5,28 @@ import axios from "axios";
 function ModalEditUser({ id, openModal, setOpenModal, onResetPasswordUser }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(true);
+  const [passwordError, setPasswordError] = useState("");
   const passwordInputRef = useRef(null);
-
-  // const fetchUserDetail = async () => {
-  //   try {
-  //     const response = await axios.get(
-  //       `${import.meta.env.VITE_API_BASE_URL}/auth/user/detail/${id}`
-  //     );
-  //     setPassword(response.data.data.password);
-  //   } catch (error) {
-  //     console.error("Error fetching User detail:", error);
-  //   }
-  // };
 
   useEffect(() => {
     if (openModal) {
-      // fetchUserDetail();
+      setPassword("");
+      setPasswordError("");
     }
   }, [openModal]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
     setPassword("");
+    setPasswordError("");
   };
 
   const resetPassword = async () => {
+    if (!password) {
+      setPasswordError("Password is required");
+      return;
+    }
+
     try {
       await onResetPasswordUser(id, {
         password: password,
@@ -57,14 +54,19 @@ function ModalEditUser({ id, openModal, setOpenModal, onResetPasswordUser }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="password" value="Password" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="password"
               ref={passwordInputRef}
               placeholder="Insert New Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => {
+                setPassword(e.target.value);
+                setPasswordError(""); // Reset password error
+              }}
             />
+            {passwordError && <p className="text-red-500">{passwordError}</p>}
           </div>
         </div>
       </Modal.Body>

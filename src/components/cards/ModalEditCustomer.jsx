@@ -4,6 +4,7 @@ import axios from "axios";
 
 function ModalEditCustomer({ id, openModal, setOpenModal, onUpdateCustomer }) {
   const [customerName, setCustomerName] = useState("");
+  const [error, setError] = useState("");
   const distributorNameInputRef = useRef(null);
 
   const fetchCustomerDetail = async () => {
@@ -27,16 +28,21 @@ function ModalEditCustomer({ id, openModal, setOpenModal, onUpdateCustomer }) {
   const handleCloseModal = () => {
     setOpenModal(false);
     setCustomerName("");
+    setError("");
   };
 
   const updateCustomer = async () => {
-    try {
-      await onUpdateCustomer(id, {
-        name: customerName,
-      });
-      handleCloseModal();
-    } catch (error) {
-      console.error("Error updating distributor:", error);
+    if (customerName.trim() === "") {
+      setError("Customer Name is required.");
+    } else {
+      try {
+        await onUpdateCustomer(id, {
+          name: customerName,
+        });
+        handleCloseModal();
+      } catch (error) {
+        console.error("Error updating distributor:", error);
+      }
     }
   };
 
@@ -57,14 +63,19 @@ function ModalEditCustomer({ id, openModal, setOpenModal, onUpdateCustomer }) {
           <div>
             <div className="mb-2 block">
               <Label htmlFor="customerName" value="Customer Name" />
+              <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="customerName"
               ref={distributorNameInputRef}
               placeholder="PT Sehat Murni Sejahtera"
               value={customerName}
-              onChange={(e) => setCustomerName(e.target.value)}
+              onChange={(e) => {
+                setCustomerName(e.target.value);
+                setError("");
+              }}
             />
+            {error && <p className="text-red-500 pt-2">{error}</p>}{" "}
           </div>
         </div>
       </Modal.Body>
