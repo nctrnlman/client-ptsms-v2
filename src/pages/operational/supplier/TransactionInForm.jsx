@@ -8,6 +8,8 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import Select from "react-select";
+
 export default function TransactionInForm() {
   const [options, setOptions] = useState([]);
   const [product, setProduct] = useState([]);
@@ -304,24 +306,35 @@ export default function TransactionInForm() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-              <select
+              <Select
                 id="supplier"
                 name="supplierId"
-                value={formData.supplierId}
-                onChange={(e) => {
-                  handleInputChange(e);
-                }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
-                disabled={loading}
-              >
-                <option value="">Choose a supplier</option>
-                {!loading &&
-                  options?.map((option) => (
-                    <option key={option.supplier_id} value={option.supplier_id}>
-                      {option.supplier_code + "-" + option.supplier_name}
-                    </option>
-                  ))}
-              </select>
+                value={
+                  formData.supplierId
+                    ? {
+                        value: formData.supplierId,
+                        label: options.find(
+                          (option) => option.supplier_id === formData.supplierId
+                        )?.supplier_name,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
+                  handleInputChange({
+                    target: {
+                      name: "supplierId",
+                      value: selectedOption ? selectedOption.value : "",
+                    },
+                  })
+                }
+                options={options.map((option) => ({
+                  value: option.supplier_id,
+                  label: option.supplier_code + "-" + option.supplier_name,
+                }))}
+                placeholder="Choose a supplier"
+                isClearable
+                isDisabled={loading}
+              />
               {errors.supplierId && (
                 <p className="text-red-500 text-sm pt-2">{errors.supplierId}</p>
               )}
@@ -334,17 +347,29 @@ export default function TransactionInForm() {
               >
                 Payment Method<span className="text-red-500">*</span>
               </label>
-              <select
+              <Select
                 id="payment_method"
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleInputChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
-              >
-                <option value="">Choose a payment method</option>
-                <option value="Cash">Cash</option>
-                <option value="Credit">Credit</option>
-              </select>
+                value={
+                  formData.paymentMethod
+                    ? {
+                        value: formData.paymentMethod,
+                        label: formData.paymentMethod,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
+                  setFormData({
+                    ...formData,
+                    paymentMethod: selectedOption ? selectedOption.value : "",
+                  })
+                }
+                options={[
+                  { value: "Cash", label: "Cash" },
+                  { value: "Credit", label: "Credit" },
+                ]}
+                placeholder="Choose a payment method"
+                isClearable
+              />
               {errors.paymentMethod && (
                 <p className="text-red-500 text-sm pt-2">
                   {errors.paymentMethod}
