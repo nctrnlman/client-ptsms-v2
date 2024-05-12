@@ -9,6 +9,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
 import { useSelector } from "react-redux";
+import Select from "react-select";
+
 export default function TransactionOutFrom() {
   const { id } = useParams();
   const [customerId, setCustomerId] = useState(0);
@@ -379,27 +381,32 @@ export default function TransactionOutFrom() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-              <select
+              <Select
                 id="salesman"
-                name="salesman"
-                value={formData.salesman}
-                onChange={(e) => {
-                  handleInputChange(e);
-                }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                disabled={loading}
-              >
-                <option value="">Choose a Salesman</option>
-                {!loading &&
-                  salesman?.map((option) => (
-                    <option
-                      key={option.sales_id}
-                      value={parseInt(option.sales_id)}
-                    >
-                      {option.sales_name}
-                    </option>
-                  ))}
-              </select>
+                value={
+                  formData.salesman
+                    ? {
+                        value: formData.salesman,
+                        label: salesman.find(
+                          (option) => option.sales_id === formData.salesman
+                        )?.sales_name,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
+                  setFormData({
+                    ...formData,
+                    salesman: selectedOption ? selectedOption.value : "",
+                  })
+                }
+                options={salesman.map((option) => ({
+                  value: option.sales_id,
+                  label: option.sales_name,
+                }))}
+                placeholder="Choose a Salesman"
+                isClearable
+                isDisabled={loading}
+              />
             </div>
             {/* CN */}
             <div>
@@ -422,7 +429,6 @@ export default function TransactionOutFrom() {
                 required
               />
             </div>
-
             {/* Payment Method */}
             <div>
               <label
@@ -431,23 +437,36 @@ export default function TransactionOutFrom() {
               >
                 Payment Method<span className="text-red-500">*</span>
               </label>
-              <select
+              <Select
                 id="payment_method"
-                name="paymentMethod"
-                value={formData.paymentMethod}
-                onChange={handleInputChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-              >
-                <option value="">Choose a payment method</option>
-                <option value="Cash">Cash</option>
-                <option value="Credit">Credit</option>
-              </select>
+                value={
+                  formData.paymentMethod
+                    ? {
+                        value: formData.paymentMethod,
+                        label: formData.paymentMethod,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
+                  setFormData({
+                    ...formData,
+                    paymentMethod: selectedOption ? selectedOption.value : "",
+                  })
+                }
+                options={[
+                  { value: "Cash", label: "Cash" },
+                  { value: "Credit", label: "Credit" },
+                ]}
+                placeholder="Choose a payment method"
+                isClearable
+              />
               {errors.paymentMethod && (
                 <p className="text-red-500 text-sm pt-2">
                   {errors.paymentMethod}
                 </p>
               )}
             </div>
+
             {/* Delivery Date */}
             <div>
               <label
