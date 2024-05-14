@@ -8,11 +8,15 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import Select from "react-select";
+
 export default function TransactionInEdit() {
   const { id } = useParams();
-  const [options, setOptions] = useState([]);
+  const [supplierOptions, setSupplierOptions] = useState([]);
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     noFaktur: "",
@@ -29,7 +33,11 @@ export default function TransactionInEdit() {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
       );
-      setOptions(response.data.data.supplier);
+      const supplierOptions = response.data.data.supplier.map((supplier) => ({
+        value: supplier.supplier_id,
+        label: `${supplier.supplier_code} - ${supplier.supplier_name}`,
+      }));
+      setSupplierOptions(supplierOptions);
 
       setLoading(false);
     } catch (error) {
@@ -291,24 +299,18 @@ export default function TransactionInEdit() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-              <select
+              <Select
                 id="supplier"
-                name="supplierId"
-                value={formData.supplierId || ""}
-                onChange={(e) => {
-                  handleInputChange(e);
+                value={selectedSupplier}
+                onChange={(option) => {
+                  setSelectedSupplier(option);
+                  handleInputChange({
+                    target: { name: "supplierId", value: option.value },
+                  });
                 }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
-                disabled={loading}
-              >
-                <option value="">Choose a supplier</option>
-                {!loading &&
-                  options?.map((option) => (
-                    <option key={option.supplier_id} value={option.supplier_id}>
-                      {option.supplier_code + "-" + option.supplier_name}
-                    </option>
-                  ))}
-              </select>
+                options={supplierOptions}
+                isSearchable
+              />
             </div>
             {/* Payment Method */}
             <div>
