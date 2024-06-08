@@ -118,7 +118,7 @@ export default function TransactionOutFrom() {
       setTotalTransaction("");
       setTotalTransactionTax("");
       toast.success(response.data.message);
-      navigate(`/operasional/customer/${encryptNumber(customerId)}`);
+      navigate(`/operasional/customers`);
     } catch (error) {
       setLoading(false);
       if (error.response && error.response.data && error.response.data.errors) {
@@ -168,7 +168,7 @@ export default function TransactionOutFrom() {
   useEffect(() => {
     getMasterDynamic();
     setCustomerId(decryptNumber(id));
-    setFormData({ ...formData, customerId: decryptNumber(id) });
+    // setFormData({ ...formData, customerId: decryptNumber(id) });
     calculateTotalTransaction();
   }, [formData.productList]);
 
@@ -212,7 +212,7 @@ export default function TransactionOutFrom() {
                   />
                 </svg>
                 <a
-                  href="#"
+                  href="/operasional/customers"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
                   Customer
@@ -240,32 +240,7 @@ export default function TransactionOutFrom() {
                   href="#"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Transaction Out
-                </a>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <svg
-                  className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 6 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 9 4-4-4-4"
-                  />
-                </svg>
-                <a
-                  href="#"
-                  className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
-                >
-                  Form
+                  Transaction Out Form
                 </a>
               </div>
             </li>
@@ -345,7 +320,7 @@ export default function TransactionOutFrom() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-              <select
+              {/* <select
                 id="customer"
                 name="customerId"
                 value={formData.customerId}
@@ -353,7 +328,7 @@ export default function TransactionOutFrom() {
                   handleInputChange(e);
                 }}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                disabled={true}
+                // disabled={true}
               >
                 <option value="">Choose a Customer</option>
                 {!loading &&
@@ -365,7 +340,33 @@ export default function TransactionOutFrom() {
                       {option.customer_name}
                     </option>
                   ))}
-              </select>
+              </select> */}
+              <Select
+                id="customer"
+                value={
+                  formData.customerId
+                    ? {
+                        value: formData.customerId,
+                        label: customer.find(
+                          (option) => option.customer_id === formData.customerId
+                        )?.customer_name,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
+                  setFormData({
+                    ...formData,
+                    customerId: selectedOption ? selectedOption.value : "",
+                  })
+                }
+                options={customer.map((option) => ({
+                  value: option.customer_id,
+                  label: option.customer_name,
+                }))}
+                placeholder="Choose a Customer"
+                isClearable
+                isDisabled={loading}
+              />
               {errors.customerId && (
                 <p className="text-red-500 text-sm pt-2">{errors.customerId}</p>
               )}

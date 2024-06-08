@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import ModalDelete from "../../../components/cards/ModalDelete";
 import ModalEdit from "../../../components/cards/ModalEditProduct";
+import ModalExpired from "../../../components/cards/ModalExpiredDetail";
 import ModalAddProductType from "../../../components/cards/ModalAddProductType";
 import ModalEditProductType from "../../../components/cards/ModalEditProductType";
 import ModalEditProductMerk from "../../../components/cards/ModalEditProductMerk";
@@ -35,6 +36,7 @@ export default function Home() {
   const [openModalMerkDelete, setOpenModalMerkDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [openModalEdit, setOpenModalEdit] = useState(false);
+  const [openModalExpired, setOpenModalExpired] = useState(false);
   const [selectedProductTypeId, setSelectedProductTypeId] = useState(null);
   const [openModalEditProductType, setOpenModalEditProductType] =
     useState(false);
@@ -60,7 +62,7 @@ export default function Home() {
           {params.row.isExpired == "1" ? (
             <button
               className="text-teal-500 hover:text-teal-800 font-bold"
-              onClick={() => handleMoveToDetail(params.row.product_id)}
+              onClick={() => handleExpired(params.row.product_id)}
             >
               Expired Detail
             </button>
@@ -93,10 +95,10 @@ export default function Home() {
     },
   ];
 
-  const handleMoveToDetail = (id) => {
-    console.log(id);
-    navigate(`/operasional/product/detail/${encryptNumber(id)}`);
-  };
+  // const handleMoveToDetail = (id) => {
+  //   console.log(id);
+  //   navigate(`/operasional/product/detail/${encryptNumber(id)}`);
+  // };
 
   const columnType = [
     { field: "id", headerName: "ID" },
@@ -216,6 +218,10 @@ export default function Home() {
   const handleEdit = (id) => {
     setSelectedProductId(id);
     setOpenModalEdit(true);
+  };
+  const handleExpired = (id) => {
+    setSelectedProductId(id);
+    setOpenModalExpired(true);
   };
   const handleEditProductType = (id) => {
     setSelectedProductTypeId(id);
@@ -481,6 +487,9 @@ export default function Home() {
     }
   };
 
+  const handleCreateClick = () => {
+    navigate(`/operasional/product/form`);
+  };
   useEffect(() => {
     fetchMasterData();
     fetchData();
@@ -538,8 +547,28 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div className="">
+        <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">Products Dashboard</h1>
+          <div className="flex justify-center gap-3">
+            <button
+              onClick={handleCreateClick}
+              className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
+            >
+              Add All Product
+              <svg
+                className="-mr-1 ml-2 h-4 w-4"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
@@ -596,7 +625,7 @@ export default function Home() {
         <div className="mt-5">
           <div className="flex justify-between pt-3 pb-4 ">
             <h3 className="text-2xl  font-medium">Product Type List</h3>
-            <div className="flex justify-end gap-3 ">
+            {/* <div className="flex justify-end gap-3 ">
               <button
                 onClick={handleToggleModalType}
                 className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full"
@@ -617,7 +646,7 @@ export default function Home() {
                   />
                 </svg>
               </button>
-            </div>
+            </div> */}
           </div>
           <DataTable rows={rowTypes} columns={columnType} loading={loading} />
         </div>
@@ -625,7 +654,7 @@ export default function Home() {
         <div className="mt-5">
           <div className="flex justify-between pt-3 pb-4 ">
             <h3 className="text-2xl  font-medium">Product Merk List</h3>
-            <div className="flex justify-end gap-3 ">
+            {/* <div className="flex justify-end gap-3 ">
               <button
                 onClick={handleToggleModalMerk}
                 className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full"
@@ -646,7 +675,7 @@ export default function Home() {
                   />
                 </svg>
               </button>
-            </div>
+            </div> */}
           </div>
           <DataTable rows={rowMerk} columns={columnMerk} loading={loading} />
         </div>
@@ -667,6 +696,11 @@ export default function Home() {
           onEditProduct={updateProduct}
           open={openModalEdit}
           onClose={() => setOpenModalEdit(false)}
+        />
+        <ModalExpired
+          id={selectedProductId}
+          open={openModalExpired}
+          onClose={() => setOpenModalExpired(false)}
         />
         <ModalAddProductMerk
           openModal={openModalMerk}

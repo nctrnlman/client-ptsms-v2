@@ -22,11 +22,11 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       icon: ProductIcon,
       title: "Products",
     },
-    {
-      path: "/operasional/distributors",
-      icon: DistributorIcon,
-      title: "Distributors",
-    },
+    // {
+    //   path: "/operasional/distributors",
+    //   icon: DistributorIcon,
+    //   title: "Distributors",
+    // },
     {
       path: "/operasional/sales",
       icon: SalesmanIcon,
@@ -62,7 +62,8 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
       <svg
         className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
           activePage.includes("/operasional/suppliers") ||
-          activePage.includes("/operasional/supplier")
+          activePage.includes("/operasional/supplier") ||
+          activePage.includes("/operasional/distributors")
             ? "text-teal-500"
             : "text-gray-500"
         }`}

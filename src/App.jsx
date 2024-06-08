@@ -7,11 +7,13 @@ import OperasionalDistributorDashboard from "./pages/operational/distributor/Hom
 import OperasionalCustomerDetail from "./pages/operational/customer/CustomerDetail.jsx";
 import OperasionalProductDashboard from "./pages/operational/product/Home.jsx";
 import OperasionalProductDetail from "./pages/operational/product/DetailProduct.jsx";
+import OperasionalProductForm from "./pages/operational/product/ProductForm.jsx";
 import OperasionalTransactionInForm from "./pages/operational/supplier/TransactionInForm.jsx";
 import OperasionalTransactionInEdit from "./pages/operational/supplier/TransactionInEdit.jsx";
 import OperasionalTransactionInDetail from "./pages/operational/supplier/TransactionInDetail.jsx";
 import OperasionalTransactionOutForm from "./pages/operational/customer/TransactionOutForm.jsx";
 import OperasionalTransactionOutDetail from "./pages/operational/customer/TransactionOutDetail.jsx";
+import OperasionalTransactionOut from "./pages/operational/customer/TransactionOut.jsx";
 import OperasionalTransactionOutEdit from "./pages/operational/customer/TransactionOutEdit.jsx";
 import OperasionalSalesDashboard from "./pages/operational/sales/Home.jsx";
 import OperasionalSalesTransaction from "./pages/operational/sales/SalesTransaction.jsx";
@@ -101,15 +103,23 @@ function App() {
             />
             <Route
               path="/operasional/customers"
-              element={<OperasionalCustomerDashboard />}
+              element={<OperasionalTransactionOut />}
             />
             <Route
+              path="/operasional/customer/list"
+              element={<OperasionalCustomerDashboard />}
+            />
+            {/* <Route
               path="/operasional/customer/:id"
               element={<OperasionalCustomerDetail />}
-            />
+            /> */}
             <Route
               path="/operasional/products"
               element={<OperasionalProductDashboard />}
+            />
+            <Route
+              path="/operasional/product/form"
+              element={<OperasionalProductForm />}
             />
             <Route
               path="/operasional/product/detail/:id"
