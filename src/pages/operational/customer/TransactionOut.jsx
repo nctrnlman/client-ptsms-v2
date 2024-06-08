@@ -1,41 +1,43 @@
-import DashboardCard from "../../../components/cards/DashboardCard";
-import {
-  FaUsers,
-  FaCalendarDay,
-  FaClipboardList,
-  FaUser,
-} from "react-icons/fa";
 import Layout from "../../../components/layouts/OperasionalLayout";
+import DashboardCard from "../../../components/cards/DashboardCard";
+import { FaCalendarDay, FaClipboardList } from "react-icons/fa";
 import DataTable from "../../../components/tables/DataTable";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
-import { encryptNumber } from "../../../utils/encryptionUtils";
+import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
 
-export default function Home() {
+export default function TransactionOut() {
+  const { id } = useParams();
   const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [totalSupplier, setTotalSupplier] = useState(0);
+  const [customerId, setCustomerId] = useState(0);
   const [todayTransaction, setTodayTransaction] = useState(0);
   const [totalTransaction, setTotalTransaction] = useState(0);
-  const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
+  const [customerName, setCustomerName] = useState("Customer");
+  const [loading, setLoading] = useState(true);
+  const [selectedTransactionId, setSelectedTransactionId] = useState(null);
 
   const navigate = useNavigate();
+
   const columns = [
     { field: "id", headerName: "ID" },
+    { field: "customer_name", headerName: "Customer " },
     { field: "no_faktur", headerName: "No Faktur" },
-    { field: "supplier_name", headerName: "Distributor name" },
+    { field: "no_po", headerName: "No PO" },
+    { field: "salesman", headerName: "Salesman" },
+    { field: "created_at", headerName: "Order Date" },
+    { field: "delivery_date", headerName: "Delivery Date" },
     { field: "payment_method", headerName: "Payment Method" },
-    { field: "created_at", headerName: "Created Date" },
-    { field: "time_to_payment", headerName: "Time To Payment" },
-    { field: "amount", headerName: "Total Amount" },
-    { field: "amount_tax", headerName: "Total Amount with Tax" },
+    { field: "time_to_payment", headerName: "Turn off Payment" },
+    { field: "amount", headerName: "Amount" },
+    { field: "amount_tax", headerName: "Amount Tax" },
     { field: "pic", headerName: "PIC" },
     { field: "note", headerName: "Note" },
     {
       field: "action",
       headerName: "Action",
+
       renderCell: (params) => (
         <div className="flex gap-3 ">
           <button
@@ -50,27 +52,32 @@ export default function Home() {
   ];
 
   const handleCreateClick = () => {
-    navigate("/operasional/supplier/transaction/in/form");
+    navigate(`/operasional/customer/transaction/out/form`);
   };
-  const handleDistributorClick = () => {
-    navigate("/operasional/distributors");
+  const handleCustomerClick = () => {
+    navigate(`/operasional/customer/list`);
   };
+
   const handleEdit = (id) => {
-    navigate(`/operasional/supplier/transaction/detail/${encryptNumber(id)}`);
+    navigate(`/operasional/customer/transaction/detail/${encryptNumber(id)}`);
   };
-  const fetchData = async () => {
+
+  const fetchData = async (id) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/list`
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/list`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
-        transaction_id: item.transaction_in_id,
+        transaction_id: item.transaction_out_id,
+        customer_name: item.customer_name,
         no_faktur: item.no_faktur,
-        supplier_name: `${item.supplier_name}-(${item.supplier_code})`,
-        payment_method: item.payment_method,
+        no_po: item.no_po,
+        salesman: item.sales_name,
         created_at: formatDate(item.created_at),
+        delivery_date: formatDate(item.delivery_date),
+        payment_method: item.payment_method,
         time_to_payment: formatDate(item.time_to_payment),
         amount: formatCurrency(item.amount),
         amount_tax: formatCurrency(item.amount_tax),
@@ -78,8 +85,6 @@ export default function Home() {
         note: item.note,
       }));
       setRows(modifiedData);
-
-      // setRows(response.data.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -91,12 +96,11 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master`
+        `${import.meta.env.VITE_API_BASE_URL}/customer/master`
       );
-      setTotalSupplier(response.data.data.totalSupplier);
-      setMostSupplierTransaction(response.data.data.mostSupplierTransaction);
       setTotalTransaction(response.data.data.totalTransaction);
       setTodayTransaction(response.data.data.todayTransaction);
+      // setCustomerName(response.data.data.customerName);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -105,6 +109,7 @@ export default function Home() {
   };
 
   useEffect(() => {
+    // setCustomerId(decryptNumber(id));
     fetchMasterData();
     fetchData();
   }, []);
@@ -149,10 +154,10 @@ export default function Home() {
                   />
                 </svg>
                 <a
-                  href="#"
+                  href="/operasional/customers"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Suppliers
+                  Customers
                 </a>
               </div>
             </li>
@@ -161,14 +166,14 @@ export default function Home() {
 
         <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">
-            Suppliers Dashboard Page
+            {customerName} Dashboard Page
           </h1>
           <div className="flex justify-center gap-3">
             <button
-              onClick={handleDistributorClick}
+              onClick={handleCustomerClick}
               className="bg-white flex  items-center border border-teal-500 hover:bg-gray-100 text-teal-500 font-bold p-3 rounded-full"
             >
-              Distributor
+              Customers
               <svg
                 className="-mr-1 ml-2 h-4 w-4"
                 fill="currentColor"
@@ -186,7 +191,7 @@ export default function Home() {
               onClick={handleCreateClick}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
             >
-              Add Transaction In
+              Add Transaction
               <svg
                 className="-mr-1 ml-2 h-4 w-4"
                 fill="currentColor"
@@ -202,13 +207,8 @@ export default function Home() {
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <DashboardCard
-            title="Total Supplier"
-            description={totalSupplier}
-            icon={FaUsers}
-            className="w-full sm:w-auto"
-          />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4">
           <DashboardCard
             title="Today Transaction"
             description={todayTransaction}
@@ -221,16 +221,10 @@ export default function Home() {
             icon={FaClipboardList}
             className="w-full sm:w-auto"
           />
-          <DashboardCard
-            title="Most Frequent Distributor"
-            description={mostSupplierTransaction}
-            icon={FaUser}
-            className="w-full sm:w-auto"
-          />
         </div>
-        <div className="overflow-x-auto">
-          <DataTable rows={rows} columns={columns} loading={loading} />
-        </div>
+
+        {/* Render DataTable component */}
+        <DataTable rows={rows} columns={columns} loading={loading} />
       </main>
     </Layout>
   );

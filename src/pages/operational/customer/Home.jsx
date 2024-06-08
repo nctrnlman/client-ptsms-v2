@@ -1,36 +1,76 @@
 import { useEffect, useState } from "react";
-import { ClipLoader } from "react-spinners";
+// import { ClipLoader } from "react-spinners";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import DataTable from "../../../components/tables/DataTable";
 import Layout from "../../../components/layouts/OperasionalLayout";
-import CustomerListCard from "../../../components/cards/CustomerListCard";
+// import CustomerListCard from "../../../components/cards/CustomerListCard";
 import ModalAddCustomer from "../../../components/cards/ModalAddCustomer";
 import ModalEditCustomer from "../../../components/cards/ModalEditCustomer";
 import ModalDelete from "../../../components/cards/ModalDelete";
 export default function Home() {
-  const [customerData, setCustomerData] = useState([]);
-  const [totalCustomer, setTotalCustomer] = useState(0);
+  const [rows, setRows] = useState([]);
+  // const [customerData, setCustomerData] = useState([]);
+  // const [totalCustomer, setTotalCustomer] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const columns = [
+    { field: "id", headerName: "ID" },
+    { field: "customer_name", headerName: "Customer Name" },
+    {
+      field: "action",
+      headerName: "Action",
+
+      renderCell: (params) => (
+        <div className="flex gap-3 ">
+          <button
+            className=" text-brand-500  hover:text-brand-800 font-bold"
+            onClick={() => handleEditClick(params.row.customer_id)}
+          >
+            Edit
+          </button>
+          <button
+            className="text-red-500 hover:text-red-800 font-bold"
+            onClick={() => handleDeleteClick(params.row.customer_id)}
+          >
+            Delete
+          </button>
+        </div>
+      ),
+    },
+  ];
   const fetchData = async () => {
     try {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/customer/all`
       );
-      const data = response.data;
-      setCustomerData(data.data);
-      setTotalCustomer(data.total);
+      // const data = response.data;
+      const modifiedData = response.data.data.map((item, index) => ({
+        id: index + 1,
+        customer_id: item.customer_id,
+        customer_name: item.customer_name,
+      }));
+      setRows(modifiedData);
+      // setCustomerData(data.data);
+      // setTotalCustomer(data.total);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching customer data:", error);
       setLoading(false);
     }
   };
-
+  const handleEditClick = (id) => {
+    setSelectedProductId(id);
+    setOpenModalEdit(true);
+  };
+  const handleDeleteClick = (id) => {
+    setSelectedProductId(id);
+    setOpenModalDelete(true);
+  };
   const handleCreateCustomer = async (newCustomer) => {
     try {
       setLoading(true);
@@ -160,14 +200,6 @@ export default function Home() {
         <div className="pb-3 flex flex-col md:flex-row justify-between items-center">
           <div>
             <h1 className="text-3xl pb-1 font-medium">Customers List</h1>
-            <p>
-              Total Customer:{" "}
-              {loading ? (
-                <ClipLoader size={10} color="#422AFB" loading={loading} />
-              ) : (
-                totalCustomer
-              )}
-            </p>
           </div>
           <div className="mt-4 md:mt-0">
             <button
@@ -192,8 +224,10 @@ export default function Home() {
             </button>
           </div>
         </div>
-
-        {loading ? (
+        <div className="">
+          <DataTable rows={rows} columns={columns} loading={loading} />
+        </div>
+        {/* {loading ? (
           <div className="flex justify-center items-center mt-6">
             <ClipLoader size={40} color="#422AFB" loading={loading} />
           </div>
@@ -209,7 +243,7 @@ export default function Home() {
               />
             ))}
           </div>
-        )}
+        )} */}
         <ModalAddCustomer
           openModal={openModal}
           setOpenModal={setOpenModal}
