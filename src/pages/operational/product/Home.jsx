@@ -596,7 +596,7 @@ export default function Home() {
         <div className="mt-3">
           <div className="flex justify-between pt-3 pb-4 ">
             <h3 className="text-2xl  font-medium">Product List</h3>
-            <div className="flex justify-end gap-3 ">
+            {/* <div className="flex justify-end gap-3 ">
               <button
                 onClick={handleToggleModal}
                 className="flex items-center text-white bg-teal-500 hover:bg-teal-800 font-bold p-3 border rounded-full"
@@ -617,7 +617,7 @@ export default function Home() {
                   />
                 </svg>
               </button>
-            </div>
+            </div> */}
           </div>
           <DataTable rows={rows} columns={columns} loading={loading} />
         </div>

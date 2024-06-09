@@ -6,35 +6,20 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate, useParams } from "react-router-dom";
-import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
-import { useSelector } from "react-redux";
-import Select from "react-select";
+import { useNavigate } from "react-router-dom";
+import { removeCurrencyFormat } from "../../../utils/converter";
 
 export default function ProductForm() {
-  const { id } = useParams();
-  const [customerId, setCustomerId] = useState(0);
   const [product, setProduct] = useState([]);
-  const [customer, setCustomer] = useState([]);
-  const [salesman, setSalesman] = useState([]);
+  const [productType, setProductType] = useState([]);
+  const [productMerk, setProductMerk] = useState([]);
+  const [supplier, setSupplier] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [totalTransactionTax, setTotalTransactionTax] = useState(0);
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.user.User);
   const [productTypeName, setProductTypeName] = useState("");
   const [productMerkName, setProductMerkName] = useState("");
+
   const [formData, setFormData] = useState({
-    noFaktur: "",
-    noPo: "",
-    cn: "",
-    customerId: "",
-    userId: userData.id,
-    salesman: "",
-    paymentMethod: "",
-    timeToPayment: "",
-    deliveryDate: "",
-    note: "",
     productList: [],
   });
   const [errors, setErrors] = useState({
@@ -45,23 +30,6 @@ export default function ProductForm() {
     timeToPayment: "",
     deliveryDate: "",
   });
-
-  const calculateTotalTransaction = () => {
-    let total = 0;
-    formData.productList.forEach((product) => {
-      total += product.productPrice;
-    });
-    let totalWithTax = 0;
-    formData.productList.forEach((product) => {
-      totalWithTax += product.productTotalPrice;
-    });
-    setTotalTransaction(total);
-    setTotalTransactionTax(totalWithTax);
-  };
-
-  const handleInputTypeChange = (e) => {
-    setProductTypeName(e.target.value);
-  };
 
   const handleCreateProductType = async (e) => {
     e.preventDefault();
@@ -141,8 +109,9 @@ export default function ProductForm() {
         `${import.meta.env.VITE_API_BASE_URL}/data/master/transaction`
       );
       setProduct(response.data.data.product);
-      setCustomer(response.data.data.customer);
-      setSalesman(response.data.data.salesman);
+      setProductType(response.data.data.productType);
+      setProductMerk(response.data.data.productMerk);
+      setSupplier(response.data.data.supplier);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
@@ -174,29 +143,22 @@ export default function ProductForm() {
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      const cleanedData = {
+        ...formData,
+        productList: formData.productList.map((product) => ({
+          ...product,
+          price: removeCurrencyFormat(product.price),
+        })),
+      };
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/out/create`,
-        {
-          ...formData,
-          totalPayment: totalTransaction,
-          totalPaymentTax: totalTransactionTax,
-        }
+        `${import.meta.env.VITE_API_BASE_URL}/product/all/create`,
+        cleanedData
       );
       setFormData({
-        noFaktur: "",
-        noPo: "",
-        customerId: "",
-        salesman: "",
-        paymentMethod: "",
-        timeToPayment: "",
-        deliveryDate: "",
-        note: "",
         productList: [],
       });
-      setTotalTransaction("");
-      setTotalTransactionTax("");
       toast.success(response.data.message);
-      navigate(`/operasional/customers`);
+      navigate(`/operasional/products`);
     } catch (error) {
       setLoading(false);
       if (error.response && error.response.data && error.response.data.errors) {
@@ -205,29 +167,6 @@ export default function ProductForm() {
         );
         toast.error(errorMessages.join(", "));
         setErrors({
-          noFaktur:
-            error.response.data.errors.find(
-              (error) => error.field === "noFaktur"
-            )?.message || "",
-          noPo:
-            error.response.data.errors.find((error) => error.field === "noPo")
-              ?.message || "",
-          customerId:
-            error.response.data.errors.find(
-              (error) => error.field === "customerId"
-            )?.message || "",
-          paymentMethod:
-            error.response.data.errors.find(
-              (error) => error.field === "paymentMethod"
-            )?.message || "",
-          timeToPayment:
-            error.response.data.errors.find(
-              (error) => error.field === "timeToPayment"
-            )?.message || "",
-          deliveryDate:
-            error.response.data.errors.find(
-              (error) => error.field === "deliveryDate"
-            )?.message || "",
           productList:
             error.response.data.errors.find(
               (error) => error.field === "productList"
@@ -245,7 +184,7 @@ export default function ProductForm() {
 
   useEffect(() => {
     getMasterDynamic();
-  }, [formData.productList]);
+  }, []);
 
   return (
     <Layout>
@@ -422,7 +361,7 @@ export default function ProductForm() {
           </div>
 
           {/* Product List */}
-          {/* <div className="pt-6 ">
+          <div className="pt-6 ">
             <label
               htmlFor=""
               className="block mb-2 text-xl font-medium text-gray-900 dark:text-white"
@@ -432,14 +371,20 @@ export default function ProductForm() {
                 <ClipLoader color="#4A90E2" loading={loading} size={10} />
               )}
             </label>
-            <AddProductRepeater product={product} setProduct={setFormData} />
+            <AddProductRepeater
+              product={product}
+              setProduct={setFormData}
+              productMerk={productMerk}
+              productType={productType}
+              supplier={supplier}
+              loading={loading}
+            />
             {errors.productList && (
               <p className="text-red-500 text-sm pt-2">{errors.productList}</p>
             )}
-          </div> */}
+          </div>
 
-          {/* <div className="flex items-center justify-end mt-10 gap-4">
- 
+          <div className="flex items-center justify-end mt-10 gap-4">
             <button
               onClick={handleSubmit}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"
@@ -451,7 +396,7 @@ export default function ProductForm() {
                 "Submit"
               )}
             </button>
-          </div> */}
+          </div>
         </div>
       </main>
     </Layout>
