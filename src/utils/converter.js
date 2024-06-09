@@ -15,6 +15,11 @@ export function formatCurrency(amount) {
   return formatter.format(amount);
 }
 
+export function removeCurrencyFormat(amount) {
+  const cleaned = amount.replace(/[^\d]/g, "");
+  return cleaned;
+}
+
 export const formatDateMonth = (dateString) => {
   const date = new Date(dateString);
   return date.toLocaleDateString([], {
