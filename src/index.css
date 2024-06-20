@@ -102,3 +102,23 @@
 .animate-delay-200 {
   animation-delay: 0.2s;
 }
+
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+.ml-64 {
+  margin-left: 16rem; /* 256px */
+}
+
+.ml-16 {
+  margin-left: 4rem; /* 64px */
+}
+
+.sidebar-transition {
+  transition: margin-left 0.3s;
+}
