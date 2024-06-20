@@ -11,44 +11,21 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
 
   const pages = [
     { path: "/operasional/dashboard", icon: DashboardIcon, title: "Dashboard" },
-    {
-      path: "/operasional/suppliers",
-      icon: SuppliersIcon,
-      title: "Suppliers",
-    },
+    { path: "/operasional/suppliers", icon: SuppliersIcon, title: "Suppliers" },
     { path: "/operasional/customers", icon: CustomersIcon, title: "Customers" },
-    {
-      path: "/operasional/products",
-      icon: ProductIcon,
-      title: "Products",
-    },
-    // {
-    //   path: "/operasional/distributors",
-    //   icon: DistributorIcon,
-    //   title: "Distributors",
-    // },
-    {
-      path: "/operasional/sales",
-      icon: SalesmanIcon,
-      title: "Sales",
-    },
-    {
-      path: "/",
-      icon: BackToAccessIcon,
-      title: "Back to Access",
-    },
+    { path: "/operasional/products", icon: ProductIcon, title: "Products" },
+    { path: "/operasional/sales", icon: SalesmanIcon, title: "Sales" },
+    { path: "/", icon: BackToAccessIcon, title: "Back to Access" },
   ];
 
   function DashboardIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 ${
           activePage === "/operasional/dashboard"
             ? "text-teal-500"
             : "text-gray-500"
         }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
         viewBox="0 0 24 24"
       >
@@ -60,15 +37,13 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
   function SuppliersIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 ${
           activePage.includes("/operasional/suppliers") ||
           activePage.includes("/operasional/supplier") ||
           activePage.includes("/operasional/distributors")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
         viewBox="0 0 24 24"
       >
@@ -80,14 +55,12 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
   function CustomersIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 ${
           activePage.includes("/operasional/customers") ||
           activePage.includes("/operasional/customer")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
         viewBox="0 0 24 24"
       >
@@ -99,14 +72,12 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
   function ProductIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 ${
           activePage.includes("/operasional/products") ||
           activePage.includes("/operasional/product")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
         fill="currentColor"
         viewBox="0 0 24 24"
       >
@@ -115,39 +86,18 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     );
   }
 
-  function DistributorIcon() {
-    return (
-      <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
-          activePage.includes("/operasional/distributors") ||
-          activePage.includes("/operasional/distributor")
-            ? "text-teal-500"
-            : "text-gray-500"
-        }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path d="M11 22v-2H5c-1.11 0-1.99-.89-1.99-2L3 5c0-1.11.89-2 2-2h10c1.11 0 2 .89 2 2v13c0 1.11-.89 2-2 2h-6v2h4c1.11 0 2-.89 2-2V5h2v15h-8zM5 5v13h6V5H5z" />
-      </svg>
-    );
-  }
-
   function SalesmanIcon() {
     return (
       <svg
-        className={`w-5 h-5 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white ${
+        className={`w-5 h-5 transition duration-75 ${
           activePage.includes("/operasional/sales") ||
           activePage.includes("/operasional/sale")
             ? "text-teal-500"
             : "text-gray-500"
         }`}
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
         fill="none"
-        viewBox="0 0 24 24"
         stroke="currentColor"
+        viewBox="0 0 24 24"
       >
         <path
           strokeLinecap="round"
@@ -163,13 +113,11 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
     return (
       <svg
         className="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-teal-500 dark:group-hover:text-white"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
         fill="none"
+        stroke="currentColor"
         viewBox="0 0 18 16"
       >
         <path
-          stroke="currentColor"
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth="2"
@@ -192,11 +140,12 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
           onClick={onClose}
         ></div>
       )}
-
       <aside
         id="default-sidebar"
-        className={`fixed sm:relative z-20 sm:z-0 w-64 h-screen transition-transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed sm:relative left-0 z-20 sm:z-0 h-screen transition-transform ${
+          isOpen
+            ? "translate-x-0 w-64"
+            : "-translate-x-full sm:translate-x-0 sm:w-16"
         } bg-white dark:bg-gray-800`}
         aria-label="Sidebar"
       >
@@ -212,7 +161,7 @@ const OperasionalSidebar = ({ isOpen, onClose }) => {
                   onClick={() => handlePageClick(page.path)}
                 >
                   <page.icon />
-                  <span className="ms-3">{page.title}</span>
+                  {isOpen && <span className="ms-3">{page.title}</span>}
                 </Link>
               </li>
             ))}
