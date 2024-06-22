@@ -17,6 +17,7 @@ export default function TransactionInForm() {
   const navigate = useNavigate();
   const userData = useSelector((state) => state.user.User);
   const [formData, setFormData] = useState({
+    noKita: "",
     noFaktur: "",
     supplierId: "",
     paymentMethod: "",
@@ -27,6 +28,7 @@ export default function TransactionInForm() {
     productList: [],
   });
   const [errors, setErrors] = useState({
+    noKita: "",
     noFaktur: "",
     supplierId: "",
     paymentMethod: "",
@@ -39,7 +41,11 @@ export default function TransactionInForm() {
         `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
       );
       setOptions(response.data.data.supplier);
-
+      setFormData((prevFormData) => ({
+        ...prevFormData,
+        noKita: response.data.data.transactionNumber,
+      }));
+      setFormData;
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
@@ -99,6 +105,7 @@ export default function TransactionInForm() {
         formData
       );
       setFormData({
+        noKita: "",
         noFaktur: "",
         supplierId: "",
         paymentMethod: "",
@@ -120,6 +127,9 @@ export default function TransactionInForm() {
         );
         toast.error(errorMessages.join(", "));
         setErrors({
+          noKita:
+            error.response.data.errors.find((error) => error.field === "noKita")
+              ?.message || "",
           noFaktur:
             error.response.data.errors.find(
               (error) => error.field === "noFaktur"
@@ -153,9 +163,7 @@ export default function TransactionInForm() {
       toast.error(error.response.data.message);
     }
   };
-  const handleDateChange = (date) => {
-    console.log(date);
-  };
+
   return (
     <Layout>
       <main className="flex flex-col gap-4 ">
@@ -273,6 +281,29 @@ export default function TransactionInForm() {
           </h4>
           {/* Form fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {/* No Kita */}
+            <div>
+              <label
+                htmlFor="no_kita"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                No Kita <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="no_kita"
+                name="noKita"
+                value={formData.noKita}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                placeholder="No Kita"
+                required
+                disabled
+              />
+              {errors.noKita && (
+                <p className="text-red-500 text-sm pt-2">{errors.noKita}</p>
+              )}
+            </div>
             {/* No Faktur */}
             <div>
               <label
@@ -295,6 +326,7 @@ export default function TransactionInForm() {
                 <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
               )}
             </div>
+
             {/* Supplier */}
             <div>
               <label

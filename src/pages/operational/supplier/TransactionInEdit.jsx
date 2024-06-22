@@ -19,6 +19,7 @@ export default function TransactionInEdit() {
 
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
+    noKita: "",
     noFaktur: "",
     supplierId: "",
     paymentMethod: "",
@@ -33,11 +34,8 @@ export default function TransactionInEdit() {
       const response = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
       );
-      const supplierOptions = response.data.data.supplier.map((supplier) => ({
-        value: supplier.supplier_id,
-        label: `${supplier.supplier_code} - ${supplier.supplier_name}`,
-      }));
-      setSupplierOptions(supplierOptions);
+
+      setSupplierOptions(response.data.data.supplier);
 
       setLoading(false);
     } catch (error) {
@@ -71,8 +69,10 @@ export default function TransactionInEdit() {
       const formattedDate = new Date(
         transactionDetail.transactionIn.time_to_payment
       ).toLocaleDateString("en-CA");
+      // setSelectedSupplier(transactionDetail.transactionIn.supplier_id);
       setFormData({
         ...formData,
+        noKita: transactionDetail.transactionIn.no_kita || "",
         noFaktur: transactionDetail.transactionIn.no_faktur || "",
         noPo: transactionDetail.transactionIn.no_po || "",
         supplierId: transactionDetail.transactionIn.supplier_id || "",
@@ -134,6 +134,7 @@ export default function TransactionInEdit() {
         formData
       );
       setFormData({
+        noKita: "",
         noFaktur: "",
         supplierId: "",
         paymentMethod: "",
@@ -269,6 +270,26 @@ export default function TransactionInEdit() {
           </h4>
           {/* Form fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {/* No Kita */}
+            <div>
+              <label
+                htmlFor="no_kita"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                No Kita <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="no_kita"
+                name="noKita"
+                value={formData.noKita}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                placeholder="No Kita"
+                required
+                disabled
+              />
+            </div>
             {/* No Faktur */}
             <div>
               <label
@@ -299,17 +320,35 @@ export default function TransactionInEdit() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
+
               <Select
                 id="supplier"
-                value={selectedSupplier}
-                onChange={(option) => {
-                  setSelectedSupplier(option);
+                name="supplierId"
+                value={
+                  formData.supplierId
+                    ? {
+                        value: formData.supplierId,
+                        label: supplierOptions.find(
+                          (option) => option.supplier_id === formData.supplierId
+                        )?.supplier_name,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
                   handleInputChange({
-                    target: { name: "supplierId", value: option.value },
-                  });
-                }}
-                options={supplierOptions}
-                isSearchable
+                    target: {
+                      name: "supplierId",
+                      value: selectedOption ? selectedOption.value : "",
+                    },
+                  })
+                }
+                options={supplierOptions.map((option) => ({
+                  value: option.supplier_id,
+                  label: option.supplier_code + "-" + option.supplier_name,
+                }))}
+                placeholder="Choose a supplier"
+                isClearable
+                isDisabled={loading}
               />
             </div>
             {/* Payment Method */}

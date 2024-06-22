@@ -24,6 +24,7 @@ export default function Home() {
   const navigate = useNavigate();
   const columns = [
     { field: "id", headerName: "ID" },
+    { field: "no_kita", headerName: "No Kita" },
     { field: "no_faktur", headerName: "No Faktur" },
     { field: "supplier_name", headerName: "Distributor name" },
     { field: "payment_method", headerName: "Payment Method" },
@@ -66,6 +67,7 @@ export default function Home() {
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
+        no_kita: item.no_kita,
         transaction_id: item.transaction_in_id,
         no_faktur: item.no_faktur,
         supplier_name: `${item.supplier_name}-(${item.supplier_code})`,
