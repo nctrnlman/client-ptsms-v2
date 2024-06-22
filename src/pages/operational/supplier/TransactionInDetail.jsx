@@ -22,10 +22,12 @@ export default function TransactionInDetail() {
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "product_name", headerName: "Product Name" },
+    { field: "product_code", headerName: "Product Code" },
     { field: "type_name", headerName: "Type" },
     { field: "merk_name", headerName: "Merk" },
     { field: "expired_date", headerName: "Expired Date" },
     { field: "akl_akd", headerName: "No AKL/AKD" },
+    { field: "batch_lot", headerName: "Batch/Lot" },
     { field: "price", headerName: "Price" },
     { field: "quantity", headerName: "Qty" },
   ];
@@ -47,10 +49,12 @@ export default function TransactionInDetail() {
         (item, index) => ({
           id: index + 1,
           product_name: item.product_name,
+          product_code: item.product_code,
           type_name: item.type_name,
           merk_name: item.merk_name,
           expired_date: item.expired_date ? formatDate(item.expired_date) : "-",
           akl_akd: item.akl_akd,
+          batch_lot: item.batch_lot,
           price: formatCurrency(item.price),
           quantity: item.quantity,
         })
