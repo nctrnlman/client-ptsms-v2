@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import logo from "../../assets/logo/icon-dark.png";
 import ava from "../../assets/profile/ava.png";
 import { useSelector } from "react-redux";
@@ -8,7 +8,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Topbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const userData = useSelector((state) => state.user.User);
 
@@ -16,19 +15,10 @@ const Topbar = ({ toggleSidebar }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleSidebarToggle = () => {
-    setIsMenuOpen(!isMenuOpen);
-    toggleSidebar();
-  };
-
-  const closeDropdown = () => {
-    setIsDropdownOpen(false);
-  };
-
   const handleSignOut = () => {
     localStorage.removeItem("user_token");
     toast.success("Logout success");
-    closeDropdown();
+    setIsDropdownOpen(false);
     navigate("/login");
   };
 
@@ -39,15 +29,24 @@ const Topbar = ({ toggleSidebar }) => {
           <div className="flex items-center justify-start rtl:justify-end">
             <button
               type="button"
-              onClick={handleSidebarToggle}
-              className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg sm:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
+              onClick={toggleSidebar}
+              className="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
             >
-              <span className="sr-only">Open sidebar</span>
-              <div className={`hamburger ${isMenuOpen ? "" : "open"}`}>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
+              <span className="sr-only">Toggle sidebar</span>
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M4 6h16M4 12h16m-7 6h7"
+                />
+              </svg>
             </button>
             <a className="flex ms-2 md:me-24">
               <img src={logo} className="h-11 me-3" alt="Company Logo" />
@@ -58,22 +57,19 @@ const Topbar = ({ toggleSidebar }) => {
           </div>
           <div className="flex items-center relative">
             <div className="flex items-center ms-3">
-              <div>
-                <button
-                  type="button"
-                  className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
-                  aria-expanded={isDropdownOpen}
-                  onClick={toggleDropdown}
-                  // onBlur={closeDropdown}
-                >
-                  <span className="sr-only">Open user menu</span>
-                  <img
-                    className="w-8 h-8 rounded-full"
-                    src={ava}
-                    alt="user photo"
-                  />
-                </button>
-              </div>
+              <button
+                type="button"
+                className="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                aria-expanded={isDropdownOpen}
+                onClick={toggleDropdown}
+              >
+                <span className="sr-only">Open user menu</span>
+                <img
+                  className="w-8 h-8 rounded-full"
+                  src={ava}
+                  alt="user photo"
+                />
+              </button>
               {isDropdownOpen && (
                 <div
                   className="z-50 absolute right-0 mt-2 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"
@@ -96,18 +92,14 @@ const Topbar = ({ toggleSidebar }) => {
                   </div>
                   <ul className="py-1" role="none">
                     <li>
-                      <ul className="py-1" role="none">
-                        <li>
-                          <a
-                            href="#"
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white hover:cursor-pointer"
-                            role="menuitem"
-                            onClick={handleSignOut}
-                          >
-                            Sign out
-                          </a>
-                        </li>
-                      </ul>
+                      <a
+                        href="#"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white hover:cursor-pointer"
+                        role="menuitem"
+                        onClick={handleSignOut}
+                      >
+                        Sign out
+                      </a>
                     </li>
                   </ul>
                 </div>
