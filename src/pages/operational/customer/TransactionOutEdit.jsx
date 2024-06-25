@@ -5,9 +5,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
+import Select from "react-select";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import { formatCurrency, removeCurrencyFormat } from "../../../utils/converter";
 export default function TransactionOutEdit() {
   const { id } = useParams();
   const [customerId, setCustomerId] = useState(0);
@@ -24,7 +26,7 @@ export default function TransactionOutEdit() {
     noPo: "",
     customerId: "",
     salesman: "",
-    cn: "",
+
     paymentMethod: "",
     timeToPayment: "",
     deliveryDate: "",
@@ -39,21 +41,6 @@ export default function TransactionOutEdit() {
     timeToPayment: "",
     deliveryDate: "",
   });
-
-  const calculateTotalTransaction = () => {
-    let total = totalTransaction;
-    formData.productList.forEach((product) => {
-      console.log(product.productPrice, "cekprice");
-      total += product.productPrice;
-    });
-    let totalWithTax = totalTransactionTax;
-    formData.productList.forEach((product) => {
-      console.log(product.productTotalPrice, "cekpricetotal");
-      totalWithTax += product.productTotalPrice;
-    });
-    setTotalTransaction(total);
-    setTotalTransactionTax(totalWithTax);
-  };
 
   const getMasterDynamic = async () => {
     try {
@@ -87,6 +74,13 @@ export default function TransactionOutEdit() {
         }/transactions/out/update/${decryptNumber(id)}`,
         {
           ...formData,
+          totalTransaction: totalTransaction,
+          productList: formData.productList.map((product) => ({
+            ...product,
+            price: removeCurrencyFormat(product.price),
+            cn: removeCurrencyFormat(product.cn),
+            productTotalPrice: parseInt(product.productTotalPrice),
+          })),
         }
       );
       setFormData({
@@ -108,20 +102,19 @@ export default function TransactionOutEdit() {
       );
     } catch (error) {
       setLoading(false);
-      setLoading(false);
       if (error.response && error.response.data && error.response.data.errors) {
         const errorMessages = error.response.data.errors.map(
           (error) => error.message
         );
         toast.error(errorMessages.join(", "));
         setErrors({
-          noFaktur:
-            error.response.data.errors.find(
-              (error) => error.field === "noFaktur"
-            )?.message || "",
-          noPo:
-            error.response.data.errors.find((error) => error.field === "noPo")
-              ?.message || "",
+          // noFaktur:
+          //   error.response.data.errors.find(
+          //     (error) => error.field === "noFaktur"
+          //   )?.message || "",
+          // noPo:
+          //   error.response.data.errors.find((error) => error.field === "noPo")
+          //     ?.message || "",
           customerId:
             error.response.data.errors.find(
               (error) => error.field === "customerId"
@@ -170,7 +163,6 @@ export default function TransactionOutEdit() {
         ...formData,
         noFaktur: transactionDetail.transactionOut.no_faktur || "",
         noPo: transactionDetail.transactionOut.no_po || "",
-        cn: transactionDetail.transactionOut.sales_cn || "",
         customerId: transactionDetail.transactionOut.customer_id || "",
         salesman: transactionDetail.transactionOut.salesman || "",
         paymentMethod: transactionDetail.transactionOut.payment_method || "",
@@ -179,13 +171,6 @@ export default function TransactionOutEdit() {
         note: transactionDetail.transactionOut.note || "",
         productList: transactionDetail.transactionOutDetail || [],
       });
-
-      setProductLength(transactionDetail.transactionOutDetail.length);
-      console.log(transactionDetail.transactionOutDetail.length);
-      setTotalTransaction(parseInt(transactionDetail.transactionOut.amount));
-      setTotalTransactionTax(
-        parseInt(transactionDetail.transactionOut.amount_tax)
-      );
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
@@ -201,10 +186,16 @@ export default function TransactionOutEdit() {
   }, []);
 
   useEffect(() => {
-    if (formData.productList.length > productLength) {
-      calculateTotalTransaction();
-    }
-  }, [formData.productList.length > productLength]);
+    const calculateTotalTransaction = () => {
+      const total = formData.productList.reduce((sum, product) => {
+        console.log(product.productTotalPrice);
+        return sum + parseInt(product.productTotalPrice);
+      }, 0);
+      setTotalTransaction(total);
+    };
+
+    calculateTotalTransaction();
+  }, [formData.productList]);
   return (
     <Layout>
       <main className="flex flex-col gap-4 ">
@@ -273,32 +264,7 @@ export default function TransactionOutEdit() {
                   href="#"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Transaction Out
-                </a>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <svg
-                  className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 6 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 9 4-4-4-4"
-                  />
-                </svg>
-                <a
-                  href="#"
-                  className="ms-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
-                >
-                  Edit
+                  Transaction Out Edit
                 </a>
               </div>
             </li>
@@ -328,7 +294,7 @@ export default function TransactionOutEdit() {
                 htmlFor="no_faktur"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No Faktur<span className="text-red-500">*</span>
+                No Faktur
               </label>
               <input
                 type="text"
@@ -340,9 +306,9 @@ export default function TransactionOutEdit() {
                 placeholder="No Faktur"
                 required
               />
-              {errors.noFaktur && (
+              {/* {errors.noFaktur && (
                 <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
-              )}
+              )} */}
             </div>
             {/* No PO */}
             <div>
@@ -350,7 +316,7 @@ export default function TransactionOutEdit() {
                 htmlFor="no_po"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No PO<span className="text-red-500">*</span>
+                No PO
               </label>
               <input
                 type="text"
@@ -362,9 +328,9 @@ export default function TransactionOutEdit() {
                 placeholder="No PO"
                 required
               />
-              {errors.noPo && (
+              {/* {errors.noPo && (
                 <p className="text-red-500 text-sm pt-2">{errors.noPo}</p>
-              )}
+              )} */}
             </div>
 
             {/* Customer */}
@@ -378,27 +344,32 @@ export default function TransactionOutEdit() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-              <select
+              <Select
                 id="customer"
-                name="customerId"
-                value={formData.customerId}
-                onChange={(e) => {
-                  handleInputChange(e);
-                }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                disabled={true}
-              >
-                <option value="">Choose a Customer</option>
-                {!loading &&
-                  customer?.map((option) => (
-                    <option
-                      key={option.customer_id}
-                      value={parseInt(option.customer_id)}
-                    >
-                      {option.customer_name}
-                    </option>
-                  ))}
-              </select>
+                value={
+                  formData.customerId
+                    ? {
+                        value: formData.customerId,
+                        label: customer.find(
+                          (option) => option.customer_id === formData.customerId
+                        )?.customer_name,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
+                  setFormData({
+                    ...formData,
+                    customerId: selectedOption ? selectedOption.value : "",
+                  })
+                }
+                options={customer.map((option) => ({
+                  value: option.customer_id,
+                  label: option.customer_name,
+                }))}
+                placeholder="Choose a Customer"
+                isClearable
+                isDisabled={loading}
+              />
               {errors.customerId && (
                 <p className="text-red-500 text-sm pt-2">{errors.customerId}</p>
               )}
@@ -414,49 +385,35 @@ export default function TransactionOutEdit() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-              <select
+
+              <Select
                 id="salesman"
-                name="salesman"
-                value={formData.salesman}
-                onChange={(e) => {
-                  handleInputChange(e);
-                }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                disabled={loading}
-              >
-                <option value="">Choose a Salesman</option>
-                {!loading &&
-                  salesman?.map((option) => (
-                    <option
-                      key={option.sales_id}
-                      value={parseInt(option.sales_id)}
-                    >
-                      {option.sales_name}
-                    </option>
-                  ))}
-              </select>
-            </div>
-            {/* CN */}
-            <div>
-              <label
-                htmlFor="cn"
-                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                CN
-              </label>
-              <input
-                type="text"
-                id="cn"
-                name="cn"
-                value={formData.cn}
-                onChange={handleInputChange}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                placeholder="CN"
-                pattern="^\d+(\.\d+)?$"
-                title="Enter a valid number"
-                required
+                value={
+                  formData.salesman
+                    ? {
+                        value: formData.salesman,
+                        label: salesman.find(
+                          (option) => option.sales_id === formData.salesman
+                        )?.sales_name,
+                      }
+                    : null
+                }
+                onChange={(selectedOption) =>
+                  setFormData({
+                    ...formData,
+                    salesman: selectedOption ? selectedOption.value : "",
+                  })
+                }
+                options={salesman.map((option) => ({
+                  value: option.sales_id,
+                  label: option.sales_name,
+                }))}
+                placeholder="Choose a Salesman"
+                isClearable
+                isDisabled={loading}
               />
             </div>
+
             {/* Payment Method */}
             <div>
               <label
@@ -580,6 +537,7 @@ export default function TransactionOutEdit() {
           </div>
 
           <div className="flex items-center justify-end mt-10 gap-4">
+            <p>Total Transaction : {formatCurrency(totalTransaction)}</p>
             <button
               onClick={handleSubmit}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"

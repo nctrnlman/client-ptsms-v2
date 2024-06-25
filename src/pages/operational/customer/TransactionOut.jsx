@@ -30,8 +30,7 @@ export default function TransactionOut() {
     { field: "delivery_date", headerName: "Delivery Date" },
     { field: "payment_method", headerName: "Payment Method" },
     { field: "time_to_payment", headerName: "Turn off Payment" },
-    { field: "amount", headerName: "Amount" },
-    { field: "amount_tax", headerName: "Amount Tax" },
+    { field: "amount_tax", headerName: "Total transaction" },
     { field: "pic", headerName: "PIC" },
     { field: "note", headerName: "Note" },
     {
@@ -79,7 +78,6 @@ export default function TransactionOut() {
         delivery_date: formatDate(item.delivery_date),
         payment_method: item.payment_method,
         time_to_payment: formatDate(item.time_to_payment),
-        amount: formatCurrency(item.amount),
         amount_tax: formatCurrency(item.amount_tax),
         pic: item.name,
         note: item.note,

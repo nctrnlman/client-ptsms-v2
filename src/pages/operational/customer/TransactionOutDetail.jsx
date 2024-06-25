@@ -28,8 +28,8 @@ export default function TransactionOutDetail() {
     { field: "discount", headerName: "Disc" },
     { field: "ppn", headerName: "PPN" },
     { field: "pph", headerName: "PPH" },
-    { field: "amount", headerName: "Total" },
-    { field: "amount_tax", headerName: "Total with Tax" },
+    // { field: "amount", headerName: "Total" },
+    { field: "amount_tax", headerName: "Total" },
   ];
 
   const handleCreateClick = () => {
@@ -53,8 +53,8 @@ export default function TransactionOutDetail() {
           price: formatCurrency(item.price),
           discount: item.discount ? item.discount + "%" : "-",
           qty: item.qty,
-          ppn: item.ppn,
-          pph: item.pph,
+          ppn: item.ppn ? item.ppn + "%" : "-",
+          pph: item.pph ? item.pph + "%" : "-",
           amount: formatCurrency(item.amount),
           amount_tax: formatCurrency(item.amount_tax),
         })
@@ -150,32 +150,7 @@ export default function TransactionOutDetail() {
                   href="#"
                   className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
                 >
-                  Transaction Out
-                </a>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center">
-                <svg
-                  className="rtl:rotate-180 w-3 h-3 text-gray-400 mx-1"
-                  aria-hidden="true"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 6 10"
-                >
-                  <path
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="m1 9 4-4-4-4"
-                  />
-                </svg>
-                <a
-                  href="#"
-                  className="ms-1 text-sm font-medium text-gray-700 hover:text-teal-600 md:ms-2 dark:text-gray-400 dark:hover:text-white"
-                >
-                  Detail{" "}
+                  Transaction Out Detail
                 </a>
               </div>
             </li>
@@ -212,10 +187,8 @@ export default function TransactionOutDetail() {
           <p>PIC : {pic}</p>
           <p>Created Date : {createdDate}</p>
           <p>Update Date : {updatedDate}</p>
-          <p>Total Transaction : {formatCurrency(totalTransaction)}</p>
-          <p>
-            Total Transaction with Tax : {formatCurrency(totalTransactionTax)}
-          </p>
+          {/* <p>Total Transaction : {formatCurrency(totalTransaction)}</p> */}
+          <p>Total Transaction : {formatCurrency(totalTransactionTax)}</p>
         </div>
 
         <DataTable rows={rows} columns={columns} loading={loading} />
