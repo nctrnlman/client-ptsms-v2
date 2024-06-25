@@ -91,8 +91,10 @@ const SettingSidebar = ({ isOpen, onClose }) => {
       )}
       <aside
         id="default-sidebar"
-        className={`fixed sm:relative left-0 z-20 sm:z-0 w-64 h-screen transition-transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed sm:relative left-0 z-20 sm:z-0 h-screen transition-transform ${
+          isOpen
+            ? "translate-x-0 w-64"
+            : "-translate-x-full sm:translate-x-0 sm:w-16"
         } bg-white dark:bg-gray-800`}
         aria-label="Sidebar"
       >
@@ -108,7 +110,7 @@ const SettingSidebar = ({ isOpen, onClose }) => {
                   onClick={() => handlePageClick(page.path)}
                 >
                   <page.icon />
-                  <span className="ms-3">{page.title}</span>
+                  {isOpen && <span className="ms-3">{page.title}</span>}
                 </Link>
               </li>
             ))}
