@@ -6,26 +6,22 @@ import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useNavigate, useParams } from "react-router-dom";
-import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Select from "react-select";
+import { formatCurrency, removeCurrencyFormat } from "../../../utils/converter";
 
 export default function TransactionOutFrom() {
-  const { id } = useParams();
-  const [customerId, setCustomerId] = useState(0);
   const [product, setProduct] = useState([]);
   const [customer, setCustomer] = useState([]);
   const [salesman, setSalesman] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [totalTransaction, setTotalTransaction] = useState(0);
-  const [totalTransactionTax, setTotalTransactionTax] = useState(0);
   const navigate = useNavigate();
   const userData = useSelector((state) => state.user.User);
+  const [totalTransaction, setTotalTransaction] = useState(0);
   const [formData, setFormData] = useState({
     noFaktur: "",
     noPo: "",
-    cn: "",
     customerId: "",
     userId: userData.id,
     salesman: "",
@@ -43,19 +39,6 @@ export default function TransactionOutFrom() {
     timeToPayment: "",
     deliveryDate: "",
   });
-
-  const calculateTotalTransaction = () => {
-    let total = 0;
-    formData.productList.forEach((product) => {
-      total += product.productPrice;
-    });
-    let totalWithTax = 0;
-    formData.productList.forEach((product) => {
-      totalWithTax += product.productTotalPrice;
-    });
-    setTotalTransaction(total);
-    setTotalTransactionTax(totalWithTax);
-  };
 
   const getMasterDynamic = async () => {
     try {
@@ -87,6 +70,7 @@ export default function TransactionOutFrom() {
         filteredValue = `${integerPart}.${decimalPart}`;
       }
     }
+
     setFormData({
       ...formData,
       [name]: filteredValue,
@@ -100,8 +84,13 @@ export default function TransactionOutFrom() {
         `${import.meta.env.VITE_API_BASE_URL}/transactions/out/create`,
         {
           ...formData,
-          totalPayment: totalTransaction,
-          totalPaymentTax: totalTransactionTax,
+          totalTransaction: totalTransaction,
+          productList: formData.productList.map((product) => ({
+            ...product,
+            price: removeCurrencyFormat(product.price),
+            cn: removeCurrencyFormat(product.cn),
+            productTotalPrice: parseInt(product.productTotalPrice),
+          })),
         }
       );
       setFormData({
@@ -115,8 +104,7 @@ export default function TransactionOutFrom() {
         note: "",
         productList: [],
       });
-      setTotalTransaction("");
-      setTotalTransactionTax("");
+
       toast.success(response.data.message);
       navigate(`/operasional/customers`);
     } catch (error) {
@@ -127,13 +115,13 @@ export default function TransactionOutFrom() {
         );
         toast.error(errorMessages.join(", "));
         setErrors({
-          noFaktur:
-            error.response.data.errors.find(
-              (error) => error.field === "noFaktur"
-            )?.message || "",
-          noPo:
-            error.response.data.errors.find((error) => error.field === "noPo")
-              ?.message || "",
+          // noFaktur:
+          //   error.response.data.errors.find(
+          //     (error) => error.field === "noFaktur"
+          //   )?.message || "",
+          // noPo:
+          //   error.response.data.errors.find((error) => error.field === "noPo")
+          //     ?.message || "",
           customerId:
             error.response.data.errors.find(
               (error) => error.field === "customerId"
@@ -167,8 +155,16 @@ export default function TransactionOutFrom() {
 
   useEffect(() => {
     getMasterDynamic();
-    setCustomerId(decryptNumber(id));
-    // setFormData({ ...formData, customerId: decryptNumber(id) });
+  }, []);
+
+  useEffect(() => {
+    const calculateTotalTransaction = () => {
+      const total = formData.productList.reduce((sum, product) => {
+        return sum + parseInt(product.productTotalPrice);
+      }, 0);
+      setTotalTransaction(total);
+    };
+
     calculateTotalTransaction();
   }, [formData.productList]);
 
@@ -270,7 +266,7 @@ export default function TransactionOutFrom() {
                 htmlFor="no_faktur"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No Faktur<span className="text-red-500">*</span>
+                No Faktur
               </label>
               <input
                 type="text"
@@ -282,9 +278,9 @@ export default function TransactionOutFrom() {
                 placeholder="No Faktur"
                 required
               />
-              {errors.noFaktur && (
+              {/* {errors.noFaktur && (
                 <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
-              )}
+              )} */}
             </div>
             {/* No PO */}
             <div>
@@ -292,7 +288,7 @@ export default function TransactionOutFrom() {
                 htmlFor="no_po"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
               >
-                No PO<span className="text-red-500">*</span>
+                No PO
               </label>
               <input
                 type="text"
@@ -302,11 +298,11 @@ export default function TransactionOutFrom() {
                 onChange={handleInputChange}
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 placeholder="No PO"
-                required
+                // required
               />
-              {errors.noPo && (
+              {/* {errors.noPo && (
                 <p className="text-red-500 text-sm pt-2">{errors.noPo}</p>
-              )}
+              )} */}
             </div>
 
             {/* Customer */}
@@ -320,27 +316,6 @@ export default function TransactionOutFrom() {
                   <ClipLoader color="#4A90E2" loading={loading} size={10} />
                 )}
               </label>
-              {/* <select
-                id="customer"
-                name="customerId"
-                value={formData.customerId}
-                onChange={(e) => {
-                  handleInputChange(e);
-                }}
-                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                // disabled={true}
-              >
-                <option value="">Choose a Customer</option>
-                {!loading &&
-                  customer?.map((option) => (
-                    <option
-                      key={option.customer_id}
-                      value={parseInt(option.customer_id)}
-                    >
-                      {option.customer_name}
-                    </option>
-                  ))}
-              </select> */}
               <Select
                 id="customer"
                 value={
@@ -410,7 +385,7 @@ export default function TransactionOutFrom() {
               />
             </div>
             {/* CN */}
-            <div>
+            {/* <div>
               <label
                 htmlFor="cn"
                 className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -429,7 +404,7 @@ export default function TransactionOutFrom() {
                 title="Enter a valid number"
                 required
               />
-            </div>
+            </div> */}
             {/* Payment Method */}
             <div>
               <label
@@ -570,7 +545,7 @@ export default function TransactionOutFrom() {
           </div>
 
           <div className="flex items-center justify-end mt-10 gap-4">
-            {/* <p>Total Price: {formatCurrency(totalTransactionTax)}</p> */}
+            <p>Total Transaction : {formatCurrency(totalTransaction)}</p>
             <button
               onClick={handleSubmit}
               className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold py-2 px-4 rounded-2xl"
