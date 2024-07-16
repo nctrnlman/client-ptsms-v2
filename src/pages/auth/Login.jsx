@@ -7,6 +7,7 @@ import { ClipLoader } from "react-spinners";
 import { setUser } from "../../features/users/user";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import codenito from "../../assets/logo/icon-dark.png";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -97,6 +98,10 @@ function Login() {
                   "Sign In"
                 )}
               </button>
+              <div className="flex justify-center items-center pt-10 md:text-xl">
+                <p>Supported by</p>
+                <img src={codenito} className="h-11 me-3" alt="Company Logo" />
+              </div>
             </form>
           </div>
         </div>
