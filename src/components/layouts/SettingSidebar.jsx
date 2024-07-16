@@ -116,8 +116,14 @@ const SettingSidebar = ({ isOpen, onClose }) => {
             ))}
           </ul>
           <div className="flex justify-center items-center pt-10 md:text-lg">
-            <p>Supported by</p>
-            <img src={codenito} className="h-8 me-3" alt="Company Logo" />
+            {isOpen ? (
+              <>
+                <p>Supported by</p>
+                <img src={codenito} className="h-8 me-3" alt="Company Logo" />
+              </>
+            ) : (
+              <img src={codenito} className="h-8" alt="Company Logo" />
+            )}
           </div>
         </div>
       </aside>
