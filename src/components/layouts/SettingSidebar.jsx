@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-
+import codenito from "../../assets/logo/icon-dark.png";
 const SettingSidebar = ({ isOpen, onClose }) => {
   const location = useLocation();
   const [activePage, setActivePage] = useState("");
@@ -91,8 +91,10 @@ const SettingSidebar = ({ isOpen, onClose }) => {
       )}
       <aside
         id="default-sidebar"
-        className={`fixed sm:relative left-0 z-20 sm:z-0 w-64 h-screen transition-transform ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed sm:relative left-0 z-20 sm:z-0 h-screen transition-transform ${
+          isOpen
+            ? "translate-x-0 w-64"
+            : "-translate-x-full sm:translate-x-0 sm:w-16"
         } bg-white dark:bg-gray-800`}
         aria-label="Sidebar"
       >
@@ -108,11 +110,15 @@ const SettingSidebar = ({ isOpen, onClose }) => {
                   onClick={() => handlePageClick(page.path)}
                 >
                   <page.icon />
-                  <span className="ms-3">{page.title}</span>
+                  {isOpen && <span className="ms-3">{page.title}</span>}
                 </Link>
               </li>
             ))}
           </ul>
+          <div className="flex justify-center items-center pt-10 md:text-lg">
+            <p>Supported by</p>
+            <img src={codenito} className="h-8 me-3" alt="Company Logo" />
+          </div>
         </div>
       </aside>
     </>
