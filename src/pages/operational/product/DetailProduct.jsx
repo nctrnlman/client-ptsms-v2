@@ -189,7 +189,6 @@ export default function DetailProduct() {
         <ModalDelete
           id={selectedTransactionId}
           onDeleteComponent={(id) => {
-            console.log(`Deleting transaction with ID: ${id}`);
             setDeleteModalOpen(false);
           }}
           open={deleteModalOpen}

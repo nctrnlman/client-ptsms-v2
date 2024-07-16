@@ -95,11 +95,6 @@ export default function Home() {
     },
   ];
 
-  // const handleMoveToDetail = (id) => {
-  //   console.log(id);
-  //   navigate(`/operasional/product/detail/${encryptNumber(id)}`);
-  // };
-
   const columnType = [
     { field: "id", headerName: "ID" },
     { field: "type_name", headerName: "Product Type Name" },

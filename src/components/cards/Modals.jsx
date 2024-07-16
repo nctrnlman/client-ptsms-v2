@@ -19,7 +19,7 @@ function Modals({ openModal, setOpenModal, inputs }) {
       data[input.id] = input.value;
       return data;
     }, {});
-    console.log("Form Data:", formData);
+
     handleCloseModal();
   };
 
