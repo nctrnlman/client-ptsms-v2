@@ -2,16 +2,17 @@ import AccessManagementCard from "../components/cards/AccessManagementCard";
 import { useSelector } from "react-redux";
 // import smsLogo from "../assets/logo/sms-logo.jpeg";
 import Particles from "../components/particle/Particles.jsx";
+
 function Home() {
   const userData = useSelector((state) => state.user.User);
 
   return (
-    <div className="min-h-screen bg-cover bg-center relative ">
-      <Particles className="absolute inset-0 " />
+    <div className="min-h-screen h-screen bg-cover bg-center relative overflow-y-auto">
+      <Particles className="absolute inset-0" />
       <header className="shadow-md">
         <div className="container mx-auto flex items-center justify-center"></div>
       </header>
-      <main className="container mx-auto px-4 py-8 relative">
+      <main className="container mx-auto px-4 py-8 relative overflow-y-auto">
         <section className="bg-white bg-opacity-50 p-8 rounded-lg shadow-md mb-8 backdrop-filter backdrop-blur-lg animate-fade-in glassmorphism">
           <h1 className="text-4xl font-bold text-center text-teal-500 mb-4 animate-slide-up">
             Welcome back, {userData.name}!
