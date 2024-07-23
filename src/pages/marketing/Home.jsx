@@ -13,6 +13,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { formatDateMonth } from "../../utils/converter";
+import ModalGeneral from "../../components/cards/ModalGeneral";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
@@ -24,6 +25,9 @@ export default function Home() {
   const [lastLocation, setLastLocation] = useState("");
   const [lastAttendance, setLastAttendance] = useState("");
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [modalGeneralIsOpen, setModalGeneralIsOpen] = useState(false);
+  const [modalTitle, setModalTitle] = useState("");
+  const [modalContent, setModalContent] = useState("");
 
   const [selectedImage, setSelectedImage] = useState("");
   const userData = useSelector((state) => state.user.User);
@@ -32,7 +36,21 @@ export default function Home() {
     { field: "name", headerName: "Name", flex: 1 },
     { field: "date", headerName: "Date", flex: 1 },
     { field: "checkin_time", headerName: "Time", flex: 1 },
-    { field: "address", headerName: "Location", flex: 1 },
+    {
+      field: "address",
+      headerName: "Location",
+      flex: 1,
+      renderCell: (params) => (
+        <div className="flex gap-3">
+          <span
+            className="cursor-pointer "
+            onClick={() => openGeneralModal("Location", params.row.address)}
+          >
+            {params.row.address}
+          </span>
+        </div>
+      ),
+    },
     {
       field: "checkin_photo",
       headerName: "Photo",
@@ -71,8 +89,40 @@ export default function Home() {
         </div>
       ),
     },
-    { field: "description", headerName: "Description", flex: 1 },
-    { field: "product_desc", headerName: "Product Offered", flex: 1 },
+    {
+      field: "description",
+      headerName: "Description",
+      flex: 1,
+      renderCell: (params) => (
+        <div className="flex gap-3">
+          <span
+            className="cursor-pointer "
+            onClick={() =>
+              openGeneralModal("Description", params.row.description)
+            }
+          >
+            {params.row.description}
+          </span>
+        </div>
+      ),
+    },
+    {
+      field: "product_desc",
+      headerName: "Product Offered",
+      flex: 1,
+      renderCell: (params) => (
+        <div className="flex gap-3">
+          <span
+            className="cursor-pointer "
+            onClick={() =>
+              openGeneralModal("Product Offered", params.row.product_desc)
+            }
+          >
+            {params.row.product_desc}
+          </span>
+        </div>
+      ),
+    },
     {
       field: "action",
       headerName: "Action",
@@ -91,6 +141,13 @@ export default function Home() {
       ),
     },
   ];
+
+  const openGeneralModal = (title, content) => {
+    setModalTitle(title);
+    setModalContent(content);
+    setModalGeneralIsOpen(true);
+  };
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -130,6 +187,7 @@ export default function Home() {
 
   const closeModal = () => {
     setModalIsOpen(false);
+    setModalGeneralIsOpen(false);
   };
 
   const fetchMasterData = async () => {
@@ -278,6 +336,13 @@ export default function Home() {
             />
           </div>
         )}
+
+        <ModalGeneral
+          isOpen={modalGeneralIsOpen}
+          onClose={closeModal}
+          title={modalTitle}
+          content={modalContent}
+        />
       </main>
     </Layout>
   );
