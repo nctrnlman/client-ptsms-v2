@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 // import logo from "../../assets/logo/icon-dark.png";
 import logo from "../../assets/logo/sms-logo.jpeg";
 import ava from "../../assets/profile/ava.png";
@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { ClipLoader } from "react-spinners";
 
 const Topbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -77,20 +78,26 @@ const Topbar = ({ toggleSidebar }) => {
                   id="dropdown-user"
                   style={{ top: "100%" }}
                 >
-                  <div className="px-4 py-3" role="none">
-                    <p
-                      className="text-sm text-gray-900 dark:text-white"
-                      role="none"
-                    >
-                      {userData.name}
-                    </p>
-                    <p
-                      className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
-                      role="none"
-                    >
-                      {userData.email}
-                    </p>
-                  </div>
+                  {!userData.name ? (
+                    <div className="px-4 py-3">
+                      <ClipLoader size={20} color={"#14b8a6"} />
+                    </div>
+                  ) : (
+                    <div className="px-4 py-3" role="none">
+                      <p
+                        className="text-sm text-gray-900 dark:text-white"
+                        role="none"
+                      >
+                        {userData.name}
+                      </p>
+                      <p
+                        className="text-sm font-medium text-gray-900 truncate dark:text-gray-300"
+                        role="none"
+                      >
+                        {userData.email}
+                      </p>
+                    </div>
+                  )}
                   <ul className="py-1" role="none">
                     <li>
                       <a

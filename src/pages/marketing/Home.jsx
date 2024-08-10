@@ -18,6 +18,7 @@ import ModalGeneral from "../../components/cards/ModalGeneral";
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [masterDataLoading, setMasterDataLoading] = useState(true);
   const [totalUser, setTotalUser] = useState(0);
   const [totalAttendance, setTotalAttendance] = useState(0);
   const [todayAttendance, setTodayAttendance] = useState(0);
@@ -56,7 +57,7 @@ export default function Home() {
       headerName: "Photo",
       flex: 1,
       renderCell: (params) => (
-        <div className="flex gap-3 ">
+        <div className="flex gap-3 pl-4">
           {params.row.checkin_photo ? (
             <img
               src={params.row.checkin_photo}
@@ -192,7 +193,7 @@ export default function Home() {
 
   const fetchMasterData = async () => {
     try {
-      setLoading(true);
+      setMasterDataLoading(true);
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/data/marketing/dashboard`,
         {
@@ -211,23 +212,26 @@ export default function Home() {
         setLastLocation(response.data.data.lastLocation);
         setLastAttendance(response.data.data.lastAttendance);
       }
-      setLoading(false);
+      setMasterDataLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setLoading(false);
+      setMasterDataLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMasterData();
-    if (userData) {
-      fetchData();
+    if (userData.id) {
+      const fetchDataAsync = async () => {
+        await fetchMasterData();
+        await fetchData();
+      };
+      fetchDataAsync();
     }
   }, [userData]);
 
   return (
     <Layout>
-      <main className="flex flex-col gap-4 ">
+      <main className="flex flex-col gap-4 pb-36">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
@@ -285,41 +289,54 @@ export default function Home() {
           <DashboardCard
             title={userData.id === 1 ? "Total User" : "Last Attendance"}
             description={
-              userData.id === 1 ? totalUser : formatDateMonth(lastAttendance)
+              userData.id === 1
+                ? totalUser || "Data not available" // Menambahkan pesan default jika totalUser tidak ada
+                : lastAttendance
+                ? formatDateMonth(lastAttendance)
+                : "Data not available" // Menambahkan pesan default jika lastAttendance tidak ada
             }
             icon={userData.id === 1 ? FaUsers : MdCalendarToday}
             className="w-full sm:w-auto"
+            isLoading={masterDataLoading}
           />
+
           <DashboardCard
             title="Today Attendance"
-            description={todayAttendance}
+            description={todayAttendance || "Data not available"}
             icon={FaCalendarDay}
             className="w-full sm:w-auto"
+            isLoading={masterDataLoading}
           />
+
           <DashboardCard
             title="Total Attendance"
-            description={totalAttendance}
+            description={totalAttendance || "Data not available"}
             icon={FaClipboardList}
             className="w-full sm:w-auto"
+            isLoading={masterDataLoading}
           />
+
           <DashboardCard
             title={userData.id === 1 ? "Most Frequent User" : "Last Location"}
             description={
               userData.id === 1 ? (
-                mostFrequentUser
-              ) : (
+                mostFrequentUser || "Data not available"
+              ) : lastLocation ? (
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${lastLocation?.latitude},${lastLocation?.longitude}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${lastLocation.latitude},${lastLocation.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-brand-500 hover:underline"
                 >
                   View on Map
                 </a>
+              ) : (
+                "Location data not available"
               )
             }
             icon={userData.id === 1 ? FaUser : MdLocationOn}
             className="w-full sm:w-auto"
+            isLoading={masterDataLoading}
           />
         </div>
         <DataTable rows={rows} columns={columns} loading={loading} />
