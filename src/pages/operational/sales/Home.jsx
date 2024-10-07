@@ -1,17 +1,17 @@
 import { useState, useEffect } from "react";
-import { FaUsers } from "react-icons/fa";
 import axios from "axios";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import DashboardCard from "../../../components/cards/DashboardCard";
 import Layout from "../../../components/layouts/OperasionalLayout";
 import DataTable from "../../../components/tables/DataTable";
 import ModalDelete from "../../../components/cards/ModalDelete";
-import ModalEditSales from "../../../components/cards/ModalEditSales";
-import ModalAddSales from "../../../components/cards/ModalAddSales";
+
+import { toast } from "react-toastify";
+import { FaUsers } from "react-icons/fa";
 import { formatCurrency } from "../../../utils/converter";
 import { encryptNumber } from "../../../utils/encryptionUtils";
 import { useNavigate } from "react-router-dom";
+import ModalAddSales from "./components/ModalAddSales";
+import ModalEditSales from "./components/ModalEditSales";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
@@ -21,10 +21,13 @@ export default function Home() {
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [selectedDistributorId, setSelectedDistributorId] = useState(null);
+
   const navigate = useNavigate();
+
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "sales_name", headerName: "Sales Name" },
+    { field: "total_cn", headerName: "Total CN" },
     { field: "total_transaction", headerName: "Total Transaction" },
     {
       field: "detail_transaction",
@@ -68,10 +71,12 @@ export default function Home() {
       ),
     },
   ];
+
   const handleToggleModalDelete = (id) => {
     setSelectedDistributorId(id);
     setOpenModalDelete(true);
   };
+
   const handleToggleModal = () => {
     setOpenModal(!openModal);
   };
@@ -80,18 +85,23 @@ export default function Home() {
     setSelectedDistributorId(id);
     setOpenModalEdit(!openModalEdit);
   };
+
   const fetchData = async () => {
     try {
       setLoading(true);
+
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/sales/all`
+        `${import.meta.env.VITE_API_BASE_URL}/sales`
       );
+
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
         sales_id: item.sales_id,
         sales_name: item.sales_name,
+        total_cn: formatCurrency(item.total_cn),
         total_transaction: formatCurrency(item.total_transaction),
       }));
+
       setRows(modifiedData);
 
       setLoading(false);
@@ -120,11 +130,14 @@ export default function Home() {
       setLoading(true);
 
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/sales/delete/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/sales/${id}`
       );
+
       toast.success(response.data.message);
+
       await fetchData();
       await fetchMasterData();
+
       setLoading(false);
     } catch (error) {
       toast.error(error.response.data.message);
@@ -136,12 +149,14 @@ export default function Home() {
   const handleCreateSales = async (newSales) => {
     try {
       setLoading(true);
+
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/sales/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/sales`,
         {
           salesName: newSales.name,
         }
       );
+
       toast.success(response.data.message);
       await fetchData();
       await fetchMasterData();
@@ -164,7 +179,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/sales/update/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/sales/${id}`,
         {
           salesName: newData.name,
         }
@@ -241,6 +256,7 @@ export default function Home() {
             </li>
           </ol>
         </nav>
+
         <div className="flex flex-col sm:flex-row justify-between">
           <h1 className="text-3xl pb-3 font-medium">Sales Dashboard Page</h1>
           <div className="flex justify-center gap-3">
@@ -266,6 +282,7 @@ export default function Home() {
             </button>
           </div>
         </div>
+
         <div className="flex gap-6 ">
           <DashboardCard
             title="Total Sales"
@@ -273,6 +290,7 @@ export default function Home() {
             icon={FaUsers}
           />
         </div>
+
         <DataTable rows={rows} columns={columns} loading={loading} />
         <ModalAddSales
           openModal={openModal}

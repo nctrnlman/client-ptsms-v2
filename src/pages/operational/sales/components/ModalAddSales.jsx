@@ -1,29 +1,10 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { Button, Label, Modal, TextInput } from "flowbite-react";
-import axios from "axios";
 
-function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
+function ModalAddSales({ openModal, setOpenModal, onCreateSales }) {
   const [salesName, setSalesName] = useState("");
   const [error, setError] = useState("");
   const salesNameInputRef = useRef(null);
-
-  const fetchSalesDetail = async () => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/sales/detail/${id}`
-      );
-      const { sales_name } = response.data.data.salesDetail;
-      setSalesName(sales_name);
-    } catch (error) {
-      console.error("Error fetching Sales detail:", error);
-    }
-  };
-
-  React.useEffect(() => {
-    if (openModal) {
-      fetchSalesDetail();
-    }
-  }, [openModal]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -31,18 +12,12 @@ function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
     setError("");
   };
 
-  const updateSales = async () => {
+  const handleCreateSales = () => {
     if (salesName.trim() === "") {
       setError("Sales Name is required.");
     } else {
-      try {
-        await onUpdateSales(id, {
-          name: salesName,
-        });
-        handleCloseModal();
-      } catch (error) {
-        console.error("Error updating salesman:", error);
-      }
+      onCreateSales({ name: salesName });
+      handleCloseModal();
     }
   };
 
@@ -58,17 +33,17 @@ function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
       <Modal.Body>
         <div className="space-y-6">
           <h3 className="text-xl font-medium text-center text-gray-900 dark:text-white">
-            Edit Salesman
+            Add New Sales
           </h3>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="salesName" value="SalesName" />
+              <Label htmlFor="salesName" value="Sales Name" />
               <span className="text-red-500">*</span>
             </div>
             <TextInput
               id="salesName"
               ref={salesNameInputRef}
-              placeholder="PT Sehat Murni Sejahtera"
+              placeholder="John Doe"
               value={salesName}
               onChange={(e) => {
                 setSalesName(e.target.value);
@@ -80,12 +55,12 @@ function ModalEditSales({ id, openModal, setOpenModal, onUpdateSales }) {
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
-        <Button onClick={updateSales} className="bg-teal-500 hover:bg-teal-800">
-          Update
+        <Button onClick={handleCreateSales} className="bg-teal-500 ">
+          Create
         </Button>
       </Modal.Footer>
     </Modal>
   );
 }
 
-export default ModalEditSales;
+export default ModalAddSales;

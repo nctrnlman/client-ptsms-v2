@@ -2,10 +2,9 @@ import Layout from "../../../components/layouts/OperasionalLayout";
 import DataTable from "../../../components/tables/DataTable";
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
-import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
-import { useSelector } from "react-redux";
+import { decryptNumber } from "../../../utils/encryptionUtils";
 export default function SalesTransaction() {
   const { id } = useParams();
   const [rows, setRows] = useState([]);
@@ -18,9 +17,9 @@ export default function SalesTransaction() {
     { field: "no_po", headerName: "No. PO" },
     { field: "customer_name", headerName: "Customer Name" },
     { field: "created_at", headerName: "Created Date" },
-    { field: "sales_cn", headerName: "CN (%)" },
+    // { field: "sales_cn", headerName: "CN (%)" },
     { field: "amount_cn", headerName: "Total CN" },
-    { field: "amount", headerName: "Total Transaction" },
+    // { field: "amount", headerName: "Total Transaction" },
     { field: "amount_tax", headerName: "Total Transaction Tax" },
     { field: "payment_method", headerName: "Payment Method" },
   ];
@@ -29,7 +28,7 @@ export default function SalesTransaction() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/sales/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/sales/${id}`
       );
       const modifiedData = response.data.data.salesTransaction.map(
         (item, index) => ({
@@ -38,10 +37,9 @@ export default function SalesTransaction() {
           no_po: item.no_po,
           customer_name: item.customer_name,
           created_at: item.created_at ? formatDate(item.created_at) : "-",
-          sales_cn: item.sales_cn + "%",
-          amount_cn: formatCurrency(item.amount_cn),
-          amount: formatCurrency(item.amount),
-          amount_tax: formatCurrency(item.amount_tax),
+          amount_cn: item.amount_cn ? formatCurrency(item.amount_cn) : "-",
+          amount: item.amount ? formatCurrency(item.amount) : "-",
+          amount_tax: item.amount_tax ? formatCurrency(item.amount_tax) : "-",
           payment_method: item.payment_method,
         })
       );
