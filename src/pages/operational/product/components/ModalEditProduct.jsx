@@ -14,6 +14,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
   const [expired, setExpired] = useState("");
   const [selectedProductType, setSelectedProductType] = useState(null);
   const [selectedProductMerk, setSelectedProductMerk] = useState(null);
+  const [selectedExpiredOption, setSelectedExpiredOption] = useState([]);
   const [errors, setErrors] = useState({
     productName: "",
     price: "",
@@ -47,13 +48,14 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
   const fetchProductData = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/products/${id}`
       );
       const productData = response.data.data;
       setProductName(productData.product_name);
-      setPrice(productData.price);
+      // setPrice(productData.price);
       setStock(productData.stock);
-      setExpired(productData.isExpired);
+      // setExpired(productData.isExpired);
+
       setAklAkd(productData.akl_akd);
       setSelectedProductType({
         value: productData.product_type,
@@ -63,6 +65,19 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
         value: productData.product_merk,
         label: productData.product_merk_name,
       });
+
+      setExpired(
+        productData.isExpired == null
+          ? ""
+          : productData.isExpired === 0
+          ? "0"
+          : "1"
+      );
+      setSelectedExpiredOption([
+        { value: "", label: "Select Expired / Not Expired" },
+        { value: "1", label: "Expired" },
+        { value: "0", label: "Not Expired" },
+      ]);
     } catch (error) {
       console.error("Error fetching product data:", error);
     }
@@ -73,7 +88,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
       const updatedProduct = {
         name: productName,
         aklAkd: aklAkd,
-        price: price,
+        // price: price,
         stock: stock,
         expired: expired,
         productType: selectedProductType,
@@ -84,7 +99,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
       let isValid = true;
       const newErrors = {
         productName: "",
-        price: "",
+        // price: "",
         expired: "",
       };
 
@@ -92,11 +107,12 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
         newErrors.productName = "Product Name is required";
         isValid = false;
       }
-      if (!price) {
-        newErrors.price = "Price is required";
-        isValid = false;
-      }
-      if (!expired) {
+      // if (!price) {
+      //   newErrors.price = "Price is required";
+      //   isValid = false;
+      // }
+
+      if (expired == "") {
         newErrors.expired = "Expired status is required";
         isValid = false;
       }
@@ -106,7 +122,6 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
         return;
       }
 
-      // Proceed with updating product if all fields are valid
       await onEditProduct(id, updatedProduct);
       onClose();
     } catch (error) {
@@ -199,7 +214,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
               required={true}
             />
           </div>
-          <div>
+          {/* <div>
             <div className="mb-2 block">
               <Label htmlFor="price" value="Price" />
               <span className="text-red-500">*</span>
@@ -215,7 +230,7 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
             {errors.price && (
               <p className="text-red-500 pt-2">{errors.price}</p>
             )}
-          </div>
+          </div> */}
           <div>
             <div className="mb-2 block">
               <Label htmlFor="productExpired" value="Product Expired" />
@@ -223,17 +238,17 @@ function ModalEditProduct({ id, open, onClose, onEditProduct }) {
             </div>
             <Select
               id="productExpired"
-              value={expired}
-              onChange={(e) => setExpired(e.target.value)}
-            >
-              <option value="">Expired and Not Expired</option>
-              <option value="1">Expired</option>
-              <option value="0">Not Expired</option>
-            </Select>
+              value={selectedExpiredOption.find(
+                (option) => option.value == expired
+              )}
+              onChange={(selectedOption) => setExpired(selectedOption.value)}
+              options={selectedExpiredOption}
+            />
             {errors.expired && (
               <p className="text-red-500 pt-2">{errors.expired}</p>
             )}
           </div>
+
           {expired == "0" && (
             <div>
               <div className="mb-2 block">

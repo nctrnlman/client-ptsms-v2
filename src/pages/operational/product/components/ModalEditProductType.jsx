@@ -2,47 +2,47 @@ import { useRef, useState, useEffect } from "react";
 import { Button, Label, Modal, TextInput } from "flowbite-react";
 import axios from "axios";
 
-function ModalEditProductMerk({
+function ModalEditProductType({
   id,
   openModal,
   setOpenModal,
-  onUpdateProductMerk,
+  onUpdateProductType,
 }) {
-  const [productMerk, setProductMerk] = useState("");
+  const [productType, setProductType] = useState("");
   const [error, setError] = useState("");
-  const productMerkNameInputRef = useRef(null);
+  const productTypeNameInputRef = useRef(null);
 
-  const fetchProductMerk = async () => {
+  const fetchProductType = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/merk/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/products/type/${id}`
       );
-      const { merk_name } = response.data.data;
-      setProductMerk(merk_name);
+      const { type_name } = response.data.data;
+      setProductType(type_name);
     } catch (error) {
-      console.error("Error fetching product merk detail:", error);
+      console.error("Error fetching product type detail:", error);
     }
   };
 
   useEffect(() => {
     if (openModal) {
-      fetchProductMerk();
+      fetchProductType();
     }
   }, [openModal]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setProductMerk("");
+    setProductType("");
     setError("");
   };
 
-  const updateProductMerk = async () => {
-    if (productMerk.trim() === "") {
-      setError("Product Merk Name is required.");
+  const updateProductType = async () => {
+    if (productType.trim() === "") {
+      setError("Product Type Name is required.");
     } else {
       try {
-        await onUpdateProductMerk(id, {
-          name: productMerk,
+        await onUpdateProductType(id, {
+          name: productType,
         });
         handleCloseModal();
       } catch (error) {
@@ -57,26 +57,26 @@ function ModalEditProductMerk({
       size="md"
       popup
       onClose={handleCloseModal}
-      initialFocus={productMerkNameInputRef}
+      initialFocus={productTypeNameInputRef}
     >
       <Modal.Header />
       <Modal.Body>
         <div className="space-y-6">
           <h3 className="text-xl font-medium text-center text-gray-900 dark:text-white">
-            Edit Product Merk
+            Edit Product Type
           </h3>
           <div>
             <div className="mb-2 block">
-              <Label htmlFor="productMerk" value="Product Merk Name" />
+              <Label htmlFor="productType" value="Product Type Name" />
               <span className="text-red-500">*</span>
             </div>
             <TextInput
-              id="productMerk"
-              ref={productMerkNameInputRef}
-              placeholder="Merk A"
-              value={productMerk}
+              id="productType"
+              ref={productTypeNameInputRef}
+              placeholder="Type A"
+              value={productType}
               onChange={(e) => {
-                setProductMerk(e.target.value);
+                setProductType(e.target.value);
                 setError("");
               }}
             />
@@ -86,7 +86,7 @@ function ModalEditProductMerk({
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
         <Button
-          onClick={updateProductMerk}
+          onClick={updateProductType}
           className="bg-teal-500 hover:bg-teal-800"
         >
           Update
@@ -96,4 +96,4 @@ function ModalEditProductMerk({
   );
 }
 
-export default ModalEditProductMerk;
+export default ModalEditProductType;

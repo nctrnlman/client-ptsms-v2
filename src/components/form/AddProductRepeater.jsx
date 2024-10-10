@@ -18,7 +18,7 @@ function AddProductRepeater({
       product_type: "",
       product_merk: "",
       akl_akd: "",
-      price: "",
+      // price: "",
       product_expired: "",
       stock: 0,
     },
@@ -32,7 +32,6 @@ function AddProductRepeater({
     } else {
       newInputs[index][name] = value;
     }
-    // newInputs[index][name] = value;
     setInputs(newInputs);
     setProduct((prevData) => ({
       ...prevData,
@@ -42,7 +41,6 @@ function AddProductRepeater({
 
   const handleAddInput = () => {
     setInputs([
-      ...inputs,
       {
         product_name: "",
         supplier: "",
@@ -53,6 +51,7 @@ function AddProductRepeater({
         product_expired: "",
         stock: 0,
       },
+      ...inputs,
     ]);
   };
 
@@ -204,7 +203,7 @@ function AddProductRepeater({
               onChange={(e) => handleChange(index, "akl_akd", e.target.value)}
             />
           </div>
-          <div>
+          {/* <div>
             <label
               htmlFor="price"
               className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
@@ -219,7 +218,7 @@ function AddProductRepeater({
               value={input.price}
               onChange={(e) => handleChange(index, "price", e.target.value)}
             />
-          </div>
+          </div> */}
           <div>
             <label
               htmlFor="product_expired"
