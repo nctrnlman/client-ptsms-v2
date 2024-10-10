@@ -22,6 +22,7 @@ export default function ProductForm() {
   const [formData, setFormData] = useState({
     productList: [],
   });
+
   const [errors, setErrors] = useState({
     noFaktur: "",
     noPo: "",
@@ -36,12 +37,12 @@ export default function ProductForm() {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/product/type/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/products/type`,
         { typeName: productTypeName }
       );
+
       toast.success(response.data.message);
       setLoading(false);
-
       setProductTypeName("");
     } catch (error) {
       if (error.response && error.response.data && error.response.data.errors) {
@@ -67,12 +68,13 @@ export default function ProductForm() {
       setLoading(false);
     }
   };
+
   const handleCreateProductMerk = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/product/merk/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/products/merk`,
         { merkName: productMerkName }
       );
       toast.success(response.data.message);
@@ -147,11 +149,11 @@ export default function ProductForm() {
         ...formData,
         productList: formData.productList.map((product) => ({
           ...product,
-          price: removeCurrencyFormat(product.price),
+          // price: removeCurrencyFormat(product.price),
         })),
       };
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/product/all/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/products/bulk`,
         cleanedData
       );
       setFormData({

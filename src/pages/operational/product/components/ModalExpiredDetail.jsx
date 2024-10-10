@@ -1,8 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { Modal } from "flowbite-react";
 import axios from "axios";
-import DataTable from "../tables/DataTable";
-import { formatDate } from "../../../src/utils/converter";
+import DataTable from "../../../../components/tables/DataTable";
+import { formatDate } from "../../../../utils/converter";
 
 function ModalExpiredDetail({ id, open, onClose }) {
   const [rows, setRows] = useState([]);
@@ -20,7 +20,7 @@ function ModalExpiredDetail({ id, open, onClose }) {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/expired/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/products/expired/${id}`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
@@ -41,7 +41,7 @@ function ModalExpiredDetail({ id, open, onClose }) {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/products/${id}`
       );
       setTotalStock(response.data.data.stock);
       setProductName(response.data.data.product_name);

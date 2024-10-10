@@ -1,24 +1,22 @@
-import DashboardCard from "../../../components/cards/DashboardCard";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 import { FaBox, FaCalendarDay, FaClipboardList, FaTags } from "react-icons/fa";
 import Layout from "../../../components/layouts/OperasionalLayout";
 import DataTable from "../../../components/tables/DataTable";
-import axios from "axios";
-import { useState, useEffect } from "react";
-import ModalAddProduct from "../../../components/cards/ModalAddProduct";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { formatDate, formatCurrency } from "../../../utils/converter";
+import DashboardCard from "../../../components/cards/DashboardCard";
+import ModalEdit from "./components/ModalEditProduct";
+import ModalExpired from "./components/ModalExpiredDetail";
+import ModalAddProductType from "./components/ModalAddProductType";
+import ModalEditProductType from "./components/ModalEditProductType";
+import ModalEditProductMerk from "./components/ModalEditProductMerk";
+import ModalAddProduct from "./components/ModalAddProduct";
+import ModalAddProductMerk from "./components/ModalAddProductMerk";
 import ModalDelete from "../../../components/cards/ModalDelete";
-import ModalEdit from "../../../components/cards/ModalEditProduct";
-import ModalExpired from "../../../components/cards/ModalExpiredDetail";
-import ModalAddProductType from "../../../components/cards/ModalAddProductType";
-import ModalEditProductType from "../../../components/cards/ModalEditProductType";
-import ModalEditProductMerk from "../../../components/cards/ModalEditProductMerk";
-import ModalAddProductMerk from "../../../components/cards/ModalAddProductMerk";
 import ModalDeleteMerk from "../../../components/cards/ModalDelete";
 import ModalDeleteType from "../../../components/cards/ModalDelete";
-import { encryptNumber } from "../../../utils/encryptionUtils";
-import { useNavigate } from "react-router-dom";
+
 export default function Home() {
   const [rows, setRows] = useState([]);
   const [rowTypes, setRowTypes] = useState([]);
@@ -44,6 +42,8 @@ export default function Home() {
   const [openModalEditProductMerk, setOpenModalEditProductMerk] =
     useState(false);
   const navigate = useNavigate();
+
+  // colomn datatable
   const columns = [
     { field: "id", headerName: "No" },
     { field: "product_id", headerName: "Product Code" },
@@ -51,7 +51,7 @@ export default function Home() {
     { field: "product_type", headerName: "Product Type" },
     { field: "product_merk", headerName: "Product Merk" },
     { field: "akl_akd", headerName: "No AKL/AKD" },
-    { field: "price", headerName: "Price" },
+    // { field: "price", headerName: "Price" },
     { field: "stock", headerName: "Stock" },
     {
       field: "expired",
@@ -149,88 +149,48 @@ export default function Home() {
     },
   ];
 
-  const handleToggleModalDelete = (id) => {
-    setSelectedProductId(id);
-    setOpenModalDelete(true);
-  };
-  const handleModalDeleteProductType = (id) => {
-    setSelectedProductTypeId(id);
-    setOpenModalTypeDelete(true);
-  };
-  const handleModalDeleteProductMerk = (id) => {
-    setSelectedProductMerkId(id);
-    setOpenModalMerkDelete(true);
-  };
-  const handleDeleteProduct = async (id) => {
-    try {
-      setLoading(true);
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/product/delete/${id}`
-      );
-      toast.success(response.data.message);
-      await fetchData();
-      await fetchMasterData();
-      setLoading(false);
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error deleting product:", error);
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteProductType = async (id) => {
-    try {
-      setLoading(true);
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/product/type/delete/${id}`
-      );
-      toast.success(response.data.message);
-      await fetchDataType();
-      await fetchMasterData();
-      setLoading(false);
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error deleting product type:", error);
-      setLoading(false);
-    }
-  };
-  const handleDeleteProductMerk = async (id) => {
-    try {
-      setLoading(true);
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/product/merk/delete/${id}`
-      );
-      toast.success(response.data.message);
-      await fetchDataMerk();
-      await fetchMasterData();
-      setLoading(false);
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error deleting product merk:", error);
-      setLoading(false);
-    }
-  };
+  // handle modal edit and expired
   const handleEdit = (id) => {
     setSelectedProductId(id);
     setOpenModalEdit(true);
   };
+
   const handleExpired = (id) => {
     setSelectedProductId(id);
     setOpenModalExpired(true);
   };
+
   const handleEditProductType = (id) => {
     setSelectedProductTypeId(id);
     setOpenModalEditProductType(true);
   };
+
   const handleEditProductMerk = (id) => {
     setSelectedProductMerkId(id);
     setOpenModalEditProductMerk(true);
   };
+
+  const handleToggleModalDelete = (id) => {
+    setSelectedProductId(id);
+    setOpenModalDelete(true);
+  };
+
+  const handleModalDeleteProductType = (id) => {
+    setSelectedProductTypeId(id);
+    setOpenModalTypeDelete(true);
+  };
+
+  const handleModalDeleteProductMerk = (id) => {
+    setSelectedProductMerkId(id);
+    setOpenModalMerkDelete(true);
+  };
+
+  // fetch logic
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/all`
+        `${import.meta.env.VITE_API_BASE_URL}/products`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
@@ -242,7 +202,7 @@ export default function Home() {
         product_type: item.type_name,
         product_merk: item.merk_name,
         akl_akd: item.akl_akd,
-        price: formatCurrency(item.price),
+        // price: formatCurrency(item.price),
         stock: item.stock,
         total_stock: item.total_stock,
       }));
@@ -253,17 +213,19 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const fetchDataType = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/type/all`
+        `${import.meta.env.VITE_API_BASE_URL}/products/type`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
         product_type_id: item.product_type_id,
         type_name: item.type_name,
       }));
+
       setRowTypes(modifiedData);
       setLoading(false);
     } catch (error) {
@@ -276,7 +238,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/merk/all`
+        `${import.meta.env.VITE_API_BASE_URL}/products/merk`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
@@ -295,7 +257,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/master`
+        `${import.meta.env.VITE_API_BASE_URL}/products/master`
       );
       setTotalProduct(response.data.data.totalProduct);
       setTotalProductMerk(response.data.data.totalProductMerk);
@@ -308,29 +270,32 @@ export default function Home() {
     }
   };
 
-  const handleToggleModal = () => {
-    setOpenModal(!openModal);
-  };
-  const handleToggleModalMerk = () => {
-    setOpenModalMerk(!openModalMerk);
-  };
-  const handleToggleModalType = () => {
-    setOpenModalType(!openModalType);
-  };
+  // not used
+  // const handleToggleModal = () => {
+  //   setOpenModal(!openModal);
+  // };
+  // const handleToggleModalMerk = () => {
+  //   setOpenModalMerk(!openModalMerk);
+  // };
+  // const handleToggleModalType = () => {
+  //   setOpenModalType(!openModalType);
+  // };
 
+  // update logic
   const updateProduct = async (id, newData) => {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/product/update/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/products/${id}`,
         {
-          name: newData.name,
+          productName: newData.name,
           aklAkd: newData.aklAkd,
           expiredDate: newData.expiredDate,
+          expired: newData.expired,
           price: newData.price,
           stock: newData.stock,
-          productType: newData.productType,
-          productMerk: newData.productMerk,
+          productTypeId: newData.productType.value,
+          productMerkId: newData.productMerk.value,
         }
       );
       toast.success(response.data.message);
@@ -355,7 +320,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/product/type/update/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/products/type/${id}`,
         {
           typeName: newData.name,
         }
@@ -378,11 +343,12 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const updateProductMerk = async (id, newData) => {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/product/merk/update/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/products/merk/${id}`,
         {
           merkName: newData.name,
         }
@@ -405,6 +371,8 @@ export default function Home() {
       setLoading(false);
     }
   };
+
+  // create logic
   const handleCreateProduct = async (newProduct) => {
     try {
       setLoading(true);
@@ -429,6 +397,7 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const handleCreateProductType = async (newProduct) => {
     try {
       setLoading(true);
@@ -455,6 +424,7 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const handleCreateProductMerk = async (newProduct) => {
     try {
       setLoading(true);
@@ -485,6 +455,59 @@ export default function Home() {
   const handleCreateClick = () => {
     navigate(`/operasional/product/form`);
   };
+
+  //  delete logic
+  const handleDeleteProduct = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/products/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting product:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProductType = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/products/type/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchDataType();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting product type:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteProductMerk = async (id) => {
+    try {
+      setLoading(true);
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/products/merk/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchDataMerk();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting product merk:", error);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchMasterData();
     fetchData();
