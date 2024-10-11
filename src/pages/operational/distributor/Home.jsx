@@ -7,12 +7,11 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import DashboardCard from "../../../components/cards/DashboardCard";
 import Layout from "../../../components/layouts/OperasionalLayout";
 import DataTable from "../../../components/tables/DataTable";
-import ModalEditDistributor from "../../../components/cards/ModalEditDistributor";
-import ModalAddDistributor from "../../../components/cards/ModalAddDistributor";
+import ModalEditDistributor from "./components/ModalEditDistributor";
+import ModalAddDistributor from "./components/ModalAddDistributor";
 import ModalDelete from "../../../components/cards/ModalDelete";
 
 export default function Home() {
@@ -27,6 +26,7 @@ export default function Home() {
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [selectedDistributorId, setSelectedDistributorId] = useState(null);
+
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "supplier_code", headerName: "Distributor Code" },
@@ -53,10 +53,13 @@ export default function Home() {
       ),
     },
   ];
+
+  // handle modal
   const handleToggleModalDelete = (id) => {
     setSelectedDistributorId(id);
     setOpenModalDelete(true);
   };
+
   const handleToggleModal = () => {
     setOpenModal(!openModal);
   };
@@ -65,11 +68,52 @@ export default function Home() {
     setSelectedDistributorId(id);
     setOpenModalEdit(!openModalEdit);
   };
+
+  const handleDeleteDistributor = async (id) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.delete(
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/${id}`
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error deleting distributor:", error);
+      setLoading(false);
+    }
+  };
+
+  const handleCreateDistributor = async (newDistributor) => {
+    try {
+      setLoading(true);
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers`,
+        {
+          supplierName: newDistributor.name,
+          supplierCode: newDistributor.code,
+        }
+      );
+      toast.success(response.data.message);
+      await fetchData();
+      await fetchMasterData();
+      setLoading(false);
+    } catch (error) {
+      toast.error(error.response.data.message);
+      console.error("Error creating distributor:", error);
+      setLoading(false);
+    }
+  };
+
+  // logic services
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/all`
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
@@ -90,54 +134,16 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master`
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/master`
       );
-      setTotalDistributor(response.data.data.totalSupplier);
+
+      setTotalDistributor(response.data.data.totalSuppliers);
       setMostDistributorTransaction(response.data.data.mostSupplierTransaction);
-      setTotalTransaction(response.data.data.totalTransaction);
-      setTodayTransaction(response.data.data.todayTransaction);
+      setTotalTransaction(response.data.data.totalTransactions);
+      setTodayTransaction(response.data.data.todayTransactions);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
-      setLoading(false);
-    }
-  };
-
-  const handleDeleteDistributor = async (id) => {
-    try {
-      setLoading(true);
-
-      const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/delete/${id}`
-      );
-      toast.success(response.data.message);
-      await fetchData();
-      await fetchMasterData();
-      setLoading(false);
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error deleting distributor:", error);
-      setLoading(false);
-    }
-  };
-
-  const handleCreateDistributor = async (newDistributor) => {
-    try {
-      setLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/create`,
-        {
-          supplierName: newDistributor.name,
-          supplierCode: newDistributor.code,
-        }
-      );
-      toast.success(response.data.message);
-      await fetchData();
-      await fetchMasterData();
-      setLoading(false);
-    } catch (error) {
-      toast.error(error.response.data.message);
-      console.error("Error creating distributor:", error);
       setLoading(false);
     }
   };
@@ -146,7 +152,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/update/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/${id}`,
         {
           supplierName: newData.name,
           supplierCode: newData.code,
@@ -164,8 +170,8 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchMasterData();
     fetchData();
+    fetchMasterData();
   }, []);
 
   return (
@@ -271,7 +277,7 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
-            title="Total Distributor"
+            title="Total Distributors"
             description={totalDistributor}
             icon={FaUsers}
           />

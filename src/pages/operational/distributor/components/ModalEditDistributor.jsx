@@ -1,12 +1,37 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Button, Label, Modal, TextInput } from "flowbite-react";
+import axios from "axios";
 
-function ModalAddDistributor({ openModal, setOpenModal, onCreateDistributor }) {
+function ModalEditDistributor({
+  id,
+  openModal,
+  setOpenModal,
+  onUpdateDistributor,
+}) {
   const [distributorName, setDistributorName] = useState("");
   const [distributorCode, setDistributorCode] = useState("");
   const [nameError, setNameError] = useState("");
   const [codeError, setCodeError] = useState("");
   const distributorNameInputRef = useRef(null);
+
+  const fetchDistributorDetail = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/${id}`
+      );
+      const { supplier_name, supplier_code } = response.data.data;
+      setDistributorName(supplier_name);
+      setDistributorCode(supplier_code);
+    } catch (error) {
+      console.error("Error fetching distributor detail:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (openModal) {
+      fetchDistributorDetail();
+    }
+  }, [openModal]);
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -16,7 +41,7 @@ function ModalAddDistributor({ openModal, setOpenModal, onCreateDistributor }) {
     setCodeError("");
   };
 
-  const handleCreateDistributor = () => {
+  const updateDistributor = async () => {
     if (distributorName.trim() === "") {
       setNameError("Distributor Name is required.");
     } else {
@@ -28,9 +53,17 @@ function ModalAddDistributor({ openModal, setOpenModal, onCreateDistributor }) {
     } else {
       setCodeError("");
     }
+
     if (distributorName.trim() !== "" && distributorCode.trim() !== "") {
-      onCreateDistributor({ name: distributorName, code: distributorCode });
-      handleCloseModal();
+      try {
+        await onUpdateDistributor(id, {
+          name: distributorName,
+          code: distributorCode,
+        });
+        handleCloseModal();
+      } catch (error) {
+        console.error("Error updating distributor:", error);
+      }
     }
   };
 
@@ -46,7 +79,7 @@ function ModalAddDistributor({ openModal, setOpenModal, onCreateDistributor }) {
       <Modal.Body>
         <div className="space-y-6">
           <h3 className="text-xl font-medium text-center text-gray-900 dark:text-white">
-            Add New Distributor
+            Edit Distributor
           </h3>
           <div>
             <div className="mb-2 block">
@@ -63,7 +96,7 @@ function ModalAddDistributor({ openModal, setOpenModal, onCreateDistributor }) {
                 setNameError("");
               }}
             />
-            {nameError && <p className="text-red-500">{nameError}</p>}{" "}
+            {nameError && <p className="text-red-500 pt-2">{nameError}</p>}{" "}
           </div>
           <div>
             <div className="mb-2 block">
@@ -79,17 +112,20 @@ function ModalAddDistributor({ openModal, setOpenModal, onCreateDistributor }) {
                 setCodeError("");
               }}
             />
-            {codeError && <p className="text-red-500 pt-2">{codeError}</p>}{" "}
+            {codeError && <p className="text-red-500 pt-2">{codeError}</p>}
           </div>
         </div>
       </Modal.Body>
       <Modal.Footer className="flex justify-end">
-        <Button onClick={handleCreateDistributor} className="bg-teal-500 ">
-          Create
+        <Button
+          onClick={updateDistributor}
+          className="bg-teal-500 hover:bg-teal-800"
+        >
+          Update
         </Button>
       </Modal.Footer>
     </Modal>
   );
 }
 
-export default ModalAddDistributor;
+export default ModalEditDistributor;
