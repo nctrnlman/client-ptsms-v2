@@ -10,7 +10,7 @@ function ModalEditCustomer({ id, openModal, setOpenModal, onUpdateCustomer }) {
   const fetchCustomerDetail = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/customer/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/customers/${id}`
       );
       const { customer_name } = response.data.data;
       setCustomerName(customer_name);

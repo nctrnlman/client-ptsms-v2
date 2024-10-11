@@ -1,23 +1,27 @@
 import { useEffect, useState } from "react";
-// import { ClipLoader } from "react-spinners";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import DataTable from "../../../components/tables/DataTable";
 import Layout from "../../../components/layouts/OperasionalLayout";
-// import CustomerListCard from "../../../components/cards/CustomerListCard";
-import ModalAddCustomer from "../../../components/cards/ModalAddCustomer";
-import ModalEditCustomer from "../../../components/cards/ModalEditCustomer";
+import ModalAddCustomer from "./components/ModalAddCustomer";
+import ModalEditCustomer from "./components/ModalEditCustomer";
 import ModalDelete from "../../../components/cards/ModalDelete";
+// import { ClipLoader } from "react-spinners";
+// import CustomerListCard from "../../../components/cards/CustomerListCard";
+
 export default function Home() {
   const [rows, setRows] = useState([]);
-  // const [customerData, setCustomerData] = useState([]);
-  // const [totalCustomer, setTotalCustomer] = useState(0);
   const [openModal, setOpenModal] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // const [customerData, setCustomerData] = useState([]);
+  // const [totalCustomer, setTotalCustomer] = useState(0);
+
+  //Datatable Column
+
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "customer_name", headerName: "Customer Name" },
@@ -43,39 +47,53 @@ export default function Home() {
       ),
     },
   ];
+
+  // handle modal
+
+  const handleEditClick = (id) => {
+    setSelectedProductId(id);
+    setOpenModalEdit(true);
+  };
+
+  const handleDeleteClick = (id) => {
+    setSelectedProductId(id);
+    setOpenModalDelete(true);
+  };
+
+  const handleToggleModal = () => {
+    setOpenModal(!openModal);
+  };
+
+  // logic
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/customer/all`
+        `${import.meta.env.VITE_API_BASE_URL}/customers`
       );
-      // const data = response.data;
-      const modifiedData = response.data.data.map((item, index) => ({
+      const modifiedData = response.data.data.customers.map((item, index) => ({
         id: index + 1,
         customer_id: item.customer_id,
         customer_name: item.customer_name,
       }));
+
       setRows(modifiedData);
+
       // setCustomerData(data.data);
       // setTotalCustomer(data.total);
+
       setLoading(false);
     } catch (error) {
       console.error("Error fetching customer data:", error);
       setLoading(false);
     }
   };
-  const handleEditClick = (id) => {
-    setSelectedProductId(id);
-    setOpenModalEdit(true);
-  };
-  const handleDeleteClick = (id) => {
-    setSelectedProductId(id);
-    setOpenModalDelete(true);
-  };
+
   const handleCreateCustomer = async (newCustomer) => {
     try {
       setLoading(true);
       const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/customer/create`,
+        `${import.meta.env.VITE_API_BASE_URL}/customers`,
         {
           customerName: newCustomer.name,
         }
@@ -98,14 +116,11 @@ export default function Home() {
     }
   };
 
-  const handleToggleModal = () => {
-    setOpenModal(!openModal);
-  };
   const updateCustomer = async (id, newData) => {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/customer/update/${id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/customers/${id}`,
         {
           customerName: newData.name,
         }
@@ -131,7 +146,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/customer/delete/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/customers/${id}`
       );
       toast.success(response.data.message);
       await fetchData();

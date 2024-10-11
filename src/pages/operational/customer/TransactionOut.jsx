@@ -94,7 +94,7 @@ export default function TransactionOut() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/customer/master`
+        `${import.meta.env.VITE_API_BASE_URL}/customers/master`
       );
       setTotalTransaction(response.data.data.totalTransaction);
       setTodayTransaction(response.data.data.todayTransaction);
