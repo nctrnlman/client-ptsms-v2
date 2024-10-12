@@ -1,13 +1,12 @@
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import ModalAddUser from "./components/ModalAddUser";
+import ModalEditUser from "./components/ModalEditUser";
+import ModalDelete from "../../components/cards/ModalDelete";
+import ModalResetPasswordUser from "./components/ModalResetPasswordUser";
 import Layout from "../../components/layouts/SettingLayout";
 import DataTable from "../../components/tables/DataTable";
-import axios from "axios";
-import { useState, useEffect } from "react";
-import ModalAddUser from "../../components/cards/ModalAddUser";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import ModalEditUser from "../../components/cards/ModalEditUser";
-import ModalDelete from "../../components/cards/ModalDelete";
-import ModalResetPasswordUser from "../../components/cards/ModalResetPasswordUser";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
@@ -17,6 +16,7 @@ export default function Home() {
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [openModalEdit, setOpenModalEdit] = useState(false);
   const [openModalReset, setOpenModalReset] = useState(false);
+
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "name", headerName: "Username" },
@@ -74,12 +74,13 @@ export default function Home() {
   const handleToggleModal = () => {
     setOpenModal(!openModal);
   };
+
   const handleDeleteUser = async (id) => {
     try {
       setLoading(true);
 
       const response = await axios.delete(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/user/delete/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user/${id}`
       );
       toast.success(response.data.message);
       await fetchData();
@@ -90,13 +91,14 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const updateUser = async (id, newData) => {
     try {
       setLoading(true);
       const response = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/user/update`,
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user/${id}`,
         {
-          user_id: id,
+          // user_id: id,
           name: newData.username,
           email: newData.email,
           role_id: newData.role_id,
@@ -119,13 +121,14 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const resetPasswordUser = async (id, newData) => {
     try {
       setLoading(true);
       const response = await axios.put(
         `${import.meta.env.VITE_API_BASE_URL}/auth/user/reset/password`,
         {
-          id: id,
+          user_id: id,
           password: newData.password,
         }
       );
@@ -146,6 +149,7 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const handleCreateUser = async (newUser) => {
     try {
       setLoading(true);
@@ -167,11 +171,12 @@ export default function Home() {
       setLoading(false);
     }
   };
+
   const fetchData = async () => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/user/all`
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,

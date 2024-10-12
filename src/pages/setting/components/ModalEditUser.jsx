@@ -15,7 +15,7 @@ function ModalEditUser({ id, openModal, setOpenModal, onUpdateUser }) {
   const fetchUserDetail = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/user/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/auth/user/${id}`
       );
       setUserName(response.data.data.name);
       setEmail(response.data.data.email);
