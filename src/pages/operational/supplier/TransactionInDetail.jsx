@@ -1,11 +1,12 @@
-import Layout from "../../../components/layouts/OperasionalLayout";
-import DataTable from "../../../components/tables/DataTable";
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { formatDate, formatCurrency } from "../../../utils/converter";
-import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
 import { useSelector } from "react-redux";
+import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
+import { formatDate, formatCurrency } from "../../../utils/converter";
+import Layout from "../../../components/layouts/OperasionalLayout";
+import DataTable from "../../../components/tables/DataTable";
+
 export default function TransactionInDetail() {
   const { id } = useParams();
   const [rows, setRows] = useState([]);
@@ -14,6 +15,11 @@ export default function TransactionInDetail() {
   const [distributor, setDistributor] = useState("");
   const [totalTransaction, setTotalTransaction] = useState("");
   const [totalTransactionTax, setTotalTransactionTax] = useState("");
+  const [noKita, setNoKita] = useState("");
+  const [noFaktur, setNoFaktur] = useState("");
+  const [shippingCost, setShippingCost] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [note, setNote] = useState("");
   const [createdAt, setCreatedAt] = useState("");
   const [updateAt, setUpdateAt] = useState("");
   const userData = useSelector((state) => state.user.User);
@@ -29,34 +35,33 @@ export default function TransactionInDetail() {
     { field: "akl_akd", headerName: "No AKL/AKD" },
     { field: "batch_lot", headerName: "Batch/Lot" },
     { field: "price", headerName: "Price" },
+    { field: "discount", headerName: "Discount (%)" },
+    { field: "price_discount", headerName: "Discounted Price" },
     { field: "quantity", headerName: "Qty" },
   ];
 
-  const handleCreateClick = () => {
-    navigate(
-      `/operasional/supplier/transaction/in/edit/${encryptNumber(
-        transactionId
-      )}`
-    );
-  };
   const fetchData = async (id) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/${id}`
       );
       const modifiedData = response.data.data.transactionInDetail.map(
         (item, index) => ({
           id: index + 1,
-          product_name: item.product_name,
-          product_code: item.product_code,
-          type_name: item.type_name,
-          merk_name: item.merk_name,
+          product_name: item.product_name || "-",
+          product_code: item.product_code || "-",
+          type_name: item.type_name || "-",
+          merk_name: item.merk_name || "-",
           expired_date: item.expired_date ? formatDate(item.expired_date) : "-",
-          akl_akd: item.akl_akd,
-          batch_lot: item.batch_lot,
-          price: formatCurrency(item.price),
-          quantity: item.quantity,
+          akl_akd: item.akl_akd || "-",
+          batch_lot: item.batch_lot || "-",
+          price: item.price ? formatCurrency(item.price) : "-",
+          price_discount: item.price_discount
+            ? formatCurrency(item.price_discount)
+            : "-",
+          discount: item.discount ? item.discount + "%" : "-",
+          quantity: item.quantity || "-",
         })
       );
       setRows(modifiedData);
@@ -69,11 +74,28 @@ export default function TransactionInDetail() {
           ? formatDate(response.data.data.transactionIn.updated_at)
           : "-"
       );
+      setShippingCost(
+        response.data.data.transactionIn.shipping_cost
+          ? formatCurrency(response.data.data.transactionIn.shipping_cost)
+          : "-"
+      );
+      setPaymentMethod(response.data.data.transactionIn.payment_method);
+      setNote(response.data.data.transactionIn.note);
+      setNoKita(response.data.data.transactionIn.no_kita);
+      setNoFaktur(response.data.data.transactionIn.no_faktur);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
       setLoading(false);
     }
+  };
+
+  const handleEditClick = () => {
+    navigate(
+      `/operasional/supplier/transaction/in/edit/${encryptNumber(
+        transactionId
+      )}`
+    );
   };
 
   useEffect(() => {
@@ -188,7 +210,7 @@ export default function TransactionInDetail() {
           {userData?.role_id == 1 && (
             <div className="flex justify-center gap-3">
               <button
-                onClick={handleCreateClick}
+                onClick={handleEditClick}
                 className="bg-teal-500 flex  items-center hover:bg-teal-800 text-white font-bold p-3 rounded-full"
               >
                 Edit Transaction
@@ -208,14 +230,28 @@ export default function TransactionInDetail() {
             </div>
           )}
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4">
-          <p>Distributor : {distributor}</p>
-          <p>Created Date : {createdAt}</p>
-          <p>Update Date : {updateAt}</p>
-          <p>Total Transaction : {formatCurrency(totalTransaction)}</p>
-          <p>
-            Total Transaction with Tax : {formatCurrency(totalTransactionTax)}
-          </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <p className="font-medium">Distributor</p>
+          <p>: {distributor || "-"}</p>
+          <p className="font-medium">No Kita</p>
+          <p>: {noKita || "-"}</p>
+          <p className="font-medium">No Faktur</p>
+          <p>: {noFaktur || "-"}</p>
+          <p className="font-medium">Payment Method</p>
+          <p>: {paymentMethod || "-"}</p>
+          <p className="font-medium">Shipping Cost</p>
+          <p>: {shippingCost || "-"}</p>
+          <p className="font-medium">Created Date</p>
+          <p>: {createdAt || "-"}</p>
+          <p className="font-medium">Update Date</p>
+          <p>: {updateAt || "-"}</p>
+          <p className="font-medium">Total Transaction</p>
+          <p>: {formatCurrency(totalTransaction) || "-"}</p>
+          <p className="font-medium">Total Transaction with Tax</p>
+          <p>: {formatCurrency(totalTransactionTax) || "-"}</p>
+          <p className="font-medium">Note:</p>
+          <p>: {note || "-"}</p>
         </div>
 
         <DataTable rows={rows} columns={columns} loading={loading} />

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { RiCloseCircleLine, RiAddLine } from "react-icons/ri";
 import { Datepicker } from "flowbite-react";
 import Select from "react-select";
+import { formatCurrency } from "../../utils/converter";
 
 function Repeater({ product, setProduct, formData }) {
   const [inputs, setInputs] = useState([
@@ -11,6 +12,8 @@ function Repeater({ product, setProduct, formData }) {
       batch_lot: "",
       expired_date: "",
       quantity: "",
+      product_price: "",
+      product_discount: "",
     },
   ]);
 
@@ -33,12 +36,20 @@ function Repeater({ product, setProduct, formData }) {
       }
     }
 
-    // Mengupdate state inputs
+    if (name === "product_price") {
+      const rawValue = value.replace(/[^\d]/g, "");
+      newValue = rawValue ? formatCurrency(rawValue) : "";
+    }
+
+    if (name === "product_discount") {
+      const parsedValue = parseFloat(value);
+      newValue = parsedValue >= 0 && parsedValue <= 100 ? parsedValue : "";
+    }
+
     const newInputs = [...inputs];
     newInputs[index][name] = newValue;
     setInputs(newInputs);
 
-    // Mengupdate state productList pada form data
     setProduct((prevData) => ({
       ...prevData,
       productList: newInputs,
@@ -47,14 +58,16 @@ function Repeater({ product, setProduct, formData }) {
 
   const handleAddInput = () => {
     setInputs([
-      ...inputs,
       {
         product_id: "",
         product_code: "",
         batch_lot: "",
         expired_date: "",
         quantity: "",
+        product_price: "",
+        product_discount: "",
       },
+      ...inputs,
     ]);
   };
 
@@ -76,6 +89,10 @@ function Repeater({ product, setProduct, formData }) {
           productName: productItem.product_id,
           productQty: productItem.quantity,
           productExpired: productItem.expired_date,
+          product_price: productItem.price
+            ? formatCurrency(productItem.price)
+            : productItem.price,
+          product_discount: productItem.discount,
         }))
       );
     }
@@ -198,7 +215,7 @@ function Repeater({ product, setProduct, formData }) {
                   );
                   handleChange(index, "expired_date", formattedDate);
                 }}
-                disabled={isExpired == 0} // Menonaktifkan Datepicker jika produk tidak kedaluwarsa
+                disabled={isExpired == 0}
               />
             </div>
             <div>
@@ -216,6 +233,44 @@ function Repeater({ product, setProduct, formData }) {
                 value={input.quantity}
                 onChange={(e) =>
                   handleChange(index, "quantity", e.target.value)
+                }
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="productPrice"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Product Price<span className="text-red-500">*</span>
+              </label>
+              <input
+                name="productPrice"
+                placeholder="Rp 0"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                type="text"
+                value={input.product_price}
+                onChange={(e) =>
+                  handleChange(index, "product_price", e.target.value)
+                }
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="productDiscount"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Product Discount (%)
+              </label>
+              <input
+                name="productDiscount"
+                placeholder="Discount"
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                type="number"
+                min="1"
+                max="100"
+                value={input.product_discount}
+                onChange={(e) =>
+                  handleChange(index, "product_discount", e.target.value)
                 }
               />
             </div>
