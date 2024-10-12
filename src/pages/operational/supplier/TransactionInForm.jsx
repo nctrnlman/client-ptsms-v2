@@ -1,21 +1,23 @@
-import Layout from "../../../components/layouts/OperasionalLayout";
-import { Datepicker } from "flowbite-react";
-import Repeater from "../../../components/form/Repeater";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import Select from "react-select";
+import { Datepicker } from "flowbite-react";
+import Layout from "../../../components/layouts/OperasionalLayout";
+import Repeater from "../../../components/form/Repeater";
+import { formatCurrency } from "../../../utils/converter";
 
 export default function TransactionInForm() {
   const [options, setOptions] = useState([]);
   const [product, setProduct] = useState([]);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+
   const userData = useSelector((state) => state.user.User);
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     noKita: "",
     noFaktur: "",
@@ -25,6 +27,7 @@ export default function TransactionInForm() {
     tax: "",
     note: "",
     userId: userData.id,
+    shippingCost: "",
     productList: [],
   });
   const [errors, setErrors] = useState({
@@ -38,14 +41,14 @@ export default function TransactionInForm() {
   const getMasterDynamic = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/master-dynamic`
       );
-      setOptions(response.data.data.supplier);
+      setOptions(response.data.data.suppliers);
       setFormData((prevFormData) => ({
         ...prevFormData,
-        noKita: response.data.data.transactionNumber,
+        // noKita: response.data.data.transactionNumber,
       }));
-      setFormData;
+      // setFormData;
       setLoading(false);
     } catch (error) {
       console.error("Error fetching options:", error);
@@ -56,7 +59,7 @@ export default function TransactionInForm() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/supplier/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/products/supplier/${id}`
       );
 
       setProduct(response.data.data.product);
@@ -67,6 +70,7 @@ export default function TransactionInForm() {
       setLoading(false);
     }
   };
+
   useEffect(() => {
     getMasterDynamic();
   }, []);
@@ -91,18 +95,42 @@ export default function TransactionInForm() {
       }
     }
 
-    setFormData({
-      ...formData,
-      [name]: filteredValue,
-    });
+    if (name === "shippingCost") {
+      filteredValue = value.replace(/[^0-9]/g, "");
+      setFormData({
+        ...formData,
+        [name]: formatCurrency(filteredValue),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: filteredValue,
+      });
+    }
   };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      const formattedProductList = formData.productList.map((item) => ({
+        ...item,
+        product_price: item.product_price
+          ? item.product_price.toString().replace(/[^\d]/g, "")
+          : "",
+        product_discount: item.product_discount
+          ? parseFloat(item.product_discount)
+          : "",
+      }));
+
+      const submissionData = {
+        ...formData,
+        shippingCost: formData.shippingCost.replace(/[^\d]/g, ""),
+        productList: formattedProductList,
+      };
+
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/transactions/in/create`,
-        formData
+        submissionData
       );
       setFormData({
         noKita: "",
@@ -113,6 +141,7 @@ export default function TransactionInForm() {
         tax: "",
         note: "",
         userId: "",
+        shippingCost: "",
         productList: [],
       });
 
@@ -298,7 +327,7 @@ export default function TransactionInForm() {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
                 placeholder="No Kita"
                 required
-                disabled
+                // disabled
               />
               {errors.noKita && (
                 <p className="text-red-500 text-sm pt-2">{errors.noKita}</p>
@@ -459,6 +488,28 @@ export default function TransactionInForm() {
                   {errors.timeToPayment}
                 </p>
               )}
+            </div>
+
+            {/* Shipping Cost */}
+            <div>
+              <label
+                htmlFor="shippingCost"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Shipping Cost
+              </label>
+              <input
+                type="text"
+                id="shippingCost"
+                name="shippingCost"
+                value={formData.shippingCost}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                placeholder="Rp 0"
+                pattern="^\d+(\.\d+)?$"
+                title="Enter a valid number"
+                required
+              />
             </div>
           </div>
 

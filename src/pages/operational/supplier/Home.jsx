@@ -1,17 +1,17 @@
-import DashboardCard from "../../../components/cards/DashboardCard";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   FaUsers,
   FaCalendarDay,
   FaClipboardList,
   FaUser,
 } from "react-icons/fa";
-import Layout from "../../../components/layouts/OperasionalLayout";
-import DataTable from "../../../components/tables/DataTable";
-import axios from "axios";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { formatDate, formatCurrency } from "../../../utils/converter";
 import { encryptNumber } from "../../../utils/encryptionUtils";
+import Layout from "../../../components/layouts/OperasionalLayout";
+import DataTable from "../../../components/tables/DataTable";
+import DashboardCard from "../../../components/cards/DashboardCard";
 
 export default function Home() {
   const [rows, setRows] = useState([]);
@@ -20,8 +20,9 @@ export default function Home() {
   const [todayTransaction, setTodayTransaction] = useState(0);
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [mostSupplierTransaction, setMostSupplierTransaction] = useState("");
-
   const navigate = useNavigate();
+
+  // column table
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "no_kita", headerName: "No Kita" },
@@ -30,8 +31,9 @@ export default function Home() {
     { field: "payment_method", headerName: "Payment Method" },
     { field: "created_at", headerName: "Created Date" },
     { field: "time_to_payment", headerName: "Time To Payment" },
-    { field: "amount", headerName: "Total Amount" },
-    { field: "amount_tax", headerName: "Total Amount with Tax" },
+    { field: "shipping_cost", headerName: "Shipping Cost" },
+    { field: "amount", headerName: "Total Transaction" },
+    { field: "amount_tax", headerName: "Total Transaction with Tax" },
     { field: "pic", headerName: "PIC" },
     { field: "note", headerName: "Note" },
     {
@@ -50,38 +52,55 @@ export default function Home() {
     },
   ];
 
+  // handle actions
+
   const handleCreateClick = () => {
     navigate("/operasional/supplier/transaction/in/form");
   };
+
   const handleDistributorClick = () => {
     navigate("/operasional/distributors");
   };
+
   const handleEdit = (id) => {
     navigate(`/operasional/supplier/transaction/detail/${encryptNumber(id)}`);
   };
+
+  // logic services
+
   const fetchData = async () => {
     try {
       setLoading(true);
+
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/list`
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in`
       );
+
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
-        no_kita: item.no_kita,
-        transaction_id: item.transaction_in_id,
-        no_faktur: item.no_faktur,
-        supplier_name: `${item.supplier_name}-(${item.supplier_code})`,
-        payment_method: item.payment_method,
-        created_at: formatDate(item.created_at),
-        time_to_payment: formatDate(item.time_to_payment),
-        amount: formatCurrency(item.amount),
-        amount_tax: formatCurrency(item.amount_tax),
-        pic: item.name,
-        note: item.note,
+        no_kita: item.no_kita || "-",
+        transaction_id: item.transaction_in_id || "-",
+        no_faktur: item.no_faktur || "-",
+        supplier_name:
+          item.supplier_name && item.supplier_code
+            ? `${item.supplier_name}-(${item.supplier_code})`
+            : "-",
+        payment_method: item.payment_method || "-",
+        created_at: item.created_at ? formatDate(item.created_at) : "-",
+        time_to_payment: item.time_to_payment
+          ? formatDate(item.time_to_payment)
+          : "-",
+        shipping_cost: item.shipping_cost
+          ? formatCurrency(item.shipping_cost)
+          : "-",
+        amount: item.amount ? formatCurrency(item.amount) : "-",
+        amount_tax: item.amount_tax ? formatCurrency(item.amount_tax) : "-",
+        pic: item.name || "-",
+        note: item.note || "-",
       }));
+
       setRows(modifiedData);
 
-      // setRows(response.data.data);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -93,12 +112,12 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master`
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/master`
       );
-      setTotalSupplier(response.data.data.totalSupplier);
+      setTotalSupplier(response.data.data.totalSuppliers);
       setMostSupplierTransaction(response.data.data.mostSupplierTransaction);
-      setTotalTransaction(response.data.data.totalTransaction);
-      setTodayTransaction(response.data.data.todayTransaction);
+      setTotalTransaction(response.data.data.totalTransactions);
+      setTodayTransaction(response.data.data.todayTransactions);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -204,6 +223,7 @@ export default function Home() {
             </button>
           </div>
         </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           <DashboardCard
             title="Total Supplier"

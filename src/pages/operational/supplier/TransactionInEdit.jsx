@@ -1,14 +1,14 @@
-import Layout from "../../../components/layouts/OperasionalLayout";
-import { Datepicker } from "flowbite-react";
-import Repeater from "../../../components/form/Repeater";
 import { useState, useEffect } from "react";
+import { Datepicker } from "flowbite-react";
+import Select from "react-select";
 import axios from "axios";
 import { ClipLoader } from "react-spinners";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate, useParams } from "react-router-dom";
+import Repeater from "../../../components/form/Repeater";
 import { decryptNumber, encryptNumber } from "../../../utils/encryptionUtils";
-import Select from "react-select";
+import Layout from "../../../components/layouts/OperasionalLayout";
+import { formatCurrency } from "../../../utils/converter";
 
 export default function TransactionInEdit() {
   const { id } = useParams();
@@ -26,16 +26,17 @@ export default function TransactionInEdit() {
     timeToPayment: "",
     tax: "",
     note: "",
+    shippingCost: "",
     productList: [],
   });
 
   const getMasterDynamic = async () => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/supplier/master-dynamic`
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/master-dynamic`
       );
 
-      setSupplierOptions(response.data.data.supplier);
+      setSupplierOptions(response.data.data.suppliers);
 
       setLoading(false);
     } catch (error) {
@@ -43,11 +44,12 @@ export default function TransactionInEdit() {
       setLoading(false);
     }
   };
+
   const getMasterDynamicProduct = async (id) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/product/supplier/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/products/supplier/${id}`
       );
 
       setProduct(response.data.data.product);
@@ -58,11 +60,12 @@ export default function TransactionInEdit() {
       setLoading(false);
     }
   };
+
   const getTransactionDetail = async (id) => {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/detail/${id}`
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/${id}`
       );
 
       const transactionDetail = response.data.data;
@@ -80,6 +83,9 @@ export default function TransactionInEdit() {
         timeToPayment: formattedDate || "",
         tax: transactionDetail.transactionIn.tax || "",
         note: transactionDetail.transactionIn.note || "",
+        shippingCost: transactionDetail.transactionIn.shipping_cost
+          ? formatCurrency(transactionDetail.transactionIn.shipping_cost)
+          : "",
         productList: response.data.data.transactionInDetail || [],
       });
       if (transactionDetail.transactionIn?.supplier_id) {
@@ -117,22 +123,46 @@ export default function TransactionInEdit() {
         filteredValue = `${integerPart}.${decimalPart}`;
       }
     }
-
-    setFormData({
-      ...formData,
-      [name]: filteredValue,
-    });
+    if (name === "shippingCost") {
+      filteredValue = value.replace(/[^0-9]/g, "");
+      setFormData({
+        ...formData,
+        [name]: formatCurrency(filteredValue),
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: filteredValue,
+      });
+    }
   };
 
   const handleSubmit = async () => {
     try {
       setLoading(true);
+      const formattedProductList = formData.productList.map((item) => ({
+        ...item,
+        product_price: item.product_price
+          ? item.product_price.toString().replace(/[^\d]/g, "")
+          : "",
+        product_discount: item.product_discount
+          ? parseFloat(item.product_discount)
+          : "",
+      }));
+
+      const submissionData = {
+        ...formData,
+        shippingCost: formData.shippingCost.replace(/[^\d]/g, ""),
+        productList: formattedProductList,
+      };
+
       const response = await axios.put(
-        `${
-          import.meta.env.VITE_API_BASE_URL
-        }/transactions/in/update/${decryptNumber(id)}`,
-        formData
+        `${import.meta.env.VITE_API_BASE_URL}/transactions/in/${decryptNumber(
+          id
+        )}`,
+        submissionData
       );
+
       setFormData({
         noKita: "",
         noFaktur: "",
@@ -141,6 +171,7 @@ export default function TransactionInEdit() {
         timeToPayment: "",
         tax: "",
         note: "",
+        shippingCost: "",
         productList: [],
       });
 
@@ -287,7 +318,7 @@ export default function TransactionInEdit() {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
                 placeholder="No Kita"
                 required
-                disabled
+                // disabled
               />
             </div>
             {/* No Faktur */}
@@ -416,6 +447,28 @@ export default function TransactionInEdit() {
                 language="en"
                 labelTodayButton="Today"
                 labelClearButton="Clear"
+              />
+            </div>
+
+            {/* Shipping Cost */}
+            <div>
+              <label
+                htmlFor="shippingCost"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Shipping Cost
+              </label>
+              <input
+                type="text"
+                id="shippingCost"
+                name="shippingCost"
+                value={formData.shippingCost}
+                onChange={handleInputChange}
+                className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
+                placeholder="Rp 0"
+                pattern="^\d+(\.\d+)?$"
+                title="Enter a valid number"
+                required
               />
             </div>
           </div>

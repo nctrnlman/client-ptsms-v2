@@ -62,7 +62,6 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
 
   const handleAddInput = () => {
     setInputs([
-      ...inputs,
       {
         product_id: "",
         qty: 0,
@@ -74,6 +73,7 @@ function TransactionOutRepeater({ product, setProduct, formData }) {
         cn_type: "",
         productTotalPrice: "",
       },
+      ...inputs,
     ]);
   };
 
