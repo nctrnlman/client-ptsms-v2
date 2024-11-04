@@ -59,7 +59,7 @@ export default function AttendanceForm() {
         throw new Error("Please take a photo before submitting");
       }
       const blob = await fetch(capturedPhoto).then((res) => res.blob());
-      const photoFileName = `images/${userData.id}_${Date.now()}.jpg`;
+      const photoFileName = `images/${userData.user_id}_${Date.now()}.jpg`;
 
       const photoStorageRef = ref(storage, photoFileName);
       const photoUploadTask = uploadBytes(photoStorageRef, blob);
@@ -71,7 +71,9 @@ export default function AttendanceForm() {
 
       // 2. Upload tanda tangan
       if (signature) {
-        const signatureFileName = `signatures/${userData.id}_${Date.now()}.png`;
+        const signatureFileName = `signatures/${
+          userData.user_id
+        }_${Date.now()}.png`;
 
         const signatureStorageRef = ref(storage, signatureFileName);
         const signatureUploadTask = uploadBytes(signatureStorageRef, signature);
@@ -91,7 +93,7 @@ export default function AttendanceForm() {
               address: address,
               latitude: loclatitude,
               longitude: loclongitude,
-              id_user: userData.id,
+              id_user: userData.user_id,
               description: description,
               product: productsOffered,
             }

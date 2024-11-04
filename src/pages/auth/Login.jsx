@@ -28,7 +28,7 @@ function Login() {
       const data = response.data;
       if (data) {
         toast.success(response.data.message);
-        localStorage.setItem("user_token", response.data.token);
+        localStorage.setItem("user_token", response.data.data.token);
         dispatch(setUser(data.data));
         navigate("/");
       }

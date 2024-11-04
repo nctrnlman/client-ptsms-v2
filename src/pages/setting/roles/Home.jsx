@@ -15,7 +15,7 @@ export default function Home() {
     try {
       setLoading(true);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/auth/role/all`
+        `${import.meta.env.VITE_API_BASE_URL}/auth/role`
       );
       const modifiedData = response.data.data.map((item, index) => ({
         id: index + 1,
