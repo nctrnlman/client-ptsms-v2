@@ -26,7 +26,7 @@ export default function TransactionInForm() {
     timeToPayment: "",
     tax: "",
     note: "",
-    userId: userData.id,
+    userId: userData.user_id,
     shippingCost: "",
     productList: [],
   });

@@ -4,10 +4,19 @@ import { Pagination } from "@mui/material";
 import LinearProgress from "@mui/material/LinearProgress";
 import { FaSearch } from "react-icons/fa";
 
-const DataTable = ({ rows, columns, loading }) => {
+const DataTable = ({
+  rows,
+  columns,
+  loading,
+  fetchData,
+  isServerSidePagination = false,
+  totalPages = 1,
+}) => {
   const [filterText, setFilterText] = useState("");
   const [includeOutliers, setIncludeOutliers] = useState(true);
   const apiRef = useGridApiRef();
+  const [page, setPage] = useState(1);
+  const pageSize = 10;
 
   const handleFilterChange = (event) => {
     setFilterText(event.target.value);
@@ -23,9 +32,14 @@ const DataTable = ({ rows, columns, loading }) => {
       )
     : [];
 
-  const [page, setPage] = useState(1);
-  const handleChangePage = (event, value) => {
-    setPage(value);
+  // const [page, setPage] = useState(1);
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+
+    // If server-side pagination is enabled, fetch the specific page from the server
+    if (isServerSidePagination) {
+      fetchData(newPage, pageSize);
+    }
   };
 
   const autosizeOptions = {
@@ -33,12 +47,18 @@ const DataTable = ({ rows, columns, loading }) => {
     includeOutliers,
   };
 
-  const pageSize = 10;
+  // const pageSize = 10;
   const pageStartIndex = (page - 1) * pageSize;
   const pageEndIndex = pageStartIndex + pageSize;
-  const pageRows = filteredRows.slice(pageStartIndex, pageEndIndex);
+  // Use rows directly if server-side pagination is enabled; otherwise, slice for client-side pagination
+  const pageRows = isServerSidePagination
+    ? rows
+    : filteredRows.slice((page - 1) * pageSize, page * pageSize);
 
-  const totalPages = Math.ceil(filteredRows.length / pageSize);
+  // Use server-provided total pages if server-side pagination is enabled; otherwise, calculate based on filtered rows
+  const calculatedTotalPages = isServerSidePagination
+    ? totalPages
+    : Math.ceil(filteredRows.length / pageSize);
 
   useEffect(() => {
     apiRef.current.autosizeColumns(autosizeOptions);
@@ -93,7 +113,7 @@ const DataTable = ({ rows, columns, loading }) => {
       </div>
       <div className="flex justify-end mt-4">
         <Pagination
-          count={totalPages}
+          count={calculatedTotalPages}
           page={page}
           onChange={handleChangePage}
         />

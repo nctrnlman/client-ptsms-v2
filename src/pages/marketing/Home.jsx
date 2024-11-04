@@ -28,6 +28,7 @@ export default function Home() {
   const [modalGeneralIsOpen, setModalGeneralIsOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("");
   const [modalContent, setModalContent] = useState("");
+  const [totalPages, setTotalPages] = useState(1);
 
   const [selectedImage, setSelectedImage] = useState("");
   const userData = useSelector((state) => state.user.User);
@@ -148,17 +149,20 @@ export default function Home() {
     setModalGeneralIsOpen(true);
   };
 
-  const fetchData = async () => {
+  const fetchData = async (page = 1, itemsPerPage = 10) => {
     try {
       setLoading(true);
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/attendance/list`,
         {
-          user_id: userData.id,
+          user_id: userData.user_id,
           role_id: userData.role_id,
+          page,
+          itemsPerPage,
         }
       );
-      const modifiedData = response.data.data.map((item, index) => ({
+
+      const modifiedData = response.data.data.results.map((item, index) => ({
         id: index + 1,
         user_id: item.user_id,
         name: item.name,
@@ -173,6 +177,7 @@ export default function Home() {
         location_long: item.location_long,
       }));
       setRows(modifiedData);
+      setTotalPages(response.data.data.totalPages);
       setLoading(false);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -196,7 +201,7 @@ export default function Home() {
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/data/marketing/dashboard`,
         {
-          user_id: userData.id,
+          user_id: userData.user_id,
           role_id: userData.role_id,
         }
       );
@@ -221,7 +226,7 @@ export default function Home() {
   useEffect(() => {
     fetchMasterData();
     if (userData) {
-      fetchData();
+      fetchData(1, 10);
     }
   }, [userData]);
 
@@ -283,11 +288,13 @@ export default function Home() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4 ">
           <DashboardCard
-            title={userData.id === 1 ? "Total User" : "Last Attendance"}
+            title={userData.user_id === 1 ? "Total User" : "Last Attendance"}
             description={
-              userData.id === 1 ? totalUser : formatDateMonth(lastAttendance)
+              userData.user_id === 1
+                ? totalUser
+                : formatDateMonth(lastAttendance)
             }
-            icon={userData.id === 1 ? FaUsers : MdCalendarToday}
+            icon={userData.user_id === 1 ? FaUsers : MdCalendarToday}
             className="w-full sm:w-auto"
           />
           <DashboardCard
@@ -303,9 +310,11 @@ export default function Home() {
             className="w-full sm:w-auto"
           />
           <DashboardCard
-            title={userData.id === 1 ? "Most Frequent User" : "Last Location"}
+            title={
+              userData.user_id === 1 ? "Most Frequent User" : "Last Location"
+            }
             description={
-              userData.id === 1 ? (
+              userData.user_id === 1 ? (
                 mostFrequentUser
               ) : (
                 <a
@@ -318,11 +327,18 @@ export default function Home() {
                 </a>
               )
             }
-            icon={userData.id === 1 ? FaUser : MdLocationOn}
+            icon={userData.user_id === 1 ? FaUser : MdLocationOn}
             className="w-full sm:w-auto"
           />
         </div>
-        <DataTable rows={rows} columns={columns} loading={loading} />
+        <DataTable
+          rows={rows}
+          columns={columns}
+          loading={loading}
+          fetchData={fetchData}
+          isServerSidePagination={true}
+          totalPages={totalPages}
+        />
 
         {modalIsOpen && (
           <div

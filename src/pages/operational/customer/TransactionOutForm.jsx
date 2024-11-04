@@ -23,7 +23,7 @@ export default function TransactionOutFrom() {
     noFaktur: "",
     noPo: "",
     customerId: "",
-    userId: userData.id,
+    userId: userData.user_id,
     salesman: "",
     paymentMethod: "",
     timeToPayment: "",
