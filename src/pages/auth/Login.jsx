@@ -8,6 +8,7 @@ import { setUser } from "../../features/users/user";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import codenito from "../../assets/logo/icon-dark.png";
+import localforage from "localforage";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -30,6 +31,7 @@ function Login() {
         toast.success(response.data.message);
         localStorage.setItem("user_token", response.data.data.token);
         dispatch(setUser(data.data));
+        await localforage.setItem("user_data", data.data);
         navigate("/");
       }
     } catch (error) {

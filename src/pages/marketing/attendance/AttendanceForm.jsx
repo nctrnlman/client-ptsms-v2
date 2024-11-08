@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../../../components/layouts/MarketingLayout";
 import { useSelector } from "react-redux";
 import { initializeApp } from "firebase/app";
+import localforage from "localforage";
 import {
   getStorage,
   ref,
@@ -30,10 +31,20 @@ export default function AttendanceForm() {
   const [address, setAddress] = useState(null);
 
   const navigate = useNavigate();
-  const userData = useSelector((state) => state.user.User);
+  const [userData, setUserData] = useState(null);
 
   const videoRef = useRef();
   const signatureRef = useRef();
+  const fetchUserData = async () => {
+    try {
+      const user = await localforage.getItem("user_data");
+      if (user) {
+        setUserData(user);
+      }
+    } catch (error) {
+      console.error("Error fetching userData from localforage", error);
+    }
+  };
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -171,6 +182,10 @@ export default function AttendanceForm() {
       console.error("Browser tidak mendukung Geolocation API");
     }
   };
+  useEffect(() => {
+    fetchUserData();
+  }, []);
+
   useEffect(() => {
     enableGeolocation();
     setIsCameraActive(true);

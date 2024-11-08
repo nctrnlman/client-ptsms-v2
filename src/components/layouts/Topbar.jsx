@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import localforage from "localforage";
 
 const Topbar = ({ toggleSidebar }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -16,7 +17,8 @@ const Topbar = ({ toggleSidebar }) => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  const handleSignOut = () => {
+  const handleSignOut = async () => {
+    await localforage.removeItem("user_data");
     localStorage.removeItem("user_token");
     toast.success("Logout success");
     setIsDropdownOpen(false);

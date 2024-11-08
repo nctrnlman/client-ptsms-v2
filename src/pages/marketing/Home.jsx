@@ -5,33 +5,44 @@ import {
   FaClipboardList,
   FaUser,
 } from "react-icons/fa";
-import { MdLocationOn } from "react-icons/md";
-import { MdCalendarToday } from "react-icons/md";
+import { MdLocationOn, MdCalendarToday } from "react-icons/md";
 import Layout from "../../components/layouts/MarketingLayout";
-import DataTable from "../../components/tables/DataTable";
+import DataTableServer from "../../components/tables/DataTableServer"; // Assuming this is the correct import path
 import axios from "axios";
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import { formatDateMonth } from "../../utils/converter";
 import ModalGeneral from "../../components/cards/ModalGeneral";
+import localforage from "localforage";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 export default function Home() {
-  const [rows, setRows] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [totalUser, setTotalUser] = useState(0);
-  const [totalAttendance, setTotalAttendance] = useState(0);
-  const [todayAttendance, setTodayAttendance] = useState(0);
-  const [mostFrequentUser, setMostFrequentUser] = useState("");
-  const [lastLocation, setLastLocation] = useState("");
-  const [lastAttendance, setLastAttendance] = useState("");
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [modalGeneralIsOpen, setModalGeneralIsOpen] = useState(false);
-  const [modalTitle, setModalTitle] = useState("");
-  const [modalContent, setModalContent] = useState("");
-  const [totalPages, setTotalPages] = useState(1);
-
-  const [selectedImage, setSelectedImage] = useState("");
-  const userData = useSelector((state) => state.user.User);
+  // State variables
+  const [dashboardStats, setDashboardStats] = useState({
+    totalUsers: 0,
+    totalAttendance: 0,
+    todayAttendance: 0,
+    mostFrequentUser: "",
+    lastLocation: "",
+    lastAttendance: "",
+  });
+  const [modals, setModals] = useState({
+    isImageOpen: false,
+    isGeneralOpen: false,
+    imageSrc: "",
+    title: "",
+    content: "",
+  });
+  const [page, setPage] = useState(1); // State for pagination
+  const [rows, setRows] = useState([]); // State for storing table data
+  const [totalPages, setTotalPages] = useState(1); // Total pages for pagination
+  const itemsPerPage = 10; // Number of items per page
+  const [userData, setUserData] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [users, setUsers] = useState([]);
+  // Columns for DataTableServer
   const columns = [
     { field: "id", headerName: "ID", flex: 1 },
     { field: "name", headerName: "Name", flex: 1 },
@@ -42,69 +53,39 @@ export default function Home() {
       headerName: "Location",
       flex: 1,
       renderCell: (params) => (
-        <div className="flex gap-3">
-          <span
-            className="cursor-pointer "
-            onClick={() => openGeneralModal("Location", params.row.address)}
-          >
-            {params.row.address}
-          </span>
-        </div>
+        <span
+          className="cursor-pointer"
+          onClick={() => openGeneralModal("Location", params.row.address)}
+        >
+          {params.row.address}
+        </span>
       ),
     },
     {
       field: "checkin_photo",
       headerName: "Photo",
       flex: 1,
-      renderCell: (params) => (
-        <div className="flex gap-3 ">
-          {params.row.checkin_photo ? (
-            <img
-              src={params.row.checkin_photo}
-              alt="Photo"
-              className="h-16 w-16 cursor-pointer rounded-full object-cover"
-              onClick={() => openModal(params.row.checkin_photo)}
-            />
-          ) : (
-            <span>-</span>
-          )}
-        </div>
-      ),
+      renderCell: (params) => renderImageCell(params.row.checkin_photo),
     },
     {
       field: "checkin_signature",
       headerName: "Signature",
       flex: 1,
-      renderCell: (params) => (
-        <div className="flex gap-3 ">
-          {params.row.checkin_signature ? (
-            <img
-              src={params.row.checkin_signature}
-              alt="Signature"
-              className="h-16 w-16 cursor-pointer rounded-full object-cover"
-              onClick={() => openModal(params.row.checkin_signature)}
-            />
-          ) : (
-            <span>-</span>
-          )}
-        </div>
-      ),
+      renderCell: (params) => renderImageCell(params.row.checkin_signature),
     },
     {
       field: "description",
       headerName: "Description",
       flex: 1,
       renderCell: (params) => (
-        <div className="flex gap-3">
-          <span
-            className="cursor-pointer "
-            onClick={() =>
-              openGeneralModal("Description", params.row.description)
-            }
-          >
-            {params.row.description}
-          </span>
-        </div>
+        <span
+          className="cursor-pointer"
+          onClick={() =>
+            openGeneralModal("Description", params.row.description)
+          }
+        >
+          {params.row.description}
+        </span>
       ),
     },
     {
@@ -112,16 +93,14 @@ export default function Home() {
       headerName: "Product Offered",
       flex: 1,
       renderCell: (params) => (
-        <div className="flex gap-3">
-          <span
-            className="cursor-pointer "
-            onClick={() =>
-              openGeneralModal("Product Offered", params.row.product_desc)
-            }
-          >
-            {params.row.product_desc}
-          </span>
-        </div>
+        <span
+          className="cursor-pointer"
+          onClick={() =>
+            openGeneralModal("Product Offered", params.row.product_desc)
+          }
+        >
+          {params.row.product_desc}
+        </span>
       ),
     },
     {
@@ -129,115 +108,123 @@ export default function Home() {
       headerName: "Action",
       flex: 1,
       renderCell: (params) => (
-        <div className="flex gap-3 ">
-          <a
-            href={`https://www.google.com/maps/search/?api=1&query=${params.row.location_lat},${params.row.location_long}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-blue-500 hover:underline"
-          >
-            View on Map
-          </a>
-        </div>
+        <a
+          href={`https://www.google.com/maps/search/?api=1&query=${params.row.location_lat},${params.row.location_long}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-blue-500 hover:underline"
+        >
+          View on Map
+        </a>
       ),
     },
   ];
 
-  const openGeneralModal = (title, content) => {
-    setModalTitle(title);
-    setModalContent(content);
-    setModalGeneralIsOpen(true);
+  // Helper functions for modals
+  const renderImageCell = (src) =>
+    src ? (
+      <img
+        src={src}
+        alt="Checkin Image"
+        className="h-16 w-16 cursor-pointer rounded-full object-cover"
+        onClick={() => openImageModal(src)}
+      />
+    ) : (
+      <span>-</span>
+    );
+
+  const openImageModal = (imageUrl) =>
+    setModals({ ...modals, isImageOpen: true, imageSrc: imageUrl });
+  const openGeneralModal = (title, content) =>
+    setModals({ ...modals, isGeneralOpen: true, title, content });
+  const closeModal = () =>
+    setModals({ ...modals, isImageOpen: false, isGeneralOpen: false });
+
+  // Fetch dashboard statistics
+  const fetchDashboardStats = async () => {
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/data/marketing/dashboard`,
+        { user_id: userData.user_id, role_id: userData.role_id }
+      );
+      setDashboardStats(response.data.data);
+    } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+    }
   };
 
-  const fetchData = async (page = 1, itemsPerPage = 10) => {
+  const fetchTableData = async (page, itemsPerPage, searchQuery = "") => {
     try {
-      setLoading(true);
       const response = await axios.post(
         `${import.meta.env.VITE_API_BASE_URL}/attendance/list`,
         {
-          user_id: userData.user_id,
+          user_id: userData.role_id == 1 ? selectedUserId : userData.user_id,
           role_id: userData.role_id,
           page,
           itemsPerPage,
+          search_query: searchQuery,
+          start_date: startDate ? startDate.toISOString() : null,
+          end_date: endDate ? endDate.toISOString() : null,
         }
       );
 
-      const modifiedData = response.data.data.results.map((item, index) => ({
-        id: index + 1,
-        user_id: item.user_id,
-        name: item.name,
+      const rows = response.data.data.results.map((item, index) => ({
+        id: index + 1 + (page - 1) * itemsPerPage,
+        ...item,
         date: formatDateMonth(item.date),
-        checkin_time: item.checkin_time,
-        address: item.address,
-        checkin_photo: item.checkin_photo,
-        checkin_signature: item.checkin_signature,
-        description: item.description,
-        product_desc: item.product_desc,
-        location_lat: item.location_lat,
-        location_long: item.location_long,
       }));
-      setRows(modifiedData);
+      setRows(rows);
       setTotalPages(response.data.data.totalPages);
-      setLoading(false);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setLoading(false);
+      console.error("Error fetching table data:", error);
+      return { rows: [], totalPages: 1 };
     }
   };
 
-  const openModal = (imageUrl) => {
-    setSelectedImage(imageUrl);
-    setModalIsOpen(true);
+  const getUserData = async () => {
+    const user = await localforage.getItem("user_data");
+    if (user) {
+      setUserData(user);
+    }
   };
-
-  const closeModal = () => {
-    setModalIsOpen(false);
-    setModalGeneralIsOpen(false);
-  };
-
-  const fetchMasterData = async () => {
+  const fetchUsers = async () => {
     try {
-      setLoading(true);
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/data/marketing/dashboard`,
-        {
-          user_id: userData.user_id,
-          role_id: userData.role_id,
-        }
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/data/users`
       );
-      if (userData.role_id == 1) {
-        setTotalUser(response.data.data.totalUsers);
-        setTotalAttendance(response.data.data.totalAttendance);
-        setTodayAttendance(response.data.data.todayAttendance);
-        setMostFrequentUser(response.data.data.mostFrequentUser.name);
-      } else {
-        setTotalAttendance(response.data.data.totalAttendance);
-        setTodayAttendance(response.data.data.todayAttendance);
-        setLastLocation(response.data.data.lastLocation);
-        setLastAttendance(response.data.data.lastAttendance);
-      }
-      setLoading(false);
+      setUsers(response.data.data);
     } catch (error) {
-      console.error("Error fetching data:", error);
-      setLoading(false);
+      console.error("Error fetching users:", error);
     }
   };
+  useEffect(() => {
+    fetchUsers();
+    getUserData();
+  }, []);
 
   useEffect(() => {
-    fetchMasterData();
     if (userData) {
-      fetchData(1, 10);
+      fetchDashboardStats();
+      fetchTableData(page, itemsPerPage);
     }
-  }, [userData]);
+  }, [userData, page, startDate, endDate, selectedUserId]);
+
+  if (!userData) {
+    return (
+      <div className="min-h-screen h-screen flex justify-center items-center">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <Layout>
-      <main className="flex flex-col gap-4 ">
+      <main className="flex flex-col gap-4 mb-10">
         <nav className="flex" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-2 rtl:space-x-reverse">
             <li className="inline-flex items-center">
               <a
-                href="#"
+                href="/marketing/dashboard"
                 className="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600 dark:text-gray-400 dark:hover:text-white"
               >
                 <svg
@@ -280,32 +267,30 @@ export default function Home() {
           </ol>
         </nav>
 
-        <div className="flex justify-between">
-          <h1 className="text-3xl pb-3 font-medium">
-            Marketing Dashboard Page
-          </h1>
-        </div>
+        <h1 className="text-3xl font-medium pb-3">Marketing Dashboard Page</h1>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-col-4 gap-4 ">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <DashboardCard
             title={userData.user_id === 1 ? "Total User" : "Last Attendance"}
             description={
               userData.user_id === 1
-                ? totalUser
-                : formatDateMonth(lastAttendance)
+                ? dashboardStats.totalUsers // For user_id === 1, show the total user count
+                : dashboardStats.lastAttendance
+                ? formatDateMonth(dashboardStats.lastAttendance)
+                : "-" // For others, show the last attendance date formatted
             }
             icon={userData.user_id === 1 ? FaUsers : MdCalendarToday}
             className="w-full sm:w-auto"
           />
           <DashboardCard
             title="Today Attendance"
-            description={todayAttendance}
+            description={dashboardStats.todayAttendance} // Display today's attendance
             icon={FaCalendarDay}
             className="w-full sm:w-auto"
           />
           <DashboardCard
             title="Total Attendance"
-            description={totalAttendance}
+            description={dashboardStats.totalAttendance} // Display total attendance
             icon={FaClipboardList}
             className="w-full sm:w-auto"
           />
@@ -315,15 +300,21 @@ export default function Home() {
             }
             description={
               userData.user_id === 1 ? (
-                mostFrequentUser
+                typeof dashboardStats.mostFrequentUser === "object" &&
+                dashboardStats.mostFrequentUser !== null ? (
+                  dashboardStats.mostFrequentUser.name // For user_id === 1, show most frequent user
+                ) : (
+                  dashboardStats.mostFrequentUser
+                ) // In case the most frequent user is just a string (fallback)
               ) : (
                 <a
-                  href={`https://www.google.com/maps/search/?api=1&query=${lastLocation?.latitude},${lastLocation?.longitude}`}
+                  href={`https://www.google.com/maps/search/?api=1&query=${dashboardStats.lastLocation?.latitude},${dashboardStats.lastLocation?.longitude}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-brand-500 hover:underline"
                 >
-                  View on Map
+                  View on Map{" "}
+                  {/* For others, show the last location with a map link */}
                 </a>
               )
             }
@@ -331,33 +322,68 @@ export default function Home() {
             className="w-full sm:w-auto"
           />
         </div>
-        <DataTable
-          rows={rows}
-          columns={columns}
-          loading={loading}
-          fetchData={fetchData}
-          isServerSidePagination={true}
-          totalPages={totalPages}
-        />
+        <div className="flex gap-4">
+          <DatePicker
+            selected={startDate}
+            onChange={(date) => setStartDate(date)}
+            selectsStart
+            startDate={startDate}
+            endDate={endDate}
+            placeholderText="Start Date"
+            className="border p-2"
+          />
+          <DatePicker
+            selected={endDate}
+            onChange={(date) => setEndDate(date)}
+            selectsEnd
+            startDate={startDate}
+            endDate={endDate}
+            minDate={startDate}
+            placeholderText="End Date"
+            className="border p-2"
+          />
+          {userData && userData.role_id === 1 && (
+            <select
+              value={selectedUserId || ""}
+              onChange={(e) => setSelectedUserId(e.target.value)}
+              className="border p-2"
+            >
+              <option value="">Select User</option>
+              {users.map((user) => (
+                <option key={user.user_id} value={user.user_id}>
+                  {user.name}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
 
-        {modalIsOpen && (
+        <DataTableServer
+          columns={columns}
+          rows={rows}
+          totalPages={totalPages}
+          page={page}
+          setPage={setPage}
+          itemsPerPage={itemsPerPage}
+        />
+        {modals.isImageOpen && (
           <div
-            className="overlay fixed inset-0  top-0 left-0 z-50 flex  h-full w-full items-center justify-center bg-gray-500 bg-opacity-70"
+            className="overlay fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-70"
             onClick={closeModal}
           >
             <img
-              src={selectedImage}
-              alt="Enlarged Checkin Photo"
+              src={modals.imageSrc}
+              alt="Enlarged Checkin"
               className="max-h-full max-w-full p-4"
             />
           </div>
         )}
 
         <ModalGeneral
-          isOpen={modalGeneralIsOpen}
+          isOpen={modals.isGeneralOpen}
           onClose={closeModal}
-          title={modalTitle}
-          content={modalContent}
+          title={modals.title}
+          content={modals.content}
         />
       </main>
     </Layout>
