@@ -27,6 +27,7 @@ export default function Home() {
     { field: "id", headerName: "ID" },
     { field: "no_kita", headerName: "No Kita" },
     { field: "no_faktur", headerName: "No Faktur" },
+    { field: "faktur_date", headerName: "Faktur Date" },
     { field: "supplier_name", headerName: "Distributor name" },
     { field: "payment_method", headerName: "Payment Method" },
     { field: "created_at", headerName: "Created Date" },
@@ -90,6 +91,7 @@ export default function Home() {
         time_to_payment: item.time_to_payment
           ? formatDate(item.time_to_payment)
           : "-",
+        faktur_date: item.faktur_date ? formatDate(item.faktur_date) : "-",
         shipping_cost: item.shipping_cost
           ? formatCurrency(item.shipping_cost)
           : "-",
