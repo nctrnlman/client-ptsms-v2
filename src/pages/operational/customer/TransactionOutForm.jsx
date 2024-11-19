@@ -21,6 +21,7 @@ export default function TransactionOutFrom() {
   const [totalTransaction, setTotalTransaction] = useState(0);
   const [formData, setFormData] = useState({
     noFaktur: "",
+    fakturDate: "",
     noPo: "",
     customerId: "",
     userId: userData.user_id,
@@ -95,6 +96,7 @@ export default function TransactionOutFrom() {
       );
       setFormData({
         noFaktur: "",
+        fakturDate: "",
         noPo: "",
         customerId: "",
         salesman: "",
@@ -281,6 +283,34 @@ export default function TransactionOutFrom() {
               {/* {errors.noFaktur && (
                 <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
               )} */}
+            </div>
+            {/* Faktur Date */}
+            <div>
+              <label
+                htmlFor="fakturDate"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Faktur Date<span className="text-red-500">*</span>
+              </label>
+              <Datepicker
+                id="fakturDate"
+                name="fakturDate"
+                // selected={formData.timeToPayment}
+                value={formData.fakturDate}
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, fakturDate: formattedDate });
+                }}
+                title="Faktur Date"
+                language="en"
+                labelTodayButton="Today"
+                labelClearButton="Clear"
+              />
+              {errors.fakturDate && (
+                <p className="text-red-500 text-sm pt-2">{errors.fakturDate}</p>
+              )}
             </div>
             {/* No PO */}
             <div>

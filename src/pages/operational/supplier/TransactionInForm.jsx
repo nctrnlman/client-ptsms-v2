@@ -21,6 +21,7 @@ export default function TransactionInForm() {
   const [formData, setFormData] = useState({
     noKita: "",
     noFaktur: "",
+    fakturDate: "",
     supplierId: "",
     paymentMethod: "",
     timeToPayment: "",
@@ -138,6 +139,7 @@ export default function TransactionInForm() {
         supplierId: "",
         paymentMethod: "",
         timeToPayment: "",
+        fakturDate: "",
         tax: "",
         note: "",
         userId: "",
@@ -162,6 +164,10 @@ export default function TransactionInForm() {
           noFaktur:
             error.response.data.errors.find(
               (error) => error.field === "noFaktur"
+            )?.message || "",
+          fakturDate:
+            error.response.data.errors.find(
+              (error) => error.field === "fakturDate"
             )?.message || "",
           supplierId:
             error.response.data.errors.find(
@@ -331,6 +337,34 @@ export default function TransactionInForm() {
               />
               {errors.noKita && (
                 <p className="text-red-500 text-sm pt-2">{errors.noKita}</p>
+              )}
+            </div>
+            {/* Faktur Date */}
+            <div>
+              <label
+                htmlFor="faktur_date"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Faktur Date<span className="text-red-500">*</span>
+              </label>
+              <Datepicker
+                id="faktur_date"
+                name="fakturDate"
+                value={formData.fakturDate}
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, fakturDate: formattedDate });
+                }}
+                title="Faktur Date"
+                language="en"
+                labelTodayButton="Today"
+                labelClearButton="Clear"
+                format="MM/dd/yyyy"
+              />
+              {errors.fakturDate && (
+                <p className="text-red-500 text-sm pt-2">{errors.fakturDate}</p>
               )}
             </div>
             {/* No Faktur */}

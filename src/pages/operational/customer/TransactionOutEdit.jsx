@@ -23,6 +23,7 @@ export default function TransactionOutEdit() {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     noFaktur: "",
+    fakturDate: "",
     noPo: "",
     customerId: "",
     salesman: "",
@@ -85,6 +86,7 @@ export default function TransactionOutEdit() {
       );
       setFormData({
         noFaktur: "",
+        fakturDate: "",
         noPo: "",
         customerId: "",
         salesman: "",
@@ -162,6 +164,7 @@ export default function TransactionOutEdit() {
       setFormData({
         ...formData,
         noFaktur: transactionDetail.transactionOut.no_faktur || "",
+        fakturDate: transactionDetail.transactionOut.faktur_date || "",
         noPo: transactionDetail.transactionOut.no_po || "",
         customerId: transactionDetail.transactionOut.customer_id || "",
         salesman: transactionDetail.transactionOut.salesman || "",
@@ -310,6 +313,36 @@ export default function TransactionOutEdit() {
                 <p className="text-red-500 text-sm pt-2">{errors.noFaktur}</p>
               )} */}
             </div>
+
+            {/* Delivery Date */}
+            <div>
+              <label
+                htmlFor="fakturDate"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Faktur Date
+              </label>
+              <Datepicker
+                id="fakturDate"
+                name="fakturDate"
+                // selected={formData.timeToPayment}
+                value={formData.fakturDate}
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, fakturDate: formattedDate });
+                }}
+                title="Faktur Date"
+                language="en"
+                labelTodayButton="Today"
+                labelClearButton="Clear"
+              />
+              {errors.fakturDate && (
+                <p className="text-red-500 text-sm pt-2">{errors.fakturDate}</p>
+              )}
+            </div>
+
             {/* No PO */}
             <div>
               <label

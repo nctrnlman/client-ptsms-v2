@@ -21,6 +21,7 @@ export default function TransactionInEdit() {
   const [formData, setFormData] = useState({
     noKita: "",
     noFaktur: "",
+    fakturDate: "",
     supplierId: "",
     paymentMethod: "",
     timeToPayment: "",
@@ -77,6 +78,7 @@ export default function TransactionInEdit() {
         ...formData,
         noKita: transactionDetail.transactionIn.no_kita || "",
         noFaktur: transactionDetail.transactionIn.no_faktur || "",
+        fakturDate: transactionDetail.transactionIn.faktur_date || "",
         noPo: transactionDetail.transactionIn.no_po || "",
         supplierId: transactionDetail.transactionIn.supplier_id || "",
         paymentMethod: transactionDetail.transactionIn.payment_method || "",
@@ -166,6 +168,7 @@ export default function TransactionInEdit() {
       setFormData({
         noKita: "",
         noFaktur: "",
+        fakturDate: "",
         supplierId: "",
         paymentMethod: "",
         timeToPayment: "",
@@ -338,6 +341,31 @@ export default function TransactionInEdit() {
                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-teal-500 focus:border-teal-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-teal-500 dark:focus:border-teal-500"
                 placeholder="No Faktur"
                 required
+              />
+            </div>
+            {/* Faktur Date */}
+            <div>
+              <label
+                htmlFor="faktur_date"
+                className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+              >
+                Faktur Date<span className="text-red-500">*</span>
+              </label>
+              <Datepicker
+                id="faktur_date"
+                name="fakturDate"
+                // selected={formData.timeToPayment}
+                value={formData.fakturDate || ""}
+                onSelectedDateChanged={(date) => {
+                  const formattedDate = new Date(date).toLocaleDateString(
+                    "en-CA"
+                  );
+                  setFormData({ ...formData, fakturDate: formattedDate });
+                }}
+                title="Faktur Date"
+                language="en"
+                labelTodayButton="Today"
+                labelClearButton="Clear"
               />
             </div>
             {/* Supplier */}
